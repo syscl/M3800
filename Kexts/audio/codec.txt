@@ -1,0 +1,141 @@
+Codec disassembly using:
+* http://forum.osxlatitude.com/index.php?/topic/1946-complete-applehda-patching-guide/
+* http://www.projectosx.com/forum/index.php?showtopic=465
+
+Codec:		Realtek ALC668
+Address: 	0
+Vendor Id: 	0x10ec0668 -> 283903592 decimal
+
+Node 0x12 [Pin Complex] -> Mic Phantom Jack
+Pin Default: 0x90a60130
+Pin Extracted: 30 01 a6 90
+
+Pathmap: 0x12 (18) -> 0x07 (7)
+
+Node 0x14 [Pin Complex] -> Speaker Playback Switch
+Connection: 3 (0x0c 0x0d* 0x0e)
+Pin Default: 0x90170110
+Pin Extracted: 10 01 17 90
+EAPD 0x02
+
+Pathmap: 0x14 (20) -> 0x0d (13) -> 0x03 (3)
+
+Node 0x15 [Pin Complex] -> Headphone Playback Switch
+Connection: 3 (0x0c* 0x0d 0x0e)
+Pin Default: 0x0321101f
+Pin Extracted: 1f 10 21 03
+EAPD 0x02
+
+Pathmap: 0x15 (21) -> 0x0c (12) -> 0x02 (2)
+
+Corrected config data:
+Int. Mic, NID 0x12:
+	01271c10 01271d01 01271ea0 01271f90
+	      |        |        |        |
+	      |        |        |        - Conn/Location: 10010000
+	      |        |        |            * Fixed function/built-in device (Bits 7:6 = 10)
+	      |        |        |            * Internal location (Bits 5:4 = 01)
+	      |        |        |            * Unknown location N/A (Bits 3:0 = 000)
+	      |        |        |
+	      |        |        - Mic in, Unknown connector
+	      |        - Color unknown, Jack detect disabled
+	      - Association 1, Sequence 0
+
+Int. Spk, NID 0x14:
+	01471c20 01471d01 01471e17 01471f90 01470c02
+	      |        |        |        |
+	      |        |        |        - Conn/Location: 10010000
+	      |        |        |            * Fixed function/built-in device (Bits 7:6 = 10)
+	      |        |        |            * Internal location (Bits 5:4 = 01)
+	      |        |        |            * Unknown location N/A (Bits 3:0 = 000)
+	      |        |        |
+	      |        |        - Spk, Other analog connector
+	      |        - Color unknown, Jack detect disabled
+	      - Association 2, Sequence 0
+
+Ext. HP,  0x15:
+	01571c30 01571d10 01571e21 01571f03 01570c02
+	      |        |        |        |
+	      |        |        |         - Conn/Location: 00000011
+	      |        |        |            * Port is connected to a jack (Bits 7:6 = 00)
+	      |        |        |            * External on primary chassis (Bits 5:4 = 00)
+	      |        |        |            * Location: left (Bits 3:0 = 011)
+	      |        |        |
+	      |        |        - Headphone Out, 1/8" stereo/mono connector
+	      |        - Color Black, Jack detect enabled
+	      - Association 3, Sequence 0
+
+Disabled 0x16:
+	01671cf0 01671d00 01671e00 01671f40
+	      |        |        |        |
+	      |        |        |        - Conn/Location: 01000000
+	      |        |        |            * No external port or physical connection (Bits 7:6 = 01)
+	      |        |        |            * N/A (Bits 5:4 = 00)
+	      |        |        |            * N/A (Bits 3:0 = 000)
+	      |        |        |
+	      |        |        - Line out, Unknown (Disabled)
+	      |        - Color Unknown, Jack detect enabled (Disabled)
+	      - Association f, Sequence 0 (Disabled)
+
+Disabled, NID 0x18:
+	01871cf0 01871d00 01871e00 01871f40
+Disabled, NID 0x19:
+	01971cf0 01971d00 01971e00 01971f40
+Disabled, NID 0x1a:
+	01a71cf0 01a71d00 01a71e00 01a71f40
+Disabled, NID 0x1b:
+	01b71cf0 01b71d00 01b71e00 01b71f40
+Disabled, NID 0x1d:
+	01d71cf0 01d71d00 01d71e00 01d71f40
+Disabled, NID 0x1e:
+	01e71cf0 01e71d00 01e71e00 01e71f40
+Disabled, NID 0x1f:
+	01f71cf0 01f71d00 01f71e00 01f71f40
+
+Connections:
+ 
+	Node 0x0b [Audio Mixer]
+	  Control: name="Beep Playback Volume", index=0, device=0
+	  Control: name="Beep Playback Switch", index=0, device=0
+	  Connection: 6
+		 0x18 0x19 0x1a 0x1b 0x1d 0x14
+	Node 0x0c [Audio Mixer]
+	  Connection: 2
+		 0x02 0x0b
+	Node 0x0d [Audio Mixer]
+	  Connection: 2
+		 0x03 0x0b
+	Node 0x0e [Audio Mixer]
+	  Connection: 2
+		 0x04 0x0b
+	Node 0x22 [Audio Mixer]
+	  Connection: 7
+		 0x18 0x19 0x1a 0x1b 0x1d 0x14 0x0b
+	Node 0x23 [Audio Mixer]
+	  Connection: 7
+		 0x18 0x19 0x1a 0x1b 0x1d 0x14 0x0b
+
+
+	Node 0x02 [Audio Output]
+	  Control: name="Headphone Playback Volume", index=0, device=0
+	  Device: name="ALC668 Analog", type="Audio", device=0
+	Node 0x03 [Audio Output]
+	  Control: name="Speaker Playback Volume", index=0, device=0
+	Node 0x04 [Audio Output]
+	Node 0x06 [Audio Output] Stereo Digital
+
+	Node 0x07 [Audio Input]
+	  Control: name="Capture Volume", index=0, device=0
+	  Control: name="Capture Switch", index=0, device=0
+	  Device: name="ALC668 Analog", type="Audio", device=0
+	  Connection: 1
+		 0x12
+	Node 0x08 [Audio Input]
+	  Connection: 1
+		 0x23
+	Node 0x09 [Audio Input]
+	  Connection: 1
+		 0x22
+	Node 0x0a [Audio Input]
+	  Connection: 1
+		 0x1f
