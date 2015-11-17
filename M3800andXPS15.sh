@@ -2,7 +2,7 @@
 
 #
 # syscl/lighting from PCBeta
-# merge for m3800 and xps15
+# merge for Dell Precision M3800 and XPS15 (9530)
 export LC_NUMERIC="en_US.UTF-8"
 
 # Bold / Non-bold
@@ -22,6 +22,17 @@ compile=${REPO}/DSDT/compile/
 tools=${REPO}/tools/
 raw=${REPO}/DSDT/raw
 prepare=${REPO}/DSDT/prepare
+
+#
+# Generate define directionaries
+#
+if [ ! -d "${prepare}" ];then
+mkdir "${prepare}"
+fi
+
+if [ ! -d "${compile}" ];then
+mkdir "${compile}"
+fi
 
 #
 # Define variables
