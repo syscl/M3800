@@ -35,6 +35,7 @@ if [[ $result -eq 0 && $HD -eq 0 ]];
         /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}" &> /dev/null
         /usr/libexec/plistbuddy -c "Print"  "${plist}" | grep "ig-platform-id = 0x0a260006" &> /dev/null && changestat=0 || changestat=1
         if [ $changestat == 0 ];then
+            sudo touch /System/Library/Extensions && sudo kextcache -u /
             echo "FINISH! REBOOT!"
         else
             echo "Failed, ensure ${esp}/EFI/CLOVER/config.plist has right config"
