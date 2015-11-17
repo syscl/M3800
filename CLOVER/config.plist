@@ -15,13 +15,6 @@
 			<key>ReuseFFFF</key>
 			<false/>
 		</dict>
-		<key>DropTables</key>
-		<array>
-			<dict>
-				<key>Signature</key>
-				<string>DMAR</string>
-			</dict>
-		</array>
 		<key>SSDT</key>
 		<dict>
 			<key>DropOem</key>
@@ -51,15 +44,17 @@
 	<key>Boot</key>
 	<dict>
 		<key>Arguments</key>
-		<string>nv_disable=1 kext-dev-mode=1</string>
+		<string>dart=0 nv_disable=1 kext-dev-mode=1</string>
 		<key>Debug</key>
 		<false/>
+		<key>DefaultVolume</key>
+		<string>Mackintosh HD</string>
 		<key>Legacy</key>
 		<string>LegacyBiosDefault</string>
 		<key>Secure</key>
 		<false/>
 		<key>Timeout</key>
-		<integer>10</integer>
+		<integer>5</integer>
 		<key>XMPDetection</key>
 		<false/>
 	</dict>
@@ -187,26 +182,6 @@
 		<array>
 			<dict>
 				<key>Comment</key>
-				<string>Enable 96MB BIOS, 34MB Framebuffer, 34MB Cursor for Azul framebuffer 0x0a260006</string>
-				<key>Find</key>
-				<data>BgAmCgEDAwMAAAACAAAwAQAAYAA=</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>BgAmCgEDAwMAAAAGAAAgAgAAIAI=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Bootloader Graphics - Second Stage Patch 2</string>
-				<key>Find</key>
-				<data>QYjE6xE=</data>
-				<key>Name</key>
-				<string>IOGraphicsFamily</string>
-				<key>Replace</key>
-				<data>QYjE6zE=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Enable USB3 after wake for Intel 8 series chipset</string>
 				<key>Find</key>
 				<data>xoDIAAAAAQ==</data>
@@ -214,46 +189,6 @@
 				<string>AppleUSBXHCI</string>
 				<key>Replace</key>
 				<data>xoDIAAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #3</string>
-				<key>Find</key>
-				<data>hBnUEQ==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>aAbsEA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #2</string>
-				<key>Find</key>
-				<data>hQjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable TRIM support for non-Apple SSD</string>
-				<key>Find</key>
-				<data>QVBQTEUgU1NEAA==</data>
-				<key>Name</key>
-				<string>IOAHCIBlockStorage</string>
-				<key>Replace</key>
-				<data>AAAAAAAAAAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #1</string>
-				<key>Find</key>
-				<data>hAjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -267,15 +202,100 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
+				<string>Enable Realtek ALC668 #1</string>
+				<key>Find</key>
+				<data>hAjsEA==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 #4</string>
+				<key>Find</key>
+				<data>hBnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>aAbsEA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 #3</string>
+				<key>Find</key>
+				<data>gxnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>AirPortBrcm4360 5ghz</string>
+				<key>Find</key>
+				<data>QYP8/3QsSA==</data>
+				<key>Name</key>
+				<string>AirPortBrcm4360</string>
+				<key>Replace</key>
+				<data>ZscGVVPrKw==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>IOBluetoothFamily - Continuity &amp; Hand-off</string>
 				<key>Find</key>
-				<data>i4eMAQAA</data>
+				<data>SIX/dEdIiwc=</data>
 				<key>Name</key>
 				<string>IOBluetoothFamily</string>
 				<key>Replace</key>
-				<data>uA8AAACQ</data>
+				<data>Qb4PAAAA60Q=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Bootloader Graphics - Second Stage Patch 2</string>
+				<key>Find</key>
+				<data>QYjE6xE=</data>
+				<key>Name</key>
+				<string>IOGraphicsFamily</string>
+				<key>Replace</key>
+				<data>QYjE6zE=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 #2</string>
+				<key>Find</key>
+				<data>hQjsEA==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a260006</string>
+				<key>Find</key>
+				<data>BgAmCgEDAwMAAAACAAAwAQAAYAA=</data>
+				<key>Name</key>
+				<string>AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>BgAmCgEDAwMAAAAIAAAAAwAAAAM=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable TRIM support for non-Apple SSD</string>
+				<key>Find</key>
+				<data>QVBQTEUgU1NEAA==</data>
+				<key>Name</key>
+				<string>IOAHCIBlockStorage</string>
+				<key>Replace</key>
+				<data>AAAAAAAAAAAAAA==</data>
 			</dict>
 		</array>
+	</dict>
+	<key>RtVariables</key>
+	<dict>
+		<key>CsrActiveConfig</key>
+		<string>0x03</string>
 	</dict>
 	<key>SMBIOS</key>
 	<dict>
@@ -289,6 +309,8 @@
 		<string>Mac-3CBD00234E554E41</string>
 		<key>BoardManufacturer</key>
 		<string>Apple Inc.</string>
+		<key>BoardSerialNumber</key>
+		<string>C02416?????FJRJ??</string>
 		<key>BoardType</key>
 		<integer>10</integer>
 		<key>ChassisAssetTag</key>
@@ -298,7 +320,7 @@
 		<key>ChassisType</key>
 		<string>08</string>
 		<key>Family</key>
-		<string>MacBook Pro</string>
+		<string>Macbook Pro</string>
 		<key>Manufacturer</key>
 		<string>Apple Inc.</string>
 		<key>Mobile</key>

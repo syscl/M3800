@@ -1,0 +1,49 @@
+
+Based on "Correction to operation of Immediate Verb mechanism" - December 8, 2005
+
+     
+    * Offset 60h: Immediate Command Output Interface - 32 bit register
+    
+     Bit 0-15 - Immediate Command Write (ICW):
+     The value written into this register is used as the verb to be sent out over the link when the ICB (ICS bit 0) is set to one (1).
+     Software must ensure that the ICB bit in the Immediate command Status register is clear before writing a value into this register or undefined behavior will result.
+     
+    * Offset 64h: Immediate Response Input Interface - 32 bit register
+
+     Bit 0-31 - Immediate Response Read (IRR):
+     The value in this register latches the last response to come in over the link.
+     If multiple codecs responded in the same frame, which one of the responses that will be saved is indeterminate. 
+     The codec’s address for the response that was latched is indicated in the ICRADD field of the Immediate Command Status register if the ICRADD field is implemented.
+     
+    * Offset 68h: Immediate Command Status - 16 bit register
+
+   - Bit 0 - Immediate Command Busy (ICB): 
+     This bit is a 0 when the controller can accept an immediate command.
+     Software must wait for this bit to be 0 before writing a value in the ICW register and may write this bit to a 0 if the bit fails to return to 0 after a reasonable timeout period. 
+     Writing to 0 is not permissible if the CORB is active.
+     
+     This bit will be clear (indicating “ready”) when the following conditions are met: 
+     (1) the link is running, 
+     (2) the CORB is not active (CORBRP = CORBWP or CORBEN is not set)
+     (3) there is not an immediate command already in the queue waiting to be sent.
+     
+     Writing this bit to 1 will cause the contents of the ICW register to be sent as a verb in the next frame. 
+     Once a response is received the IRV bit will be set and this bit will be cleared indicating ready to transmit another verb.
+    
+   - Bit 1 - Immediate Result Valid (IRV): This bit is set to a 1 by hardware when a new response is latched into the IRR register. 
+     Software must clear this bit before issuing a new command by writing a one to it so that the software may determine when a new response has arrived.
+
+    
+    
+Operation of Immediate Verb mechanism:
+     
+     The steps for PIO operation are as follows:
+     
+     (a) Software sets up the PIO verb to be sent out in the Immediate Command Output Register (ICW)
+     (b) Then software writes a “1” to Immediate Command Status ICB (bit 0 of ICS)
+     (c) HD Audio Controller sends out the PIO verb on the next frame and waits for response in following frame
+     (d) When response (in frame after PIO verb frame) is received the HD Audio controller sets the IRV (bit 1 of ICS) and clears ICB (bit 0 of ICS)
+     (e) Software polls for IRV (Bit 1 of ICS) being set, then the PIO verb response is read from the IRR register and the IRV is cleared by writing a 1 to it
+     
+     In the case where IRV bit is not set after a long delay, software should implement a timeout condition where the software clears the ICB bit 0 and then polls until ICB bit 0 returns to zero.
+
