@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# syscl/lighting from PCBeta
+# syscl/Yating Zhou/lighting from bbs.PCBeta.com
 # merge for Dell Precision M3800 and XPS15 (9530)
 export LC_NUMERIC="en_US.UTF-8"
 
@@ -40,7 +40,7 @@ fi
 #
 gProductVersion=""
 #
-# Choose ESP
+# Choose ESP by syscl/Yating
 #
 diskutil list
 read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
@@ -55,7 +55,7 @@ if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];then
 cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"
 else
 echo "Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
-exit 0
+exit 1
 fi
 #
 # Decompile dsdt
@@ -64,7 +64,7 @@ cd "${REPO}"
 
 "${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml
 
-# Search specification tables
+# Search specification tables by syscl/Yating Zhou 
 
 # DptfTa
 for num in $(seq 1 20)
@@ -125,12 +125,10 @@ echo "${BOLD}[sys] SMBus Fix${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_SMBUS.txt "${REPO}"/DSDT/raw/DSDT.dsl
 
 echo "${BOLD}[sys] OS Check Fix${OFF}"
-#"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_OSYS.txt "${REPO}"/DSDT/raw/DSDT.dsl
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system_OSYS.txt "${REPO}"/DSDT/raw/DSDT.dsl
 
 echo "${BOLD}[sys] AC Adapter Fix${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_ADP1.txt "${REPO}"/DSDT/raw/DSDT.dsl
-#"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system_AC.txt "${REPO}"/DSDT/raw/DSDT.dsl
 
 echo "${BOLD}[sys] Add MCHC${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_MCHC.txt "${REPO}"/DSDT/raw/DSDT.dsl
@@ -140,9 +138,6 @@ echo "${BOLD}[sys] Fix _WAK Arg0 v2${OFF}"
 
 echo "${BOLD}[sys] Add IMEI${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_IMEI.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-#echo "${BOLD}[sys] Fix PNOT/PPNT${OFF}"
-#"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_PNOT.txt "${REPO}"/DSDT/raw/DSDT.dsl
 
 echo "${BOLD}[sys] Fix Non-zero Mutex${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_Mutex.txt "${REPO}"/DSDT/raw/DSDT.dsl
@@ -235,14 +230,14 @@ rm "${compile}"SSDT-*x.aml
 
 
 #
-# Check if Clover is in place [syscl]
+# Check if Clover is in place [syscl/Yating Zhou]
 #
 if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
 #
 # Not installed
 #
     echo "Clover does not install on EFI, please reinstall Clover to EFI and try again."
-    exit 0
+    exit 1
 fi
 
 if [ ! -d /Volumes/EFI/EFI/CLOVER/ACPI/patched ];then
@@ -270,6 +265,10 @@ gOSVersion=$(echo ${gProductVersion:3:2} | tr -d '.')
 echo "\n"
 echo "Copying kexts to ${esp}/EFI/CLOVER/kexts/10.${gOSVersion}"
 cp -R "${REPO}/Kexts/"*.kext "/Volumes/EFI/EFI/CLOVER/kexts/10.${gOSVersion}"/
+
+#
+# Finish operation on Configuration on booting progress [syscl/Yating Zhou]
+#
 
 #
 # Install AppleHDA by darkvoid
@@ -319,87 +318,16 @@ sudo cp -r ./Kexts/audio/CodecCommander.kext /Library/Extensions
 echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
 
 #
-# Patch IOKit by darkvoid
+# Patch IOKit
 #
-iokit_md5=$(md5 -q "/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit")
-
 echo "${GREEN}[IOKit]${OFF}: Patching IOKit for maximum pixel clock"
 echo "${BLUE}[IOKit]${OFF}: Current IOKit md5 is ${BOLD}${iokit_md5}${OFF}"
-
-case $iokit_md5 in
-"2a8cbc2f6616d3f7a5e499bd2d5593ab")
-echo "         --> Yosemite 10.10.1 IOKit (${GREEN}unpatched${OFF})"
 sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "         Patched"
-;;
-"a94dc8e1b6bb6491e5f610f0a3caf960")
-echo "         --> Yosemite 10.10.2 IOKit (${GREEN}unpatched${OFF})"
-sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "         Patched"
-;;
-"29d7632362b2fa4993156717671a5642")
-echo "         --> Yosemite 10.10.3 / 10.10.4 IOKit (${GREEN}unpatched${OFF})"
-sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "         Patched"
-;;
-"15f9046ff25c807b7c76db8cdaf6ae4c")
-echo "         --> El Capitan 10.11 Beta 1 IOKit (${GREEN}unpatched${OFF})"
-sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "         Patched"
-;;
-"16e1320076417596176c919009f4b088")
-echo "         --> El Capitan 10.11 Beta 2 IOKit (${GREEN}unpatched${OFF})"
-sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "         Patched"
-;;
-"8756e20f979c9e74c80f07b452ebfadd")
-echo "         --> Yosemite 10.10.1 IOKit (${RED}patched, not signed${OFF})"
-;;
-"20849598dcfa1e8c59038d28e0ab5fd5")
-echo "         --> Yosemite 10.10.2 IOKit (${RED}patched, not signed${OFF})"
-;;
-"4bd81492fd13e905ef10719ef391e8a0")
-echo "         --> Yosemite 10.10.3 / 10.10.4 IOKit (${RED}patched, not signed${OFF})"
-;;
-"1ab7c0ec047d11f6b40798b6f0107c0c")
-echo "         --> El Capitan 10.11 Beta 1 IOKit (${RED}patched, not signed${OFF})"
-;;
-"080b614971777a0b7022f0c19ba58f9b")
-echo "         --> El Capitan 10.11 Beta 2 IOKit (${RED}patched, not signed${OFF})"
-;;
-"f834136d72126cc9479604879270d24f")
-echo "         --> Yosemite 10.10.1 IOKit (${RED}patched${OFF})"
-echo "         IOKit is already patched, no action taken."
-;;
-"9f99c861294afc3d643987782ce45e4f")
-echo "         --> Yosemite 10.10.2 IOKit (${RED}patched${OFF})"
-echo "         IOKit is already patched, no action taken."
-;;
-"a045c1ac523fece1f1b083b2c5ee842c"|"4c99100b36f37df4bdcc5dc4cd2b8237")
-echo "         --> Yosemite 10.10.3 / 10.10.4 IOKit (${RED}patched${OFF})"
-echo "         IOKit is already patched, no action taken."
-;;
-"e96a04420555b71bb0933e26773575bc")
-echo "         --> El Capitan 10.11 Beta 1 IOKit (${RED}patched${OFF})"
-echo "         IOKit is already patched, no action taken."
-;;
-"f0b2d73ac13c9211857af8707db9676d")
-echo "         --> El Capitan 10.11 Beta 1 IOKit (${RED}patched${OFF})"
-echo "         IOKit is already patched, no action taken."
-;;
-*)
-echo "         --> Unknown IOKit version (${RED}no action taken${OFF})"
-;;
-esac
 
 #
 # Patch end
 #
 
-echo "Rebuild caches by Kext Utility and reboot. Then run the Finalstep.sh to finish the installation"
-exit
+echo "Reboot OS X now. Then run the Finalstep.sh to finish the installation"
+exit 0
