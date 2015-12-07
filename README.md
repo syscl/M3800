@@ -8,7 +8,11 @@
 
 - Merge two scripts into one : easier to use than before.
 - Add permission for two kernel extensions to solve problem known as no audio after installation.
-- Boost the speed of the script
+- Boost the speed of the script.
+- Update VoodooPS2Controller.kext to 11-28.
+- Update CodecCommander.kext to 11-22.
+- Use BrcmBluetoothInjector.kext in place of BrcmPatchRAM.kext to drive bluetooth in a more precise way.
+- Remove ACPIBacklight.kext. 
 
 
 2015-11-17 
