@@ -333,7 +333,13 @@ sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
 echo "       --> ${BOLD}Installed AppleHDA_ALC668.kext to /Library/Extensions${OFF}"
 sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
 echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
-
+#
+# Repair the permission by syscl/Yating Zhou
+#
+sudo chmod -R 755 /Library/Extensions/Apple_ALC668.kext
+sudo chown -R root:wheel /Library/Extensions/Apple_ALC668.kext
+sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
+sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
 #
 # Patch IOKit
 #
@@ -383,4 +389,3 @@ exit -1
 fi
 
 exit 0
-
