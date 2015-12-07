@@ -336,8 +336,8 @@ echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OF
 #
 # Repair the permission by syscl/Yating Zhou
 #
-sudo chmod -R 755 /Library/Extensions/Apple_ALC668.kext
-sudo chown -R root:wheel /Library/Extensions/Apple_ALC668.kext
+sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
+sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
 sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
 sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
 #
