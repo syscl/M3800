@@ -7,7 +7,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>1.0.1, Copyright © 2000-2015 syscl/Yating Zhou. All Rights Reserved.</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.syscl.injector.USBXHCI-M3800</string>
+	<string>org.syscl.injector.USBXHCI</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
