@@ -387,5 +387,8 @@ fi
 else
 exit -1
 fi
-
+#
+# You fool: don't use <em>rm -rf </em> commands in a script!
+#
+rm ${REPO}/efi
 exit 0
