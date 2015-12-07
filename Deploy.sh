@@ -284,7 +284,7 @@ echo "Copying kexts to ${esp}/EFI/CLOVER/kexts/10.${gOSVersion}"
 cp -R "${REPO}/Kexts/"*.kext "/Volumes/EFI/EFI/CLOVER/kexts/10.${gOSVersion}"/
 
 #
-# Finish operation on Configuration on booting progress [syscl/Yating Zhou]
+# Finish operation of configuration on booting progress [syscl/Yating Zhou]
 #
 
 #
@@ -352,7 +352,7 @@ sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Curren
 # Patch end
 #
 
-echo "Reboot OS X now. Then run the Finalstep.sh to finish the installation"
+echo "Reboot OS X now. Then run the Deploy.sh again to finish the installation"
 exit 0
 #
 # Note: This "fi" is for the first "if" just to separate/make two step clear.
