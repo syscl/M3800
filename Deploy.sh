@@ -24,6 +24,13 @@ raw=${REPO}/DSDT/raw
 prepare=${REPO}/DSDT/prepare
 
 #
+# Decide which progress to finish [syscl/Yating]
+# Merge two step Initialstep.sh and Finalstep.sh into one.
+#
+# Note : This "if" is to make two steps clear.
+#
+if [ ! -f ${REPO}/efi ];then
+#
 # Generate define directionaries
 #
 if [ ! -d "${prepare}" ];then
@@ -55,7 +62,12 @@ if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];then
 cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"
 else
 echo "Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
-exit 1
+# ERROR.
+#
+# Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
+#       but we use -1 here to make it clear (obviously) that something went wrong.
+#
+exit -1
 fi
 #
 # Decompile dsdt
@@ -237,7 +249,12 @@ if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
 # Not installed
 #
     echo "Clover does not install on EFI, please reinstall Clover to EFI and try again."
-    exit 1
+# ERROR.
+#
+# Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
+#       but we use -1 here to make it clear (obviously) that something went wrong.
+#
+exit -1
 fi
 
 if [ ! -d /Volumes/EFI/EFI/CLOVER/ACPI/patched ];then
@@ -312,9 +329,9 @@ replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist |
 /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
 
 echo "       --> ${BOLD}Created AppleHDA_ALC668.kext${OFF}"
-sudo cp -r ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
+sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
 echo "       --> ${BOLD}Installed AppleHDA_ALC668.kext to /Library/Extensions${OFF}"
-sudo cp -r ./Kexts/audio/CodecCommander.kext /Library/Extensions
+sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
 echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
 
 #
@@ -331,3 +348,39 @@ sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Curren
 
 echo "Reboot OS X now. Then run the Finalstep.sh to finish the installation"
 exit 0
+#
+# Note: This "fi" is for the first "if" just to separate/make two step clear.
+#
+fi
+
+#
+# Finalstep.sh : lead to lid wake
+#
+
+#
+# Detect whether the QE/CI is enabled [syscl/Yating Zhou]
+#
+kextstat |grep -y Azul &> /dev/null && result=0 || result=1
+kextstat |grep -y HD5000 &> /dev/null && HD=0 || HD=1
+
+if [[ $result -eq 0 && $HD -eq 0 ]];
+then
+echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
+esp=$(grep "dev" "${REPO}"/efi)
+diskutil mount ${esp}
+plist=/Volumes/EFI/EFI/CLOVER/config.plist
+/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}" &> /dev/null
+/usr/libexec/plistbuddy -c "Print"  "${plist}" | grep "ig-platform-id = 0x0a260006" &> /dev/null && changestat=0 || changestat=1
+if [ $changestat == 0 ];then
+sudo touch /System/Library/Extensions && sudo kextcache -u /
+echo "FINISH! REBOOT!"
+else
+echo "Failed, ensure ${esp}/EFI/CLOVER/config.plist has right config"
+echo "Try the script again!"
+fi
+else
+exit -1
+fi
+
+exit 0
+
