@@ -23,6 +23,25 @@ tools=${REPO}/tools/
 raw=${REPO}/DSDT/raw
 prepare=${REPO}/DSDT/prepare
 
+# Sync all files from https://github.com/syscl/M3800
+
+# Check if github is available
+timeout=5
+# Define target website
+target_website=https://github.com/syscl/M3800
+
+# Detect whether the website is available
+echo Please wait ...
+echo Updating ...
+ret_code=`curl -I -s --connect-timeout $timeout $target_website -w %{http_code} | tail -n1`
+
+if [ "x$ret_code" = "x200" ]; then
+cd ${REPO}
+git pull
+else
+echo https://github.com/syscl/M3800 is not available at this time
+echo Relink again.
+fi
 #
 # Decide which progress to finish [syscl/Yating]
 # Merge two step Initialstep.sh and Finalstep.sh into one.
