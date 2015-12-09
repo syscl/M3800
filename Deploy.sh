@@ -41,6 +41,10 @@ if [ ! -d "${compile}" ];then
 mkdir "${compile}"
 fi
 
+if [ ! -d "${precompile}" ];then
+mkdir "${precompile}"
+fi
+
 #
 # Define variables
 # Gvariables stands for getting datas from OS X
@@ -229,11 +233,11 @@ cp "${raw}"/SSDT-*.aml "$compile"
 # Finish rest progress
 cp "${raw}/"*.dsl "${precompile}"
 
-${tool}iasl -vr -w1 -ve -p "${compile}"DSDT.aml "${precompile}"DSDT.dsl &> ./installation.log
-${tool}iasl -vr -w1 -ve -p "${compile}"${DptfTa}.aml "${precompile}"${DptfTa}.dsl &> ./installation.log
-${tool}iasl -vr -w1 -ve -p "${compile}"${SaSsdt}.aml "${precompile}"${SaSsdt}.dsl &> ./installation.log
-${tool}iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl &> ./installation.log
-${tool}iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl &> ./installation.log
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"DSDT.aml "${precompile}"DSDT.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${DptfTa}.aml "${precompile}"${DptfTa}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SaSsdt}.aml "${precompile}"${SaSsdt}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl
 
 cp "${prepare}"/*.aml "${compile}"
 rm "${compile}"SSDT-*x.aml
