@@ -272,43 +272,23 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>HDMI-audio, port 0105, 0x0a2e0008, 0x0a16000c, 0x0a2e000d, 0x0a26000d</string>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
+				<string>Replace Intel HDMI audio ID #1</string>
 				<key>Find</key>
-				<data>AQUJAAAEAAAHAQAA</data>
+				<data>PQsMAAA=</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
 				<key>Replace</key>
-				<data>AQUJAAAIAAAHAQAA</data>
+				<data>PQwMAAA=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>HDMI-audio, port 0204, 0x0a2e0008, 0x0a16000c, 0x0a2e000d, 0x0a26000d</string>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
+				<string>Replace Intel HDMI audio ID #2</string>
 				<key>Find</key>
-				<data>AgQJAAAEAAAHAQAA</data>
-				<key>Replace</key>
-				<data>AgQJAAAIAAAHAQAA</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>HDMI-audio, port 0105(12), 0x0a2e0008, 0x0a16000c, 0x0a2e000d, 0x0a26000d</string>
+				<data>PQwKAAA=</data>
 				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Find</key>
-				<data>AQUJAAAEAAAHAQAA</data>
+				<string>AppleHDAController</string>
 				<key>Replace</key>
-				<data>AQUSAAAIAAAHAQAA</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>HDMI-audio, port 0204(12), 0x0a2e0008, 0x0a16000c, 0x0a2e000d, 0x0a26000d</string>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Find</key>
-				<data>AgQJAAAEAAAHAQAA</data>
-				<key>Replace</key>
-				<data>AgQSAAAIAAAHAQAA</data>
+				<data>PQwMAAA=</data>
 			</dict>
 		</array>
 	</dict>
