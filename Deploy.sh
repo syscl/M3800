@@ -426,18 +426,15 @@ else
 #
 # Detect whether the QE/CI is enabled [syscl/Yating Zhou]
 #
-kextstat |grep -y Azul &> /dev/null && result=0 || result=1
-kextstat |grep -y HD5000 &> /dev/null && HD=0 || HD=1
-
-if [[ $result -eq 0 && $HD -eq 0 ]];
+if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
 echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
 esp=$(grep "dev" "${REPO}"/efi)
 diskutil mount ${esp}
 plist=/Volumes/EFI/EFI/CLOVER/config.plist
-/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}" &> /dev/null
-/usr/libexec/plistbuddy -c "Print"  "${plist}" | grep "ig-platform-id = 0x0a260006" &> /dev/null && changestat=0 || changestat=1
-if [ $changestat == 0 ];then
+/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"
+if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
+then
 sudo touch /System/Library/Extensions && sudo kextcache -u /
 echo "FINISH! REBOOT!"
 else
