@@ -20,6 +20,7 @@
 #  ASUS F551CA Bios rev. 207
 #  ASUS S551LB VivoBook
 #  ASUS ZenBook UX32VD
+#  ASUS ZenBook UX32V
 #  ASUS F550L-X455H
 #  ASUS X53S
 #  ASUS K550JD-XX003H
@@ -27,6 +28,8 @@
 #  ASUS K56CB
 #  ASUS UX305
 #  ASUS N550LF (per gabberZ)
+#  ASUS TP300LA
+#  ASUS X200LA
 
 into method label B1B2 remove_entry;
 into definitionblock code_regex . insert
@@ -267,3 +270,15 @@ into_all method label _BIX code_regex \(\^\^LPCB\.EC0\.B1C3, replaceall_matched 
 
 #into_all method label _BIX remove_entry;
 
+#fix logic error in some newer ASUS DSDTs (issue #23)
+into method label FBST code_regex If\s\(CHGS\s\(Zero\)\)[\s]+\{[\s]+Store\s\(0x02,\sLocal0\)[\s]+\}[\s]+Else[\s]+\{[\s]+Store\s\(One,\sLocal0\)[\s]+\} replaceall_matched
+begin
+If (CHGS (Zero))\n
+{\n
+    Store (0x02, Local0)\n
+}\n
+Else\n
+{\n
+    Store (Zero, Local0)\n
+}
+end;

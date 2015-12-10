@@ -17,6 +17,8 @@
 #  ASUS N551 (per shutt1e)
 #  ASUS T300LA-DH51T (per maromi)
 #  ASUS X551CA
+#  ASUS G51Jx-a1 (per elkis75)
+#  ASUS A555LD
 
 #Convert 16 bit to 8 bit registers
 into device label EC0 code_regex TAH0,\s+16, replace_matched begin AH00,8,AH01,8, end;
@@ -179,3 +181,15 @@ into method label ECSB code_regex \(BDAT, replaceall_matched begin (RECB(0x1c,25
 into method label ECSB code_regex \(BDA2, replaceall_matched begin (RECB(0x44,256), end;
 into method label SMBR code_regex \(BDAT, replaceall_matched begin (RECB(0x1c,256), end;
 
+#fix logic error in some newer ASUS DSDTs (issue #23)
+into method label FBST code_regex If\s\(CHGS\s\(Zero\)\)[\s]+\{[\s]+Store\s\(0x02,\sLocal0\)[\s]+\}[\s]+Else[\s]+\{[\s]+Store\s\(One,\sLocal0\)[\s]+\} replaceall_matched
+begin
+If (CHGS (Zero))\n
+{\n
+    Store (0x02, Local0)\n
+}\n
+Else\n
+{\n
+    Store (Zero, Local0)\n
+}
+end;

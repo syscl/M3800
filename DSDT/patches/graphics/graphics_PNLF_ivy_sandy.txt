@@ -14,9 +14,11 @@
 #     http://www.tonymacx86.com/hp-probook-mavericks/121031-native-brightness-working-without-blinkscreen-using-patched-applebacklight-kext.html
 # (also read any linked threads)
 #
-#
 # Note: This patch should be applied to the DSDT or SSDT that defines
 # your integrated graphics device (always at _ADR 0x00020000)
+#
+# This patch works for both Sandy Bridge and Ivy Bridge graphics.
+# also reported to work with graphics prior to Sandy Bridge (eg. Arrandale)
 #
 
 into_all device label PNLF remove_entry;
@@ -65,12 +67,15 @@ Device (PNLF)\n
     // KMAX: defines the unscaled range in the _BCL table below\n
     Name (KMAX, 0x710)\n
     // KPCH: saved value for PCHL\n
-    Name(KPCH, 0)\n
+    //   use Ones if PCHL does not need to be set (normal)\n
+    //   use Zero if your laptop nees PCHL set on every brightness set\n
+    //   you can also use a custom value (not Ones, not Zero)\n
+    Name(KPCH, Ones)\n
     // _INI deals with differences between native setting and desired\n
     Method (_INI, 0, NotSerialized)\n
     {\n
         // save value of PCHL for later\n
-        Store(PCHL, KPCH)\n
+        If (LNot(KPCH)) { Store(PCHL, KPCH) }\n
         // determine LMAX to use\n
         If (LNot(LMAX)) { Store(ShiftRight(LEVX,16), LMAX) }\n
         If (LNot(LMAX)) { Store(KMAX, LMAX) }\n
@@ -110,7 +115,7 @@ Device (PNLF)\n
     Method (_BCM, 1, NotSerialized)\n
     {\n
         // initialize for consistent backlight level before/after sleep\n
-        If (LNotEqual(PCHL, KPCH)) { Store(KPCH, PCHL) }\n
+        If (LAnd(LNotEqual(KPCH, Ones),LNotEqual(PCHL, KPCH))) { Store(KPCH, PCHL) }\n
         If (LNotEqual(LEVW, 0x80000000)) { Store (0x80000000, LEVW) }\n
         If (LNotEqual(LEVX, KLVX)) { Store (KLVX, LEVX) }\n
         // store new backlight level\n
@@ -136,7 +141,7 @@ Device (PNLF)\n
     Method (XBCM, 1, NotSerialized)\n
     {\n
         // initialize for consistent backlight level before/after sleep\n
-        If (LNotEqual(PCHL, KPCH)) { Store(KPCH, PCHL) }\n
+        If (LAnd(LNotEqual(KPCH, Ones),LNotEqual(PCHL, KPCH))) { Store(KPCH, PCHL) }\n
         If (LNotEqual(LEVW, 0x80000000)) { Store (0x80000000, LEVW) }\n
         If (LNotEqual(LEVX, KLVX)) { Store (KLVX, LEVX) }\n
         // store new backlight level\n
@@ -154,6 +159,7 @@ Device (PNLF)\n
     }\n
     // Set XOPT bit 0 to disable smooth transitions\n
     // Set XOPT bit 1 to wait for native BacklightHandler\n
+    // Set XOPT bit 2 to force use of native BacklightHandler\n
     Name (XOPT, 0x02)\n
     // XRGL/XRGH: defines the valid range\n
     Name (XRGL, 40)\n

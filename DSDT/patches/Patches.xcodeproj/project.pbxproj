@@ -124,6 +124,7 @@
 		84F782711916F08B0096E38E /* graphics_Rename-VID_AGP1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_Rename-VID_AGP1.txt"; path = "graphics/graphics_Rename-VID_AGP1.txt"; sourceTree = "<group>"; };
 		84F8BB9D1806D4A800BD0774 /* audio_HDEF-layout12.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "audio_HDEF-layout12.txt"; path = "audio/audio_HDEF-layout12.txt"; sourceTree = "<group>"; };
 		84FEF29C196D8B7D0061DF5A /* fix_PARSEOP_ZERO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = fix_PARSEOP_ZERO.txt; path = syntax/fix_PARSEOP_ZERO.txt; sourceTree = "<group>"; };
+		ED01642F1BEE6038008B1949 /* battery_HP-DV2-2500.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_HP-DV2-2500.txt"; path = "battery/battery_HP-DV2-2500.txt"; sourceTree = "<group>"; };
 		ED0EC5E41A01E9880021AD90 /* graphics_HD4600_yosemite.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = graphics_HD4600_yosemite.txt; path = graphics/graphics_HD4600_yosemite.txt; sourceTree = "<group>"; };
 		ED1646481A94E21C00D2D49B /* battery_Lenovo-E430.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Lenovo-E430.txt"; path = "battery/battery_Lenovo-E430.txt"; sourceTree = "<group>"; };
 		ED1EDC921B051A2F00EFA50B /* battery_Acer-Aspire-5741g.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Acer-Aspire-5741g.txt"; path = "battery/battery_Acer-Aspire-5741g.txt"; sourceTree = "<group>"; };
@@ -142,10 +143,13 @@
 		ED8F121A1B4DB5D5007ADCA9 /* system_OSYS_win7.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = system_OSYS_win7.txt; path = system/system_OSYS_win7.txt; sourceTree = "<group>"; };
 		EDB15EEA1A34B10C009F0E21 /* graphics_PTS_WAK-disable.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_PTS_WAK-disable.txt"; path = "graphics/graphics_PTS_WAK-disable.txt"; sourceTree = "<group>"; };
 		EDB280191A3A21BD002C47E1 /* graphics_nvidia_laptop2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = graphics_nvidia_laptop2.txt; path = graphics/graphics_nvidia_laptop2.txt; sourceTree = "<group>"; };
+		EDB703891BAB9D49002AED96 /* audio_HDEF-layout3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "audio_HDEF-layout3.txt"; path = "audio/audio_HDEF-layout3.txt"; sourceTree = "<group>"; };
 		EDBC416D1AFAA14700F2C133 /* battery_Dell-XPS-14Z-L412Z.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Dell-XPS-14Z-L412Z.txt"; path = "battery/battery_Dell-XPS-14Z-L412Z.txt"; sourceTree = "<group>"; };
 		EDCCC2CB1A70148300C7301E /* battery_Lenovo-G50-70.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Lenovo-G50-70.txt"; path = "battery/battery_Lenovo-G50-70.txt"; sourceTree = "<group>"; };
 		EDCD54641A2E10550009F438 /* graphics_REG-disable.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_REG-disable.txt"; path = "graphics/graphics_REG-disable.txt"; sourceTree = "<group>"; };
 		EDCD54651A2E11EA0009F438 /* graphics_INI-disable.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_INI-disable.txt"; path = "graphics/graphics_INI-disable.txt"; sourceTree = "<group>"; };
+		EDCDC82A1BD1F90A00B4050C /* battery_HP_Envy_M4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = battery_HP_Envy_M4.txt; path = battery/battery_HP_Envy_M4.txt; sourceTree = "<group>"; };
+		EDD7C2F11BE1A7E6005C40AE /* battery_Dell-Inspiron-5548.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Dell-Inspiron-5548.txt"; path = "battery/battery_Dell-Inspiron-5548.txt"; sourceTree = "<group>"; };
 		EDDD15E51A72C7C80093ACE1 /* graphics_nvidia_gt520m.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = graphics_nvidia_gt520m.txt; sourceTree = "<group>"; };
 		EDE3BCB71B018ED700475630 /* fix_PSS.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = fix_PSS.txt; path = syntax/fix_PSS.txt; sourceTree = "<group>"; };
 		EDE3BCB81B018F8800475630 /* usb_prw_0x6d_xhc.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = usb_prw_0x6d_xhc.txt; path = usb/usb_prw_0x6d_xhc.txt; sourceTree = "<group>"; };
@@ -154,6 +158,7 @@
 		EDE3BCBB1B01904E00475630 /* graphics_Rename-B0D3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_Rename-B0D3.txt"; path = "graphics/graphics_Rename-B0D3.txt"; sourceTree = "<group>"; };
 		EDF0829E1A0BC52C00DD15A5 /* battery_Clevo-M860TU.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Clevo-M860TU.txt"; path = "battery/battery_Clevo-M860TU.txt"; sourceTree = "<group>"; };
 		EDFBE3951A3767DF00F61E48 /* graphics_SSDT-disable-cleanup.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "graphics_SSDT-disable-cleanup.txt"; path = "graphics/graphics_SSDT-disable-cleanup.txt"; sourceTree = "<group>"; };
+		EDFC30DB1C05097100370D17 /* battery_Alienware-m15x.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "battery_Alienware-m15x.txt"; path = "battery/battery_Alienware-m15x.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -256,6 +261,7 @@
 				ED1EDC921B051A2F00EFA50B /* battery_Acer-Aspire-5741g.txt */,
 				842F531717FB301B001CF33B /* battery_Acer-Aspire-5750g.txt */,
 				8436750118359126000618D0 /* battery_Acer-S7-391.txt */,
+				EDFC30DB1C05097100370D17 /* battery_Alienware-m15x.txt */,
 				843A1C9518A52A4C00DB6154 /* battery_ASUS-G75vw.txt */,
 				842F531817FB301B001CF33B /* battery_ASUS-N55SL.txt */,
 				EDF0829E1A0BC52C00DD15A5 /* battery_Clevo-M860TU.txt */,
@@ -264,6 +270,7 @@
 				842F531917FB301B001CF33B /* battery_Compaq-CQ60.txt */,
 				842525F519CDBD01009FA9D7 /* battery_Dell-Inspiron-13z.txt */,
 				ED2050221AD1124600E60CD2 /* battery_Dell-Inspiron-15-7xxx.txt */,
+				EDD7C2F11BE1A7E6005C40AE /* battery_Dell-Inspiron-5548.txt */,
 				ED5EDD851AF50EE4008F32DE /* battery_Dell-Studio-1558.txt */,
 				843D33E71832C37F00C347A4 /* battery_Dell-Vostro-15xx.txt */,
 				842F531A17FB301B001CF33B /* battery_Dell-XPS-13.txt */,
@@ -273,6 +280,7 @@
 				845A0C2419322B0F005001DE /* battery_Gateway-ID49C07u.txt */,
 				840D7594184398D500160A94 /* battery_Gigabyte-u2442N.txt */,
 				84C489F118B93BA200061EA3 /* battery_HP-DM4T-1000.txt */,
+				ED01642F1BEE6038008B1949 /* battery_HP-DV2-2500.txt */,
 				84F1901A187F66A700254761 /* battery_HP-DV6-3165sf.txt */,
 				8436A57519152CE7004E19A7 /* battery_HP-DV6t-6b00.txt */,
 				845E02D21846FE8000208D98 /* battery_HP-DV7-1120.txt */,
@@ -280,10 +288,11 @@
 				8484672A180F0C3600DD3D99 /* battery_HP-DV7-7xxx.txt */,
 				845B33B8182C17A1000F2476 /* battery_HP-Envy-14.txt */,
 				842108E9180F3E4300905120 /* battery_HP-Envy-17t.txt */,
+				842F531C17FB301B001CF33B /* battery_HP-Envy-DV6.txt */,
+				EDCDC82A1BD1F90A00B4050C /* battery_HP_Envy_M4.txt */,
 				8440626619C48B3400EAC8CF /* battery_HP-Folio-13-1010es.txt */,
 				842F531B17FB301B001CF33B /* battery_HP-G6-2221ss.txt */,
 				8427D28F188ECAD900AF8C9C /* battery_HP-G62-B13SL.txt */,
-				842F531C17FB301B001CF33B /* battery_HP-Envy-DV6.txt */,
 				84091BCF19CE1F4D00695D4C /* battery_HP-Pavilion-n012tx.txt */,
 				845AA66318871888007B305B /* battery_HP-ProBook-4x0s-G1.txt */,
 				84CD226F18246E1B0076EF62 /* battery_HP-ProBook-Generic.txt */,
@@ -375,6 +384,7 @@
 			children = (
 				84F8BB9D1806D4A800BD0774 /* audio_HDEF-layout12.txt */,
 				84B7DC531808792C00CAA692 /* audio_HDEF-layout12a.txt */,
+				EDB703891BAB9D49002AED96 /* audio_HDEF-layout3.txt */,
 			);
 			name = Audio;
 			sourceTree = "<group>";
