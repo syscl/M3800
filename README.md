@@ -3,6 +3,15 @@
 
 ### Change Log:
 
+2015-12-10
+
+- Added support for 1920*1080p model. (Don't worry about the progress, detection will be automatical.)
+- Refined scripts (Runing more smooth).
+- Easier to read.
+- Removed ACPIBacklight.kext in ~/M3800/CLOVER/Kexts/10.11
+- Minor bugs fixed.
+
+
 2015-12-9
 
 - Fixed iasl counld not find problem
