@@ -1,5 +1,5 @@
-###OS X on DELL M3800 and XPS15 (9530)
-======================================
+OS X on DELL M3800 and XPS15 (9530)
+====================================
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
