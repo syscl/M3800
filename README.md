@@ -1,7 +1,7 @@
-# M3800
+###OS X on DELL M3800 and XPS15 (9530)
+======================================
 
-
-### Change Log:
+* [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
 2015-12-10
 
@@ -10,6 +10,7 @@
 - Easier to read.
 - Removed ACPIBacklight.kext in ~/M3800/CLOVER/Kexts/10.11
 - Minor bugs fixed.
+- Revised README.md.
 
 
 2015-12-9
