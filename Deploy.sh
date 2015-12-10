@@ -378,16 +378,29 @@ sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
 sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
 sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
 sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
+
 #
-# Patch IOKit
+# Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
+# Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
+#
+echo "${BLUE}Note${OFF}: You need to change ${BOLD} System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED} ${BOLD}『128MB』${OFF}"
+if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
+then
+echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
+cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
+else
+echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
+#
+# Patch IOKit.
 #
 echo "${GREEN}[IOKit]${OFF}: Patching IOKit for maximum pixel clock"
 echo "${BLUE}[IOKit]${OFF}: Current IOKit md5 is ${BOLD}${iokit_md5}${OFF}"
 sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
+fi
 
 #
-# Patch end
+# Operation complete!
 #
 
 echo "Reboot OS X now. Then run the Deploy.sh again to finish the installation"
@@ -401,6 +414,15 @@ fi
 # Finalstep.sh : lead to lid wake
 #
 
+#
+# Note: Added this "if" to terminate the script if the model is 1920*1080
+#
+if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
+then
+echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
+echo "You do not need to run this script again since all the operations on your laptop have done!"
+exit 0
+else
 #
 # Detect whether the QE/CI is enabled [syscl/Yating Zhou]
 #
@@ -426,7 +448,11 @@ else
 exit -1
 fi
 #
-# You fool: don't use <em>rm -rf </em> commands in a script!
+# You fool: don't use <em>rm -rf</em> commands in a script!
 #
 rm ${REPO}/efi
+#
+# Note: this "fi" is just for termiante the script one
+#
+fi
 exit 0
