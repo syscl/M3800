@@ -1,15 +1,15 @@
-#audio_Intel_HD4600
+#graphics_Intel_HD4600
 
-into method label _DSM parent_label HDAU remove_entry;
-into device label HDAU insert
+into method label _DSM parent_adr 0x00020000 remove_entry;
+into device name_adr 0x00020000 insert
 begin
 Method (_DSM, 4, NotSerialized)\n
 {\n
     If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }\n
     Return (Package()\n
     {\n
+        "model", Buffer() { "Intel Iris Pro” },\n
         "hda-gfx", Buffer() { "onboard-1" },\n
-        "device-id", Buffer() { 0x0c, 0x0d, 0x0, 0x0 }\n
     })\n
 }\n
 end;

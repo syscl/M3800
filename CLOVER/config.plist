@@ -182,43 +182,13 @@
 		<array>
 			<dict>
 				<key>Comment</key>
-				<string>Enable USB3 after wake for Intel 8 series chipset</string>
+				<string>IOBluetoothFamily - Continuity &amp; Hand-off</string>
 				<key>Find</key>
-				<data>xoDIAAAAAQ==</data>
+				<data>SIXAdFwPt0gQg8kEg/kGdVBIiw==</data>
 				<key>Name</key>
-				<string>AppleUSBXHCI</string>
+				<string>IOBluetoothFamily</string>
 				<key>Replace</key>
-				<data>xoDIAAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable eDP port 0x00, HDMI port 0x05 for Azul framebuffer 0x0a260006</string>
-				<key>Find</key>
-				<data>AAAIAAIAAAAwAAAAAQUJAAAEAACHAAAA</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>AAAIAAQAAAAwAAAAAQUJAAAIAACHAAAA</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #1</string>
-				<key>Find</key>
-				<data>hAjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #4</string>
-				<key>Find</key>
-				<data>hBnUEQ==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>aAbsEA==</data>
+				<data>PsaDvAIAAAJBvg8AAADpTgAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -232,39 +202,19 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>AirPortBrcm4360 5ghz</string>
+				<string>Boot graphics glitch, 10.10.x/10.11.x (credit lisai9093, cecekpawon)</string>
 				<key>Find</key>
-				<data>QYP8/3QsSA==</data>
-				<key>Name</key>
-				<string>AirPortBrcm4360</string>
-				<key>Replace</key>
-				<data>ZscGVVPrKw==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>IOBluetoothFamily - Continuity &amp; Hand-off</string>
-				<key>Find</key>
-				<data>SIX/dEdIiwc=</data>
-				<key>Name</key>
-				<string>IOBluetoothFamily</string>
-				<key>Replace</key>
-				<data>Qb4PAAAA60Q=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Bootloader Graphics - Second Stage Patch 2</string>
-				<key>Find</key>
-				<data>QYjE6xE=</data>
+				<data>AQAAdRc=</data>
 				<key>Name</key>
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
-				<data>QYjE6zE=</data>
+				<data>AQAA6xc=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable Realtek ALC668 #2</string>
+				<string>Enable Realtek ALC668 #1</string>
 				<key>Find</key>
-				<data>hQjsEA==</data>
+				<data>hAjsEA==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
@@ -282,13 +232,53 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable TRIM support for non-Apple SSD</string>
+				<string>AirPortBrcm4360 5ghz</string>
 				<key>Find</key>
-				<data>QVBQTEUgU1NEAA==</data>
+				<data>QYP8/3QsSA==</data>
 				<key>Name</key>
-				<string>IOAHCIBlockStorage</string>
+				<string>AirPortBrcm4360</string>
 				<key>Replace</key>
-				<data>AAAAAAAAAAAAAA==</data>
+				<data>ZscGVVPrKw==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 #2</string>
+				<key>Find</key>
+				<data>hQjsEA==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable eDP port 0x00, HDMI port 0x05 for Azul framebuffer 0x0a260006</string>
+				<key>Find</key>
+				<data>AAAIAAIAAAAwAAAAAQUJAAAEAACHAAAA</data>
+				<key>Name</key>
+				<string>AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>AAAIAAQAAAAwAAAAAQUJAAAIAACHAAAA</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable USB3 after wake for Intel 8 series chipset</string>
+				<key>Find</key>
+				<data>xoDIAAAAAQ==</data>
+				<key>Name</key>
+				<string>disable:AppleUSBXHCI</string>
+				<key>Replace</key>
+				<data>xoDIAAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 #4</string>
+				<key>Find</key>
+				<data>hBnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>aAbsEA==</data>
 			</dict>
 		</array>
 	</dict>
@@ -310,7 +300,7 @@
 		<key>BoardManufacturer</key>
 		<string>Apple Inc.</string>
 		<key>BoardSerialNumber</key>
-		<string>C02416?????FJRJ??</string>
+		<string>C02K7SNAFD56A0CF3</string>
 		<key>BoardType</key>
 		<integer>10</integer>
 		<key>ChassisAssetTag</key>
@@ -320,7 +310,7 @@
 		<key>ChassisType</key>
 		<string>08</string>
 		<key>Family</key>
-		<string>Macbook Pro</string>
+		<string>MacBook Pro</string>
 		<key>Manufacturer</key>
 		<string>Apple Inc.</string>
 		<key>Mobile</key>
@@ -328,7 +318,7 @@
 		<key>ProductName</key>
 		<string>MacBookPro11,2</string>
 		<key>SerialNumber</key>
-		<string>C02L5QYSFD56</string>
+		<string>C02K7SNAFD56</string>
 		<key>Trust</key>
 		<false/>
 		<key>Version</key>

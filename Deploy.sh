@@ -211,7 +211,7 @@ echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
 
 
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics_Intel_HD4600.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
+"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/syscl_Iris_Pro.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
 
 echo "${BOLD}[gfx] Brightness fix (Haswell)${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics/graphics_PNLF_haswell.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
