@@ -258,7 +258,22 @@ cp "${raw}/"*.dsl "${precompile}"
 "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl
 "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl
 
-cp "${prepare}"/*.aml "${compile}"
+cp "${prepare}"/SSDT-rmne.aml "${compile}"
+#
+# Detect which SSDT for processor to be installed.
+#
+if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]]
+then
+echo "${BLUE}[PRgen]${OFF}: Intel ${BOLD}i7-4702HQ${OFF} processor found"
+cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml
+fi
+
+if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
+then
+echo "${BLUE}[PRgen]${OFF}: Intel ${BOLD}i7-4712HQ${OFF} processor found"
+cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml
+fi
+
 rm "${compile}"SSDT-*x.aml
 
 ##################################
