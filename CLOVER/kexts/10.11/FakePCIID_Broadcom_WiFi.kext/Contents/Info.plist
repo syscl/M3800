@@ -3,23 +3,27 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>14E46</string>
+	<string>15B42</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.rehabman.injector.FakePCIID-BCM94352Z-as-BCM94360CS2</string>
+	<string>org.rehabman.injector.FakePCIID-Broadcom-WiFi</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>FakePCIID_BCM94352Z_as_BCM94360CS2</string>
+	<string>FakePCIID_Broadcom_WiFi</string>
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.2.0</string>
+	<string>1.2.3</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1.2.0</string>
+	<string>1.2.3</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>6E35b</string>
+	<string>7B1005</string>
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
@@ -27,9 +31,9 @@
 	<key>DTSDKName</key>
 	<string>macosx10.6</string>
 	<key>DTXcode</key>
-	<string>0640</string>
+	<string>0711</string>
 	<key>DTXcodeBuild</key>
-	<string>6E35b</string>
+	<string>7B1005</string>
 	<key>IOKitPersonalities</key>
 	<dict>
 		<key>Airport_Brcm4360</key>
@@ -91,10 +95,6 @@
 			</array>
 			<key>IOProviderClass</key>
 			<string>IOPCIDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>FakePCIID_BCM94352Z_as_BCM94360CS2 1.2.0</string>
 		</dict>
 		<key>Broadcom FakePCIID WiFi 43a0</key>
 		<dict>
@@ -125,16 +125,11 @@
 			<string>FakePCIID</string>
 			<key>IONameMatch</key>
 			<array>
-				<string>pci14e4,43a0</string>
 				<string>pci14e4,4357</string>
 				<string>pci14e4,43b1</string>
 			</array>
 			<key>IOProviderClass</key>
 			<string>IOPCIDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>FakePCIID_BCM94352Z_as_BCM94360CS2 1.2.0</string>
 		</dict>
 		<key>Broadcom FakePCIID WiFi no device-id</key>
 		<dict>
@@ -161,19 +156,15 @@
 			<string>FakePCIID</string>
 			<key>IONameMatch</key>
 			<array>
+				<string>pci14e4,43a0</string>
 				<string>pci14e4,4331</string>
 				<string>pci14e4,4353</string>
 				<string>pci14e4,432b</string>
 				<string>pci14e4,43ba</string>
 				<string>pci14e4,43a3</string>
-				<string>pci14e4,43a0</string>
 			</array>
 			<key>IOProviderClass</key>
 			<string>IOPCIDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>FakePCIID_BCM94352Z_as_BCM94360CS2 1.2.0</string>
 		</dict>
 	</dict>
 	<key>OSBundleRequired</key>
