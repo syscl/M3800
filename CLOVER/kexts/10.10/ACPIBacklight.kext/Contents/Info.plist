@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>14E46</string>
+	<string>14F27</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
@@ -17,15 +17,19 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.0.1d2</string>
+	<string>3.0.4</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>3.0.1d2</string>
+	<string>3.0.4</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>6E35b</string>
+	<string>7A1001</string>
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
@@ -33,9 +37,9 @@
 	<key>DTSDKName</key>
 	<string>macosx10.8</string>
 	<key>DTXcode</key>
-	<string>0640</string>
+	<string>0701</string>
 	<key>DTXcodeBuild</key>
-	<string>6E35b</string>
+	<string>7A1001</string>
 	<key>IOKitPersonalities</key>
 	<dict>
 		<key>ACPIBacklight</key>
@@ -69,10 +73,6 @@
 			<integer>3000</integer>
 			<key>IOProviderClass</key>
 			<string>IOACPIPlatformDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>ACPIBacklight 3.0.1d2</string>
 		</dict>
 		<key>Haswell Broadwell Handler</key>
 		<dict>
@@ -88,10 +88,6 @@
 			<integer>4000</integer>
 			<key>IOProviderClass</key>
 			<string>IOPCIDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>ACPIBacklight 3.0.1d2</string>
 			<key>kFrameBufferType</key>
 			<integer>2</integer>
 		</dict>
@@ -109,10 +105,6 @@
 			<integer>4000</integer>
 			<key>IOProviderClass</key>
 			<string>IOPCIDevice</string>
-			<key>RM,Build</key>
-			<string>Release-RehabMan</string>
-			<key>RM,Version</key>
-			<string>ACPIBacklight 3.0.1d2</string>
 			<key>kFrameBufferType</key>
 			<integer>1</integer>
 		</dict>
