@@ -5,8 +5,9 @@ OS X on DELL M3800 and XPS15 (9530)
 
 2015-12-23
 
--Added new Touchpad/Trackpad driver with zoom for M3800/XPS9530.
--Removed VoodooPS2Controller.kext to avoid function abnormally in some special case.
+- Added new Touchpad/Trackpad driver with zoom for M3800/XPS9530.
+- Removed VoodooPS2Controller.kext to avoid function abnormally in some special case.
+- Fixed typo in README.md.
 
 
 2015-12-10
