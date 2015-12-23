@@ -3,6 +3,12 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2015-12-23
+
+-Added new Touchpad/Trackpad driver with zoom for M3800/XPS9530.
+-Removed VoodooPS2Controller.kext to avoid function abnormally in some special case.
+
+
 2015-12-10
 
 - Added support for 1920*1080p model. (Don't worry about the progress, detection will be automatical.)
