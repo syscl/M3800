@@ -2,20 +2,26 @@
 
 #
 # syscl/Yating Zhou/lighting from bbs.PCBeta.com
-# merge for Dell Precision M3800 and XPS15 (9530)
+# Merge for Dell Precision M3800 and XPS15 (9530).
+#
 export LC_NUMERIC="en_US.UTF-8"
-
-# Bold / Non-bold
+#
+# Display style setting.
+#
 BOLD="\033[1m"
 RED="\033[0;31m"
 GREEN="\033[0;32m"
 BLUE="\033[1;34m"
 OFF="\033[m"
 
+#
 # Repository location
+#
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+#
 # Define place
+#
 decompile=${REPO}/DSDT/raw/
 precompile=${REPO}/DSDT/precompile/
 compile=${REPO}/DSDT/compile/
@@ -23,11 +29,17 @@ tools=${REPO}/tools/
 raw=${REPO}/DSDT/raw
 prepare=${REPO}/DSDT/prepare
 
+#
 # Sync all files from https://github.com/syscl/M3800
+#
 
+#
 # Check if github is available
+#
 timeout=5
+#
 # Define target website
+#
 target_website=https://github.com/syscl/M3800
 
 # Detect whether the website is available
