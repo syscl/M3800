@@ -8,6 +8,7 @@ OS X on DELL M3800 and XPS15 (9530)
 - Added new Touchpad/Trackpad driver with zoom for M3800/XPS9530.
 - Removed VoodooPS2Controller.kext to avoid function abnormally in some special cases.
 - Fixed typo in README.md.
+- Updated sytle of README.md.
 
 
 2015-12-10
@@ -16,30 +17,30 @@ OS X on DELL M3800 and XPS15 (9530)
 - Refined scripts (Runing more smooth).
 - Easier to read.
 - Removed ACPIBacklight.kext in ~/M3800/CLOVER/Kexts/10.11
-- Minor bugs fixed.
+- Fixed minor bugs.
 - Revised README.md.
 
 
 2015-12-9
 
-- Fixed iasl counld not find problem
-- Add auto update function
+- Fixed iasl counld not find problem.
+- Added auto update function.
 
 
 2015-12-7 
 
-- Merge two scripts into one : easier to use than before.
-- Add permission for two kernel extensions to solve problem known as no audio after installation.
-- Boost the speed of the script.
-- Update VoodooPS2Controller.kext to 11-28.
-- Update CodecCommander.kext to 11-22.
-- Use BrcmBluetoothInjector.kext in place of BrcmPatchRAM.kext to drive bluetooth in a more precise way.
-- Remove ACPIBacklight.kext. 
+- Merged two scripts into one : easier to use than before.
+- Added permission for two kernel extensions to solve problem known as no audio after installation.
+- Boosted the speed of the script.
+- Updated VoodooPS2Controller.kext to 11-28.
+- Updated CodecCommander.kext to 11-22.
+- Used BrcmBluetoothInjector.kext in place of BrcmPatchRAM.kext to drive bluetooth in a more precise way.
+- Removed ACPIBacklight.kext. 
 
 
 2015-11-17 
 
-- Add A10 bios file and flash tools (AFU)
-- Bump version of Clover to v3320.
-- Remove "Scan Entiries ..." to boost the progress of booting operation system.
-- Config.plist updated
+- Added A10 bios file and flash tools (AFU).
+- Bumped version of Clover to v3320.
+- Removed "Scan Entiries ..." to boost the progress of booting operation system.
+- Updated Config.plist
