@@ -229,10 +229,10 @@ echo "${BOLD}[gfx] Brightness fix (Haswell)${OFF}"
 "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics/graphics_PNLF_haswell.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
 
 echo "${BOLD}Rename B0D3 to HDAU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/Kexts/audio_B0D3_HDAU.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
+"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/audio_B0D3_HDAU.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
 
 echo "${BOLD}Insert HDAU device${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/Kexts/audio_Intel_HD4600.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
+"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/audio_Intel_HD4600.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
 
 ########################
 # SgRef Patches
