@@ -52,7 +52,7 @@ cd ${REPO}
 git pull
 else
 echo https://github.com/syscl/M3800 is not available at this time
-echo Relink again.
+echo You can relink again next time.
 fi
 #
 # Decide which progress to finish [syscl/Yating]
@@ -399,7 +399,9 @@ echo "${BLUE}Note${OFF}: You need to change ${BOLD} System Agent (SA) Configurat
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
 echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
+echo "Updating configuration for 1920 x 1080p model, progress will finish instantly..."
 cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
+echo "Congratulations! All operation has been completed! Reboot OS X now. Then enjoy your OS X! --syscl PCBeta"
 else
 echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
 #
@@ -408,13 +410,12 @@ echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
 echo "${GREEN}[IOKit]${OFF}: Patching IOKit for maximum pixel clock"
 sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
+echo "Reboot OS X now. Then run the Deploy.sh again to finish the installation"
 fi
 
 #
 # Operation complete!
 #
-
-echo "Reboot OS X now. Then run the Deploy.sh again to finish the installation"
 exit 0
 #
 # Note: This "fi" is for the first "if" just to separate/make two step clear.
