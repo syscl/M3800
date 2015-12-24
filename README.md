@@ -5,8 +5,10 @@ OS X on DELL M3800 and XPS15 (9530)
 
 2015-12-24
 
-- Fixed typo that will casuse AUDIO do not work properly.
+- Fixed typo that will cause AUDIO do not work properly.
 - Added new installation guide and clean operation for model of 1920 x 1080p.
+- Updated new bluetooth drivers to solve failure of searching bluetooth devices in some cases for all platforms of OS X. 
+
 
 2015-12-23
 
