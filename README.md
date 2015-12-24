@@ -3,6 +3,11 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2015-12-24
+
+- Fixed typo that will casuse AUDIO do not work properly.
+- Added new installation guide and clean operation for model of 1920 x 1080p.
+
 2015-12-23
 
 - Added new Touchpad/Trackpad driver with zoom for M3800/XPS9530.
