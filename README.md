@@ -3,6 +3,11 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2015-12-25
+
+- Huge change in Deploy.sh, added function method to make the script easy to read, and yes, the script is faster than ever.
+
+
 2015-12-24
 
 - Fixed typo that will cause AUDIO do not work properly.
