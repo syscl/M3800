@@ -28,6 +28,11 @@ compile=${REPO}/DSDT/compile/
 tools=${REPO}/tools/
 raw=${REPO}/DSDT/raw
 prepare=${REPO}/DSDT/prepare
+#
+# Define variables
+# Gvariables stands for getting datas from OS X
+#
+gProductVersion=""
 
 #
 # Sync all files from https://github.com/syscl/M3800
@@ -54,6 +59,26 @@ else
 echo https://github.com/syscl/M3800 is not available at this time
 echo You can relink again next time.
 fi
+
+create_dir()
+{
+    if [ ! -d "$1" ];then
+    echo "${BLUE}[Creating directionary]${OFF}: $1"
+    mkdir "$1"
+    fi
+}
+
+patch_acpi()
+{
+    echo "${BLUE}[$2]${OFF} $3"
+    if [ "$2" == "syscl" ]
+    then
+    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$4.txt "${REPO}"/DSDT/raw/$1.dsl
+    else
+    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$2/$4.txt "${REPO}"/DSDT/raw/$1.dsl
+    fi
+}
+
 #
 # Decide which progress to finish [syscl/Yating]
 # Merge two step Initialstep.sh and Finalstep.sh into one.
@@ -62,25 +87,13 @@ fi
 #
 if [ ! -f ${REPO}/efi ];then
 #
-# Generate define directionaries
+# Generate define directories.
 #
-if [ ! -d "${prepare}" ];then
-mkdir "${prepare}"
-fi
+create_dir "${REPO}/DSDT"
+create_dir ${prepare}
+create_dir ${precompile}
+create_dir ${compile}
 
-if [ ! -d "${compile}" ];then
-mkdir "${compile}"
-fi
-
-if [ ! -d "${precompile}" ];then
-mkdir "${precompile}"
-fi
-
-#
-# Define variables
-# Gvariables stands for getting datas from OS X
-#
-gProductVersion=""
 #
 # Choose ESP by syscl/Yating
 #
@@ -90,6 +103,7 @@ echo "${targetEFI}"
 esp=$(echo "/${targetEFI}")
 echo /dev${esp} >${REPO}/efi
 diskutil mount /dev${esp}
+
 #
 # Copy origin aml to raw
 #
@@ -149,57 +163,27 @@ do
     fi
 done
 
-# DSDT Fix
+########################
+# Dsdt Patches
+########################
 
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/syntax/fix_PARSEOP_ZERO.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[syn] Fix ADBG Error${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/syntax/fix_ADBG.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[usb] 7-series/8-series USB${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/usb/usb_7-series.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[bat] Acer Aspire E1-571${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/battery/battery_Acer-Aspire-E1-571.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] IRQ Fix${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_IRQ.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] SMBus Fix${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_SMBUS.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] OS Check Fix${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system_OSYS.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] AC Adapter Fix${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_ADP1.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] Add MCHC${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_MCHC.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] Fix _WAK Arg0 v2${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_WAK2.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] Add IMEI${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_IMEI.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] Fix Non-zero Mutex${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/system/system_Mutex.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}[sys] Add Haswell LPC${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/misc/misc_Haswell-LPC.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}Kexts/audio Layout${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/Kexts/audio_HDEF-layout1.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}Rename B0D3 to HDAU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/Kexts/audio_B0D3_HDAU.txt "${REPO}"/DSDT/raw/DSDT.dsl
-
-echo "${BOLD}Remove GLAN device${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/DSDT.dsl "${REPO}"/DSDT/patches/remove_glan.txt "${REPO}"/DSDT/raw/DSDT.dsl
+patch_acpi DSDT syntax "Fix PARSEOP_ZERO" "fix_PARSEOP_ZERO"
+patch_acpi DSDT syntax "Fix ADBG Error" "fix_ADBG"
+patch_acpi DSDT graphics "Rename GFX0 to IGPU" "graphics_Rename-GFX0"
+patch_acpi DSDT usb "7-series/8-series USB" "usb_7-series"
+patch_acpi DSDT battery "Acer Aspire E1-571" "battery_Acer-Aspire-E1-571"
+patch_acpi DSDT system "IRQ Fix" "system_IRQ"
+patch_acpi DSDT system "SMBus Fix" "system_SMBUS"
+patch_acpi DSDT system "OS Check Fix" "system_OSYS"
+patch_acpi DSDT system "AC Adapter Fix" "system_ADP1"
+patch_acpi DSDT system "Add MCHC" "system_MCHC"
+patch_acpi DSDT system "Fix _WAK Arg0 v2" "system_WAK2"
+patch_acpi DSDT system "Add IMEI" "system_IMEI"
+patch_acpi DSDT system "Fix Non-zero Mutex" "system_Mutex"
+patch_acpi DSDT misc "Add Haswell LPC" "misc_Haswell-LPC"
+patch_acpi DSDT syscl "Add audio Layout 1" "audio_HDEF-layout1"
+patch_acpi DSDT syscl "Rename B0D3 to HDAU" "audio_B0D3_HDAU"
+patch_acpi DSDT syscl "Remove GLAN device" "remove_glan"
 
 ########################
 # DptfTa Patches
@@ -207,11 +191,8 @@ echo "${BOLD}Remove GLAN device${OFF}"
 
 echo "${BLUE}[${DptfTa}]${OFF}: Patching ${DptfTa}.dsl in "${REPO}"/DSDT/raw"
 
-echo "${BOLD}_BST package size${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${DptfTa}.dsl "${REPO}"/DSDT/patches/_BST-package-size.txt "${REPO}"/DSDT/raw/${DptfTa}.dsl
-
-echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${DptfTa}.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/${DptfTa}.dsl
+patch_acpi ${DptfTa} syscl "_BST package size" "_BST-package-size"
+patch_acpi ${DptfTa} graphics "Rename GFX0 to IGPU" "graphics_Rename-GFX0"
 
 ########################
 # SaSsdt Patches
@@ -219,20 +200,11 @@ echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
 
 echo "${BLUE}[${SaSsdt}]${OFF}: Patching ${SaSsdt}.dsl in "${REPO}"/DSDT/raw"
 
-echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
-
-
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/syscl_Iris_Pro.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
-
-echo "${BOLD}[gfx] Brightness fix (Haswell)${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/graphics/graphics_PNLF_haswell.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
-
-echo "${BOLD}Rename B0D3 to HDAU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/audio_B0D3_HDAU.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
-
-echo "${BOLD}Insert HDAU device${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SaSsdt}.dsl "${REPO}"/DSDT/patches/audio_Intel_HD4600.txt "${REPO}"/DSDT/raw/${SaSsdt}.dsl
+patch_acpi ${SaSsdt} graphics "Rename GFX0 to IGPU" "graphics_Rename-GFX0"
+patch_acpi ${SaSsdt} syscl "Rename HD4600 to Iris Pro" "syscl_Iris_Pro"
+patch_acpi ${SaSsdt} graphics "Brightness fix (Haswell)" "graphics_PNLF_haswell"
+patch_acpi ${SaSsdt} syscl "Rename B0D3 to HDAU" "audio_B0D3_HDAU"
+patch_acpi ${SaSsdt} syscl "Insert HDAU device" "audio_Intel_HD4600"
 
 ########################
 # SgRef Patches
@@ -240,8 +212,7 @@ echo "${BOLD}Insert HDAU device${OFF}"
 
 echo "${BLUE}[${SgRef}]${OFF}: Patching SSDT-13 in "${REPO}"/DSDT/raw"
 
-echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${SgRef}.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/${SgRef}.dsl
+patch_acpi ${SgRef} graphics "Rename GFX0 to IGPU" "graphics_Rename-GFX0"
 
 ########################
 # OptRef Patches
@@ -249,26 +220,18 @@ echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
 
 echo "${BLUE}[${OptRef}]${OFF}: Patching SSDT-15 in "${REPO}"/DSDT/raw"
 
-echo "${BOLD}Remove invalid operands${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${OptRef}.dsl "${REPO}"/DSDT/patches/WMMX-invalid-operands.txt "${REPO}"/DSDT/raw/${OptRef}.dsl
+patch_acpi ${OptRef} syscl "Remove invalid operands" "WMMX-invalid-operands"
+patch_acpi ${OptRef} graphics "Rename GFX0 to IGPU" "graphics_Rename-GFX0"
+patch_acpi ${OptRef} syscl "Disable Nvidia card (Non-operational in OS X)" "graphics_Disable_Nvidia"
 
-echo "${BOLD}[gfx] Rename GFX0 to IGPU${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${OptRef}.dsl "${REPO}"/DSDT/patches/graphics/graphics_Rename-GFX0.txt "${REPO}"/DSDT/raw/${OptRef}.dsl
-
-echo "${BOLD}Disable Nvidia card (Non-operational in OS X)${OFF}"
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/${OptRef}.dsl "${REPO}"/DSDT/patches/graphics_Disable_Nvidia.txt "${REPO}"/DSDT/raw/${OptRef}.dsl
-
-# Copy raw tables to compile
+########################
+# Compiling tables
+########################
+#
+# Copying raw tables to compile.
+#
+echo "${BLUE}[Copying]${OFF}: raw/untouch tables to compile..."
 cp "${raw}"/SSDT-*.aml "$compile"
-
-# Finish rest progress
-cp "${raw}/"*.dsl "${precompile}"
-
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"DSDT.aml "${precompile}"DSDT.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${DptfTa}.aml "${precompile}"${DptfTa}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SaSsdt}.aml "${precompile}"${SaSsdt}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl
 
 cp "${prepare}"/SSDT-rmne.aml "${compile}"
 #
@@ -286,6 +249,23 @@ echo "${BLUE}[PRgen]${OFF}: Intel ${BOLD}i7-4712HQ${OFF} processor found"
 cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml
 fi
 
+#
+# Copying all tables to precompile.
+#
+echo "${BLUE}[Copying]${OFF}: all tables to precompile..."
+cp "${raw}/"*.dsl "${precompile}"
+
+echo "${BLUE}[Compiling]${OFF}: touch tables to compile..."
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"DSDT.aml "${precompile}"DSDT.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${DptfTa}.aml "${precompile}"${DptfTa}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SaSsdt}.aml "${precompile}"${SaSsdt}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl
+"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl
+
+#
+# Clean up dynamic SSDTs.
+#
+echo "${BLUE}[Cleaning]${OFF}: dynamic SSDTs..."
 rm "${compile}"SSDT-*x.aml
 
 ##################################
@@ -386,11 +366,12 @@ echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OF
 #
 # Repair the permission by syscl/Yating Zhou
 #
+echo "Repairing kexts permission..."
 sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
 sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
 sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
 sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
-
+sudo touch /System/Library/Extensions && sudo kextcache -u /
 #
 # Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
 # Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
@@ -405,7 +386,7 @@ cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
 rm ${REPO}/efi
-echo "Congratulations! All operation has been completed! Reboot OS X now. Then enjoy your OS X! --syscl PCBeta"
+echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
 else
 echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
 #
@@ -414,7 +395,7 @@ echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
 echo "${GREEN}[IOKit]${OFF}: Patching IOKit for maximum pixel clock"
 sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "Reboot OS X now. Then run the Deploy.sh again to finish the installation"
+echo "Reboot now. Then run the Deploy.sh again to finish the installation"
 fi
 
 #
