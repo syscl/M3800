@@ -386,7 +386,7 @@ cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
-rm ${REPO}/efi
+rm ${REPO}/DSDT/efi
 echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
 else
 echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
