@@ -427,7 +427,7 @@ else
 if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
 echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
-diskutil mount `grep "disk" efi`
+diskutil mount `grep "disk" ./DSDT/efi`
 plist=/Volumes/EFI/EFI/CLOVER/config.plist
 /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"
 if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
@@ -444,7 +444,7 @@ fi
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
-rm ${REPO}/efi
+rm ${REPO}/DSDT/efi
 #
 # Note: this "fi" is just for termiante the script one
 #
