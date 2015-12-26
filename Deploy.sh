@@ -9,8 +9,8 @@ export LC_NUMERIC="en_US.UTF-8"
 # Display style setting.
 #
 BOLD="\033[1m"
-RED="\033[0;31m"
-GREEN="\033[0;32m"
+RED="\033[1;31m"
+GREEN="\033[1;32m"
 BLUE="\033[1;34m"
 OFF="\033[m"
 
@@ -22,12 +22,12 @@ REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 #
 # Define place
 #
-decompile=${REPO}/DSDT/raw/
-precompile=${REPO}/DSDT/precompile/
-compile=${REPO}/DSDT/compile/
-tools=${REPO}/tools/
-raw=${REPO}/DSDT/raw
-prepare=${REPO}/DSDT/prepare
+decompile="${REPO}/DSDT/raw/"
+precompile="${REPO}/DSDT/precompile/"
+compile="${REPO}/DSDT/compile/"
+tools="${REPO}/tools/"
+raw="${REPO}/DSDT/raw"
+prepare="${REPO}/DSDT/prepare"
 #
 # Define variables
 # Gvariables stands for getting datas from OS X
@@ -48,16 +48,13 @@ timeout=5
 target_website=https://github.com/syscl/M3800
 
 # Detect whether the website is available
-echo Please wait ...
-echo Updating ...
-ret_code=`curl -I -s --connect-timeout $timeout $target_website -w %{http_code} | tail -n1`
-
-if [ "x$ret_code" = "x200" ]; then
+echo "${GREEN}[Updating]${OFF} files from ${BLUE}${target_website}${OFF}"
+if [[ `curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code} | grep "Status"` == *"OK"* && `curl -I -s --connect-timeout $timeout $target_website -w %{http_code} | grep "Status"` == *"200"* ]]
+then
 cd ${REPO}
 git pull
 else
-echo https://github.com/syscl/M3800 is not available at this time
-echo You can relink again next time.
+echo "${RED}[Note]${OFF} ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
 fi
 
 create_dir()
@@ -79,30 +76,34 @@ patch_acpi()
     fi
 }
 
+compile_table()
+{
+    echo "${BLUE}[Compiling]${OFF}: $1.dsl"
+    "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
+}
+
 #
 # Decide which progress to finish [syscl/Yating]
 # Merge two step Initialstep.sh and Finalstep.sh into one.
 #
 # Note : This "if" is to make two steps clear.
 #
-if [ ! -f ${REPO}/efi ];then
+if [ ! -f ${REPO}/DSDT/efi ];then
 #
 # Generate define directories.
 #
 create_dir "${REPO}/DSDT"
-create_dir ${prepare}
-create_dir ${precompile}
-create_dir ${compile}
+create_dir "${prepare}"
+create_dir "${precompile}"
+create_dir "${compile}"
 
 #
 # Choose ESP by syscl/Yating
 #
 diskutil list
 read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
-echo "${targetEFI}"
-esp=$(echo "/${targetEFI}")
-echo /dev${esp} >${REPO}/efi
-diskutil mount /dev${esp}
+echo "${targetEFI}" >${REPO}/DSDT/efi
+diskutil mount ${targetEFI}
 
 #
 # Copy origin aml to raw
@@ -255,12 +256,15 @@ fi
 echo "${BLUE}[Copying]${OFF}: all tables to precompile..."
 cp "${raw}/"*.dsl "${precompile}"
 
-echo "${BLUE}[Compiling]${OFF}: touch tables to compile..."
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"DSDT.aml "${precompile}"DSDT.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${DptfTa}.aml "${precompile}"${DptfTa}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SaSsdt}.aml "${precompile}"${SaSsdt}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${SgRef}.aml "${precompile}"${SgRef}.dsl
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"${OptRef}.aml "${precompile}"${OptRef}.dsl
+########################
+# Compiling tables
+########################
+
+compile_table "DSDT"
+compile_table "${DptfTa}"
+compile_table "${SaSsdt}"
+compile_table "${SgRef}"
+compile_table "${OptRef}"
 
 #
 # Clean up dynamic SSDTs.
@@ -278,7 +282,7 @@ if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
 #
 # Not installed
 #
-    echo "Clover does not install on EFI, please reinstall Clover to EFI and try again."
+    echo "[${RED}NOTE${OFF}] Clover does not install on EFI, please reinstall Clover to EFI and try again."
 # ERROR.
 #
 # Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
@@ -287,9 +291,7 @@ if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
 exit -1
 fi
 
-if [ ! -d /Volumes/EFI/EFI/CLOVER/ACPI/patched ];then
-mkdir /Volumes/EFI/EFI/CLOVER/ACPI/patched
-fi
+create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"
 
 #
 # Copy AML to Destination Place
@@ -298,20 +300,19 @@ fi
 cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched
 
 #
-# Check OS generation
+# Gain OS generation
 #
 gProductVersion="$(sw_vers -productVersion)"
+OS_Version=$(echo ${gProductVersion:0:5})
+KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
 #
-# Gain generation of OS X
-#
-gOSVersion=$(echo ${gProductVersion:3:2} | tr -d '.')
-
-#
-# Copy KEXTs to Destiantion Place
+# Updating kexts. NOTE: This progress will remove any previous kexts.
 #
 echo "\n"
-echo "Copying kexts to ${esp}/EFI/CLOVER/kexts/10.${gOSVersion}"
-cp -R "${REPO}/Kexts/"*.kext "/Volumes/EFI/EFI/CLOVER/kexts/10.${gOSVersion}"/
+echo "[${GREEN}Updating${OFF}] kexts from ${target_website}"
+rm -R ${KEXT_DIR}
+cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/
+ls ./Kexts |grep "kext" |xargs -I{} cp -R ./Kexts/{} ${KEXT_DIR}/
 
 #
 # Finish operation of configuration on booting progress [syscl/Yating Zhou]
@@ -426,8 +427,7 @@ else
 if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
 echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
-esp=$(grep "dev" "${REPO}"/efi)
-diskutil mount ${esp}
+diskutil mount `grep "disk" efi`
 plist=/Volumes/EFI/EFI/CLOVER/config.plist
 /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"
 if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
@@ -435,7 +435,7 @@ then
 sudo touch /System/Library/Extensions && sudo kextcache -u /
 echo "FINISH! REBOOT!"
 else
-echo "Failed, ensure ${esp}/EFI/CLOVER/config.plist has right config"
+echo "Failed, ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config"
 echo "Try the script again!"
 fi
 else
