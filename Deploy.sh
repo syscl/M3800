@@ -404,9 +404,9 @@ fi
 #
 exit 0
 #
-# Note: This "fi" is for the first "if" just to separate/make two step clear.
+# Note: This "else" is for the first "if" just to separate/make two step clear.
 #
-fi
+else
 
 #
 # Finalstep.sh : lead to lid wake
@@ -446,7 +446,11 @@ fi
 #
 rm ${REPO}/DSDT/efi
 #
-# Note: this "fi" is just for termiante the script one
+# Note: this "fi" is just for 1920 x 1080p one
 #
 fi
+#
+# Note: this "fi" is just to terminate the whole "if".
+#
+
 exit 0
