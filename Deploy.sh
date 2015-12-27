@@ -60,14 +60,14 @@ fi
 create_dir()
 {
     if [ ! -d "$1" ];then
-    echo "${BLUE}[Creating directionary]${OFF}: $1"
+    echo "[${BLUE}Creating${OFF}] $1"
     mkdir "$1"
     fi
 }
 
 patch_acpi()
 {
-    echo "${BLUE}[$2]${OFF} $3"
+    echo "[${BLUE}$2${OFF}] $3"
     if [ "$2" == "syscl" ]
     then
     "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$4.txt "${REPO}"/DSDT/raw/$1.dsl
@@ -78,7 +78,7 @@ patch_acpi()
 
 compile_table()
 {
-    echo "${BLUE}[Compiling]${OFF}: $1.dsl"
+    echo "[${BLUE}Compiling${OFF}] $1.dsl"
     "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
 }
 
@@ -269,7 +269,7 @@ compile_table "${OptRef}"
 #
 # Clean up dynamic SSDTs.
 #
-echo "${BLUE}[Cleaning]${OFF}: dynamic SSDTs..."
+echo "[${GREEN}Cleaning${OFF}]: dynamic SSDTs..."
 rm "${compile}"SSDT-*x.aml
 
 ##################################
@@ -321,7 +321,7 @@ ls ./Kexts |grep "kext" |xargs -I{} cp -R ./Kexts/{} ${KEXT_DIR}/
 #
 # Install AppleHDA by darkvoid
 #
-echo "${GREEN}[HDA]${OFF}: Creating AppleHDA injection kernel extension for ${BOLD}ALC668${OFF}"
+echo "[${GREEN}Creating${OFF}] AppleHDA injection kernel extension for ${BOLD}ALC668${OFF}"
 cd "${REPO}"
 
 plist=./Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist
@@ -367,7 +367,7 @@ echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OF
 #
 # Repair the permission by syscl/Yating Zhou
 #
-echo "Repairing kexts permission..."
+echo "[${BLUE}Repairing${OFF}] kexts permission..."
 sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
 sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
 sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
@@ -377,10 +377,10 @@ sudo touch /System/Library/Extensions && sudo kextcache -u /
 # Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
 # Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
 #
-echo "${BLUE}Note${OFF}: You need to change ${BOLD} System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED} ${BOLD}『128MB』${OFF}"
+echo "[${RED}NOTE${OFF}] You need to change ${BOLD} System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED} ${BOLD}『128MB』${OFF}"
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
-echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
+echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 1920 x 1080${OFF} found"
 echo "Updating configuration for 1920 x 1080p model, progress will finish instantly..."
 cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
 #
@@ -389,14 +389,14 @@ cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist
 rm ${REPO}/DSDT/efi
 echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
 else
-echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 3200 x 1800${OFF} found"
+echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 3200 x 1800${OFF} found"
 #
 # Patch IOKit.
 #
-echo "${GREEN}[IOKit]${OFF}: Patching IOKit for maximum pixel clock"
+echo "[${BLUE}Patching${OFF}] IOKit for maximum pixel clock"
 sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-echo "Reboot now. Then run the Deploy.sh again to finish the installation"
+echo "[${RED}NOTE${OFF}]Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
 
 #
@@ -417,8 +417,8 @@ else
 #
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
-echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
-echo "You do not need to run this script again since all the operations on your laptop have done!"
+echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 1920 x 1080${OFF} found"
+echo "[${RED}NOTE${OFF}]You do not need to run this script again since all the operations on your laptop have done!"
 else
 #
 # Detect whether the QE/CI is enabled [syscl/Yating Zhou]
@@ -432,7 +432,7 @@ plist=/Volumes/EFI/EFI/CLOVER/config.plist
 if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
 then
 sudo touch /System/Library/Extensions && sudo kextcache -u /
-echo "FINISH! REBOOT!"
+echo "[${RED}NOTE${OFF}]FINISH! REBOOT!"
 else
 echo "Failed, ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config"
 echo "Try the script again!"
