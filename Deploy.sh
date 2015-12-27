@@ -402,7 +402,7 @@ fi
 #
 # Operation complete!
 #
-exit 0
+
 #
 # Note: This "else" is for the first "if" just to separate/make two step clear.
 #
