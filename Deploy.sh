@@ -419,7 +419,6 @@ if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
 echo "${BLUE}[Display]${OFF}: Resolution ${BOLD} 1920 x 1080${OFF} found"
 echo "You do not need to run this script again since all the operations on your laptop have done!"
-exit 0
 else
 #
 # Detect whether the QE/CI is enabled [syscl/Yating Zhou]
@@ -439,6 +438,7 @@ echo "Failed, ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config"
 echo "Try the script again!"
 fi
 else
+echo "[${RED}NOTE${OFF}] It seems that QE/EC has not been powered up yet."
 exit -1
 #
 fi
