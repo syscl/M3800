@@ -269,7 +269,7 @@ compile_table "${OptRef}"
 #
 # Clean up dynamic SSDTs.
 #
-echo "[${GREEN}Cleaning${OFF}]: dynamic SSDTs..."
+echo "[${GREEN}Cleaning${OFF}] dynamic SSDTs..."
 rm "${compile}"SSDT-*x.aml
 
 ##################################
