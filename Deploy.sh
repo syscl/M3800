@@ -446,14 +446,14 @@ tidy_execute "cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.
 tidy_execute "rm ${REPO}/DSDT/efi" "Clean up after installation"
 echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
 else
-echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 3200 x 1800${OFF} found"
+echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model, progress will finish instantly...${OFF}"
 #
 # Patch IOKit.
 #
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
 tidy_execute "sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Patching IOKit for maximum pixel clock"
 tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-echo "[ ${RED}NOTE${OFF} ]Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
+echo "[ ${RED}NOTE${OFF} ] Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
 
 #
