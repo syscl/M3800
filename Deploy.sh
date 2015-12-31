@@ -61,48 +61,47 @@ fi
 
 create_dir()
 {
-if [ ! -d "$1" ];then
-echo "${BLUE}[Creating directory]${OFF}: $1"
-mkdir "$1"
-fi
+    if [ ! -d "$1" ];then
+    echo "${BLUE}[Creating directory]${OFF}: $1"
+    mkdir "$1"
+    fi
 }
 
 patch_acpi()
 {
-#   echo "${BLUE}[$2]${OFF} $3"
-if [ "$2" == "syscl" ]
-then
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$3.txt "${REPO}"/DSDT/raw/$1.dsl
-else
-"${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$2/$3.txt "${REPO}"/DSDT/raw/$1.dsl
-fi
+    if [ "$2" == "syscl" ]
+    then
+    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$3.txt "${REPO}"/DSDT/raw/$1.dsl
+    else
+    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$2/$3.txt "${REPO}"/DSDT/raw/$1.dsl
+    fi
 }
 
 tidy_execute()
 {
-$1 >./DSDT/report 2>&1
+    $1 >./DSDT/report 2>&1
 #
-                        # ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
-# `grep -i "Error" ./DSDT/report` == *"0 Errors"* : `grep -i "patch complete" ./DSDT/report` == *"complete"* : ! `test -s ./DSDT/report`    :`grep -i "mounted" ./DSDT/report` == *"mounted"*
-# ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
-#         iasl failure                            :             patchmatic failure                           : cp, rm, grep, touch, mk...   :diskutil mount
-# ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
+# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
+#  grep -i "Error" ./DSDT/report : grep -i "patch complete" ./DSDT/report : ! `test -s ./DSDT/report` : grep -i "mounted" ./DSDT/report : grep -i "complete" ./DSDT/report
+# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
+#  iasl failure                  : patchmatic failure                     : cp, rm, grep, touch, mk...: diskutil mount                  : codesign status
+# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
 #
     if [[ `grep -i "0 Errors" ./DSDT/report` || `grep -i "patch complete" ./DSDT/report` || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` || `grep -i "complete" ./DSDT/report` ]]
-then
-echo "[  ${GREEN}OK${OFF}  ] $2."
-else
-echo "[${RED}FAILED${OFF}] $2."
-grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
-cat ./DSDT/report.tmp
-fi
-rm ./DSDT/report.tmp ./DSDT/report &> /dev/null
+    then
+        echo "[  ${GREEN}OK${OFF}  ] $2."
+    else
+    echo "[${RED}FAILED${OFF}] $2."
+    grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
+    cat ./DSDT/report.tmp
+    fi
+    rm ./DSDT/report.tmp ./DSDT/report &> /dev/null
 }
 
 compile_table()
 {
-echo "${BLUE}[Compiling]${OFF}: $1.dsl"
-"${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
+    echo "${BLUE}[Compiling]${OFF}: $1.dsl"
+    "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
 }
 
 rebuild_kernel_cache()
@@ -110,53 +109,53 @@ rebuild_kernel_cache()
 #
 # Repair the permission by syscl/Yating Zhou
 #
-echo "[${BLUE}Repairing${OFF}] kexts permission..."
-sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
-sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
-sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
-sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
-sudo touch /System/Library/Extensions && sudo kextcache -u /
+    echo "[${BLUE}Repairing${OFF}] kexts permission..."
+    sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
+    sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
+    sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
+    sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
+    sudo touch /System/Library/Extensions && sudo kextcache -u /
 }
 
 install_audio()
 {
-echo "[${GREEN}Creating${OFF}] AppleHDA injection kernel extension for ${BOLD}ALC668${OFF}"
-rm -R ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
-cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
-rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
-rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
-rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
-rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
-ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-echo "       --> ${BOLD}Creating AppleHDA_ALC668 file layout${OFF}"
-echo "       --> ${BOLD}Copying AppleHDA_ALC668 Kexts/audio platform & layouts${OFF}"
-cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
+    echo "[${GREEN}Creating${OFF}] AppleHDA injection kernel extension for ${BOLD}ALC668${OFF}"
+    rm -R ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
+    cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
+    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
+    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
+    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
+    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
+    rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
+    ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
+    echo "       --> ${BOLD}Creating AppleHDA_ALC668 file layout${OFF}"
+    echo "       --> ${BOLD}Copying AppleHDA_ALC668 Kexts/audio platform & layouts${OFF}"
+    cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
 
-echo "       --> ${BOLD}Configuring AppleHDA_ALC668 Info.plist${OFF}"
-replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-/usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
-replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-/usr/libexec/plistbuddy -c "Set :CFBundleGetInfoString '$replace'" $plist
-replace=`/usr/libexec/plistbuddy -c "Print :CFBundleVersion" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-/usr/libexec/plistbuddy -c "Set :CFBundleVersion '$replace'" $plist
-replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-/usr/libexec/plistbuddy -c "Set :CFBundleShortVersionString '$replace'" $plist
-/usr/libexec/plistbuddy -c "Add ':HardwareConfigDriver_Temp' dict" $plist
-/usr/libexec/plistbuddy -c "Merge /System/Library/Extensions/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" $plist
-/usr/libexec/plistbuddy -c "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-/usr/libexec/plistbuddy -c "Delete ':HardwareConfigDriver_Temp'" $plist
-/usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" $plist
-/usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" $plist
-/usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
-/usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
-/usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
+    echo "       --> ${BOLD}Configuring AppleHDA_ALC668 Info.plist${OFF}"
+    replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+    /usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
+    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+    /usr/libexec/plistbuddy -c "Set :CFBundleGetInfoString '$replace'" $plist
+    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleVersion" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+    /usr/libexec/plistbuddy -c "Set :CFBundleVersion '$replace'" $plist
+    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+    /usr/libexec/plistbuddy -c "Set :CFBundleShortVersionString '$replace'" $plist
+    /usr/libexec/plistbuddy -c "Add ':HardwareConfigDriver_Temp' dict" $plist
+    /usr/libexec/plistbuddy -c "Merge /System/Library/Extensions/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" $plist
+    /usr/libexec/plistbuddy -c "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
+    /usr/libexec/plistbuddy -c "Delete ':HardwareConfigDriver_Temp'" $plist
+    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" $plist
+    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" $plist
+    /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
+    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
+    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
 
-echo "       --> ${BOLD}Created AppleHDA_ALC668.kext${OFF}"
-sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
-echo "       --> ${BOLD}Installed AppleHDA_ALC668.kext to /Library/Extensions${OFF}"
-sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
-echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
+    echo "       --> ${BOLD}Created AppleHDA_ALC668.kext${OFF}"
+    sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
+    echo "       --> ${BOLD}Installed AppleHDA_ALC668.kext to /Library/Extensions${OFF}"
+    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+    echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
 }
 
 #
