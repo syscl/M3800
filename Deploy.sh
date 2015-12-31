@@ -82,13 +82,13 @@ tidy_execute()
 {
 $1 >./DSDT/report 2>&1
 #
-# ------------------------------------------------:----------------------------------------------------------:------------------------------
-# `grep -i "Error" ./DSDT/report` == *"0 Errors"* : `grep -i "patch complete" ./DSDT/report` == *"complete"* : ! `test -s ./DSDT/report`
-# ------------------------------------------------:----------------------------------------------------------:------------------------------
-#         iasl failure                            :             patchmatic failure                           : cp, rm, grep, touch, mk...
-# ------------------------------------------------:----------------------------------------------------------:------------------------------
+                        # ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
+# `grep -i "Error" ./DSDT/report` == *"0 Errors"* : `grep -i "patch complete" ./DSDT/report` == *"complete"* : ! `test -s ./DSDT/report`    :`grep -i "mounted" ./DSDT/report` == *"mounted"*
+# ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
+#         iasl failure                            :             patchmatic failure                           : cp, rm, grep, touch, mk...   :diskutil mount
+# ------------------------------------------------:----------------------------------------------------------:------------------------------:------------------------------
 #
-if [[ `grep -i "Error" ./DSDT/report` == *"0 Errors"* || `grep -i "patch complete" ./DSDT/report` == *"complete"* || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` != *"mounted"* ]]
+    if [[ `grep -i "0 Errors" ./DSDT/report` || `grep -i "patch complete" ./DSDT/report` || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` || `grep -i "complete" ./DSDT/report` ]]
 then
 echo "[  ${GREEN}OK${OFF}  ] $2."
 else
@@ -329,17 +329,17 @@ tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Compiling tables...${OFF}"
 tidy_execute "compile_table "DSDT"" "Compiling DSDT"
-tidy_execute "compile_table "${DptfTa}"" "Compiling DptfTa"
-tidy_execute "compile_table "${SaSsdt}"" "Compiling SaSsdt"
-tidy_execute "compile_table "${SgRef}"" "Compiling SgRef"
-tidy_execute "compile_table "${OptRef}"" "Compiling OptRef"
+tidy_execute "compile_table "${DptfTa}"" "Compile DptfTa"
+tidy_execute "compile_table "${SaSsdt}"" "Compile SaSsdt"
+tidy_execute "compile_table "${SgRef}"" "Compile SgRef"
+tidy_execute "compile_table "${OptRef}"" "Compile OptRef"
 
 ########################
 # Copying raw tables to compile.
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
-tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile."
+tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
 
 ########################
 # Copying SSDT-rmne.aml.
@@ -354,12 +354,12 @@ tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to
 
 if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]]
 then
-tidy_execute "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel Corei7-4702HQ"
+tidy_execute "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
 fi
 
 if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
 then
-tidy_execute "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel Corei7-4712HQ"
+tidy_execute "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
 fi
 
 ########################
@@ -435,7 +435,7 @@ tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
 # Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
 # Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
 #
-echo "[ ${RED}NOTE${OFF} ] You need to change ${BOLD} System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED} ${BOLD}『128MB』${OFF}"
+echo "[ ${RED}NOTE${OFF} ] You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 1920 x 1080p model, progress will finish instantly...${OFF}"
@@ -450,8 +450,7 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model
 #
 # Patch IOKit.
 #
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
-tidy_execute "sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Patching IOKit for maximum pixel clock"
+tidy_execute "sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Patch IOKit for maximum pixel clock"
 tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
 echo "[ ${RED}NOTE${OFF} ] Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
