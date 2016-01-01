@@ -35,7 +35,8 @@ plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
 # Gvariables stands for getting datas from OS X
 #
 gProductVersion=""
-
+target_website=""
+target_website_status=""
 #
 # Sync all files from https://github.com/syscl/M3800
 #
@@ -50,13 +51,14 @@ timeout=5
 target_website=https://github.com/syscl/M3800
 
 # Detect whether the website is available
-echo "${GREEN}[Updating]${OFF} files from ${BLUE}${target_website}${OFF}"
-if [[ `curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code} | grep "Status"` == *"OK"* && `curl -I -s --connect-timeout $timeout $target_website -w %{http_code} | grep "Status"` == *"200"* ]]
+echo "[ ${GREEN}--->${OFF} ] Updating files from ${BLUE}${target_website}${OFF}"
+target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
+if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} |grep -i "Status"` == *"200"* ]]
 then
 cd ${REPO}
 git pull
 else
-echo "${RED}[Note]${OFF} ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
+echo "[ ${RED}Note${OFF} ] ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
 fi
 
 create_dir()
@@ -119,7 +121,6 @@ rebuild_kernel_cache()
 
 install_audio()
 {
-    echo "[${GREEN}Creating${OFF}] AppleHDA injection kernel extension for ${BOLD}ALC668${OFF}"
     rm -R ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
     cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
     rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
@@ -128,11 +129,7 @@ install_audio()
     rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
     rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
     ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-    echo "       --> ${BOLD}Creating AppleHDA_ALC668 file layout${OFF}"
-    echo "       --> ${BOLD}Copying AppleHDA_ALC668 Kexts/audio platform & layouts${OFF}"
     cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
-
-    echo "       --> ${BOLD}Configuring AppleHDA_ALC668 Info.plist${OFF}"
     replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
     /usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
     replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
@@ -150,12 +147,8 @@ install_audio()
     /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
     /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
     /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-
-    echo "       --> ${BOLD}Created AppleHDA_ALC668.kext${OFF}"
     sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
-    echo "       --> ${BOLD}Installed AppleHDA_ALC668.kext to /Library/Extensions${OFF}"
     sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
-    echo "       --> ${BOLD}Installed CodecCommander.kext to /Library/Extensions${OFF}"
 }
 
 #
@@ -174,17 +167,19 @@ tidy_execute "create_dir "${prepare}"" "Create ./DSDT/prepare"
 tidy_execute "create_dir "${precompile}"" "Create ./DSDT/precompile"
 tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
 
-#
+########################
 # Choose ESP by syscl/Yating
-#
+########################
+
 diskutil list
 read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
 echo "${targetEFI}" >${REPO}/DSDT/efi
 diskutil mount ${targetEFI}
 
-#
+########################
 # Copy origin aml to raw
-#
+########################
+
 if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];then
 cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"
 else
@@ -196,6 +191,7 @@ echo "Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump A
 #
 exit -1
 fi
+
 ########################
 # Decompile dsdt
 ########################
@@ -454,18 +450,18 @@ tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/V
 echo "[ ${RED}NOTE${OFF} ] Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
 
-#
+########################
 # Operation complete!
-#
+########################
 
 #
 # Note: This "else" is for the first "if" just to separate/make two step clear.
 #
 else
 
-#
+########################
 # Finalstep.sh : lead to lid wake
-#
+########################
 
 #
 # Note: Added this "if" to terminate the script if the model is 1920*1080
@@ -475,9 +471,11 @@ then
 echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 1920 x 1080${OFF} found"
 echo "[${RED}NOTE${OFF}]You do not need to run this script again since all the operations on your laptop have done!"
 else
-#
+
+########################
 # Detect whether the QE/CI is enabled [syscl/Yating Zhou]
-#
+########################
+
 if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
 echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
@@ -486,6 +484,7 @@ plist=/Volumes/EFI/EFI/CLOVER/config.plist
 tidy_execute "/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"" "Lead to lid wake by syscl/Lighting/Yating Zhou"
 if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
 then
+
 ########################
 # Rebuilding kernel extensions cache.
 ########################
@@ -494,7 +493,7 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
 tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
 echo "[ ${RED}NOTE${OFF} ] FINISH! REBOOT!"
 else
-echo "[ ${RED}FAILED${OFF} ] Ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config."
+echo "[${RED}FAILED${OFF}] Ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config."
 echo "[ ${RED}NOTE${OFF} ] Try the script again!"
 fi
 else
