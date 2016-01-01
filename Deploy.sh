@@ -185,8 +185,7 @@ tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
 diskutil list
 read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
 echo "${targetEFI}" >${REPO}/DSDT/efi
-tidy_execute "diskutil mount `grep -i "disk" ./DSDT/efi`" "Mount `grep -i "disk" ./DSDT/efi`"
-#diskutil mount ${targetEFI}
+tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
 ########################
 # Copy origin aml to raw
