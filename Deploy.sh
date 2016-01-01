@@ -111,11 +111,22 @@ rebuild_kernel_cache()
 #
 # Repair the permission by syscl/Yating Zhou
 #
-    echo "[${BLUE}Repairing${OFF}] kexts permission..."
+    if [ "$1" == *"force"* ]
+    then
+    ls /System/Library/Extensions |xargs -I{} sudo chmod -R 755 /System/Library/Extensions/{}
+    ls /System/Library/Extensions |xargs -I{} sudo chown -R root:wheel /System/Library/Extensions/{}
+    ls /Library/Extensions |xargs -I{} sudo chmod -R 755 /Library/Extensions/{}
+    ls /Library/Extensions |xargs -I{} sudo chown -R root:wheel /Library/Extensions/{}
+    fi
+
+    if [ "$1" == *"hda"* ]
+    then
     sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
     sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
     sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
     sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
+    fi
+
     sudo touch /System/Library/Extensions && sudo kextcache -u /
 }
 
@@ -278,7 +289,6 @@ tidy_execute "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
 # DptfTa Patches
 ########################
 
-#echo "${BLUE}[DptfTa]${OFF}: Patching ${DptfTa}.dsl in "${REPO}"/DSDT/raw"
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${DptfTa}.dsl${OFF}"
 tidy_execute "patch_acpi ${DptfTa} syscl "_BST-package-size"" "_BST package size"
 tidy_execute "patch_acpi ${DptfTa} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
@@ -305,7 +315,6 @@ tidy_execute "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 
 # OptRef Patches
 ########################
 
-#echo "${BLUE}[OptRef]${OFF}: Patching SSDT-15 in "${REPO}"/DSDT/raw"
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${OptRef}.dsl${OFF}"
 tidy_execute "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
 tidy_execute "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
@@ -374,7 +383,7 @@ if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
 #
 # Not installed
 #
-    echo "[${RED}NOTE${OFF}] Clover does not install on EFI, please reinstall Clover to EFI and try again."
+    echo "[ ${RED}NOTE${OFF} ] Clover does not install on EFI, please reinstall Clover to EFI and try again."
 # ERROR.
 #
 # Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
@@ -424,7 +433,7 @@ tidy_execute "install_audio" "Install audio"
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+tidy_execute "rebuild_kernel_cache "hda"" "Rebuild kernel extensions cache"
 
 #
 # Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
@@ -490,7 +499,7 @@ then
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
 echo "[ ${RED}NOTE${OFF} ] FINISH! REBOOT!"
 else
 echo "[${RED}FAILED${OFF}] Ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config."
