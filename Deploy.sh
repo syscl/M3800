@@ -51,7 +51,7 @@ timeout=5
 target_website=https://github.com/syscl/M3800
 
 # Detect whether the website is available
-echo "[ ${GREEN}--->${OFF} ] Updating files from ${BLUE}${target_website}${OFF}"
+echo "[ ${GREEN}--->${OFF} ] Updating files from ${BLUE}${target_website}...${OFF}"
 target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
 if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} |grep -i "Status"` == *"200"* ]]
 then
@@ -456,7 +456,7 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model
 #
 tidy_execute "sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Patch IOKit for maximum pixel clock"
 tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-echo "[ ${RED}NOTE${OFF} ] Reboot! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
+echo "[ ${RED}NOTE${OFF} ] ${RED}REBOOT${OFF}! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
 
 ########################
@@ -500,7 +500,7 @@ then
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
 tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
-echo "[ ${RED}NOTE${OFF} ] FINISH! REBOOT!"
+echo "[ ${RED}NOTE${OFF} ] FINISH! ${RED}REBOOT${OFF}!"
 else
 echo "[${RED}FAILED${OFF}] Ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config."
 echo "[ ${RED}NOTE${OFF} ] Try the script again!"
