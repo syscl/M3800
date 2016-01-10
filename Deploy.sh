@@ -192,9 +192,9 @@ tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 ########################
 
 if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];then
-cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"
+tidy_execute "cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
 else
-echo "Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
+echo "[ ${RED}NOTE${OFF} ] Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
 # ERROR.
 #
 # Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
@@ -242,6 +242,7 @@ done
 ########################
 # Search SgRef
 ########################
+
 for num in $(seq 1 20)
 do
 grep "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && result=0 || result=1
@@ -477,8 +478,7 @@ else
 #
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
-echo "[${BLUE}Display${OFF}]: Resolution ${BOLD} 1920 x 1080${OFF} found"
-echo "[${RED}NOTE${OFF}]You do not need to run this script again since all the operations on your laptop have done!"
+echo "[ ${RED}NOTE${OFF} ] You do not need to run this script again since all the operations on your laptop have done!"
 else
 
 ########################
@@ -487,13 +487,24 @@ else
 
 if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
-echo "After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
+echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
 tidy_execute "diskutil mount `grep -i "disk" ./DSDT/efi`" "Mount `grep -i "disk" ./DSDT/efi`"
 plist=/Volumes/EFI/EFI/CLOVER/config.plist
-tidy_execute "/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"" "Lead to lid wake by syscl/Lighting/Yating Zhou"
+tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
+
+########################
+# Lead to lid wake by syscl/Yating Zhou
+########################
+
+echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
+tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
+echo "[ ${GREEN}--->${OFF} ] ${BLUE}Leading to lid wake by syscl/Lighting/Yating Zhou ...${OFF}"
+/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"
+
 if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
 then
 
+echo "[  ${GREEN}OK${OFF}  ] Lead to lid wake by syscl/Lighting/Yating Zhou."
 ########################
 # Rebuilding kernel extensions cache.
 ########################
