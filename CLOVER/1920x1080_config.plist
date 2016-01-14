@@ -242,16 +242,6 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable USB3 after wake for Intel 8 series chipset</string>
-				<key>Find</key>
-				<data>xoDIAAAAAQ==</data>
-				<key>Name</key>
-				<string>disable:AppleUSBXHCI</string>
-				<key>Replace</key>
-				<data>xoDIAAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Enable Realtek ALC668 #4</string>
 				<key>Find</key>
 				<data>hBnUEQ==</data>
@@ -289,6 +279,16 @@
 				<string>AppleHDAController</string>
 				<key>Replace</key>
 				<data>PQwMAAA=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable TRIM support for non-Apple SSD</string>
+				<key>Find</key>
+				<data>QVBQTEUgU1NEAA==</data>
+				<key>Name</key>
+				<string>IOAHCIBlockStorage</string>
+				<key>Replace</key>
+				<data>AAAAAAAAAAAAAA==</data>
 			</dict>
 		</array>
 	</dict>
