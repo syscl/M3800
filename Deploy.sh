@@ -132,12 +132,12 @@ rebuild_kernel_cache()
 
 install_audio()
 {
-    rm -R ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
+    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
     cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
-    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
-    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
-    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
-    rm -R ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
+    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
+    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
+    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
+    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
     rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
     ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
     cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
@@ -351,7 +351,7 @@ tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSD
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying SSDT-rmne.aml to ./DSDT/compile...${OFF}"
-tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile."
+tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
 
 ########################
 # Detect which SSDT for processor to be installed.
@@ -414,9 +414,9 @@ KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating kexts...${OFF}"
-tidy_execute "rm -R ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
+tidy_execute "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
 tidy_execute "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
-tidy_execute "ls ./Kexts |grep "kext" |xargs -I{} cp -R ./Kexts/{} ${KEXT_DIR}/" "Update kexts from ./Kexts"
+tidy_execute "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
 
 #
 # Finish operation of configuration on booting progress [syscl/Yating Zhou]
@@ -455,7 +455,8 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model
 #
 # Patch IOKit.
 #
-tidy_execute "sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Patch IOKit for maximum pixel clock"
+echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
+sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
 tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
 echo "[ ${RED}NOTE${OFF} ] ${RED}REBOOT${OFF}! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
