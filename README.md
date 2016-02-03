@@ -3,6 +3,11 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2016-2-4
+
+- Fixed a major problem that cause the ACPI tables patch fail.
+- Use UUID to locate the EFI partition instead of IDENTIFER that may change after reboot.
+
 2015-12-25
 
 - Huge change in Deploy.sh, added function method to make the script easy to read, and yes, the script is faster than ever.
