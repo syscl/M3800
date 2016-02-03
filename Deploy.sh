@@ -29,6 +29,7 @@ tools="${REPO}/tools/"
 raw="${REPO}/DSDT/raw"
 prepare="${REPO}/DSDT/prepare"
 plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
+EFI_INFO="${REPO}/DSDT/EFIINFO"
 
 #
 # Define variables
@@ -60,6 +61,11 @@ git pull
 else
 echo "[ ${RED}Note${OFF} ] ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
 fi
+
+locate_esp(){
+    diskutil info $1 |grep -i "Partition UUID" >${EFI_INFO}
+    targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
+}
 
 create_dir()
 {
@@ -168,7 +174,7 @@ install_audio()
 #
 # Note : This "if" is to make two steps clear.
 #
-if [ ! -f ${REPO}/DSDT/efi ];then
+if [ ! -f ${EFI_INFO} ];then
 ########################
 # Generate define directionaries
 ########################
@@ -184,7 +190,7 @@ tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
 
 diskutil list
 read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
-echo "${targetEFI}" >${REPO}/DSDT/efi
+locate_esp ${targetEFI}
 tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
 ########################
@@ -449,7 +455,7 @@ tidy_execute "cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
-tidy_execute "rm ${REPO}/DSDT/efi" "Clean up after installation"
+tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
 echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
 else
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model, progress will finish instantly...${OFF}"
@@ -490,7 +496,8 @@ else
 if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
 then
 echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
-tidy_execute "diskutil mount `grep -i "disk" ./DSDT/efi`" "Mount `grep -i "disk" ./DSDT/efi`"
+targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
+tidy_execute "diskutil mount ${targetUUID}" "Mount ${targetUUID}"
 plist=/Volumes/EFI/EFI/CLOVER/config.plist
 tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
 
@@ -526,7 +533,7 @@ fi
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
-tidy_execute "rm ${REPO}/DSDT/efi" "Clean up after installation"
+tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
 #
 # Note: this "fi" is just for 1920 x 1080p one
 #
