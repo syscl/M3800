@@ -329,6 +329,14 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying tables to precompile...${OFF}"
 tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
 
 ########################
+# Copying raw tables to compile.
+########################
+
+echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
+tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
+
+
+########################
 # Compiling tables
 ########################
 
@@ -338,13 +346,6 @@ tidy_execute "compile_table "${DptfTa}"" "Compile DptfTa"
 tidy_execute "compile_table "${SaSsdt}"" "Compile SaSsdt"
 tidy_execute "compile_table "${SgRef}"" "Compile SgRef"
 tidy_execute "compile_table "${OptRef}"" "Compile OptRef"
-
-########################
-# Copying raw tables to compile.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
-tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
 
 ########################
 # Copying SSDT-rmne.aml.
