@@ -3,6 +3,11 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2016-2-5
+
+- Improve the compatibility of the executive script: This change / improvement allows the script to patch the OS X again while the patches of Dell Precision M3800 (3200 x 1800) will fail due to Graphics kexts fail to load.
+
+
 2016-2-4
 
 - Fixed a major problem that cause the ACPI tables patch fail.
