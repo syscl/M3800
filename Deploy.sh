@@ -29,6 +29,7 @@ tools="${REPO}/tools/"
 raw="${REPO}/DSDT/raw"
 prepare="${REPO}/DSDT/prepare"
 plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
+config_plist="/Volumes/EFI/EFI/CLOVER/config.plist"
 EFI_INFO="${REPO}/DSDT/EFIINFO"
 
 #
@@ -193,6 +194,16 @@ read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
 locate_esp ${targetEFI}
 tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
+#
+# Ensure / Force Graphics card to power
+#
+
+/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
+if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]]
+then
+
+echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
+fi
 ########################
 # Copy origin aml to raw
 ########################
@@ -451,7 +462,7 @@ echo "[ ${RED}NOTE${OFF} ] You need to change ${BOLD}System Agent (SA) Configura
 if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 1920 x 1080p model, progress will finish instantly...${OFF}"
-tidy_execute "cp ./CLOVER/1920x1080_config.plist /Volumes/EFI/EFI/CLOVER/config.plist" "Update configuration for 1920 x 1080p model"
+tidy_execute "cp ./CLOVER/1920x1080_config.plist ${config_plist}" "Update configuration for 1920 x 1080p model"
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
@@ -498,7 +509,6 @@ then
 echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
 targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
 tidy_execute "diskutil mount ${targetUUID}" "Mount ${targetUUID}"
-plist=/Volumes/EFI/EFI/CLOVER/config.plist
 tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
 
 ########################
@@ -508,9 +518,9 @@ tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redunda
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
 tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Leading to lid wake by syscl/Lighting/Yating Zhou ...${OFF}"
-/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${plist}"
+/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
 
-if [[ `/usr/libexec/plistbuddy -c "Print"  "${plist}"` == *"ig-platform-id = 0x0a260006"* ]]
+if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a260006"* ]]
 then
 
 echo "[  ${GREEN}OK${OFF}  ] Lead to lid wake by syscl/Lighting/Yating Zhou."
@@ -522,7 +532,7 @@ echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
 tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
 echo "[ ${RED}NOTE${OFF} ] FINISH! ${RED}REBOOT${OFF}!"
 else
-echo "[${RED}FAILED${OFF}] Ensure /Volumes/EFI/EFI/CLOVER/config.plist has right config."
+echo "[${RED}FAILED${OFF}] Ensure ${config_plist} has right config."
 echo "[ ${RED}NOTE${OFF} ] Try the script again!"
 fi
 else
