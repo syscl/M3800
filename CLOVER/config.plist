@@ -280,6 +280,16 @@
 				<key>Replace</key>
 				<data>AAAAAAAAAAAAAA==</data>
 			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Remove the limitation of the number of usb ports</string>
+				<key>Find</key>
+				<data>g72M/v//EA==</data>
+				<key>Name</key>
+				<string>AppleUSBXHCIPCI</string>
+				<key>Replace</key>
+				<data>g72M/v//Fg==</data>
+			</dict>
 		</array>
 	</dict>
 	<key>RtVariables</key>
