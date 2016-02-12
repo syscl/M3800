@@ -3,6 +3,12 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2016-2-12
+
+- Solve the injected headphone will lose sound problem after a cold boot. (syscl)
+- Sync vbourachot's repo to fix the headphone distortion (credit vbourachot)
+
+
 2016-2-5
 
 - Improve the compatibility of the executive script: This change / improvement allows the script to patch the OS X again while the patches of Dell Precision M3800 (3200 x 1800) will fail due to Graphics kexts fail to load.
