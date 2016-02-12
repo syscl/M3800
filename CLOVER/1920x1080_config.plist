@@ -300,6 +300,36 @@
 				<key>Replace</key>
 				<data>g72M/v//Fg==</data>
 			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable HDMI audio at Azul-Port: 0x5-DP2HDMI </string>
+				<key>Find</key>
+				<data>AQUJAAAEAACHAAAA</data>
+				<key>Name</key>
+				<string>AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>AQUJAAAIAAAGAAAA</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable HD4600_HDMI_Audio (patch 1)</string>
+				<key>Find</key>
+				<data>PQsMAAA=</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
+				<key>Replace</key>
+				<data>PQwMAAA=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable HD4600_HDMI_Audio (patch 2)</string>
+				<key>Find</key>
+				<data>PQwKAAA=</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
+				<key>Replace</key>
+				<data>PQwMAAA=</data>
+			</dict>
 		</array>
 	</dict>
 	<key>RtVariables</key>
