@@ -134,7 +134,9 @@ rebuild_kernel_cache()
     sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
     fi
 
-    sudo touch /System/Library/Extensions && sudo kextcache -u /
+    sudo touch /System/Library/Extensions
+    sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
+    sudo kextcache -u /
 }
 
 install_audio()
@@ -197,13 +199,17 @@ tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 #
 # Ensure / Force Graphics card to power
 #
-
-/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
-if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]]
+if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
 then
-
-echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
+    /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
+else
+    /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
+    if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]]
+    then
+    echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
+    fi
 fi
+
 ########################
 # Copy origin aml to raw
 ########################
@@ -287,12 +293,15 @@ done
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching DSDT.dsl${OFF}"
 tidy_execute "patch_acpi DSDT syntax "fix_PARSEOP_ZERO"" "Fix PARSEOP_ZERO"
 tidy_execute "patch_acpi DSDT syntax "fix_ADBG"" "Fix ADBG Error"
+# patch_acpi DSDT syscl "Insert_DTGP"
 tidy_execute "patch_acpi DSDT graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
 tidy_execute "patch_acpi DSDT usb "usb_7-series"" "7-series/8-series USB"
+tidy_execute "patch_acpi DSDT usb "usb_prw_0x0d_xhc"" "Fix USB _PRW"
+# patch_acpi DSDT usb "usb_8-series_prw"
 tidy_execute "patch_acpi DSDT battery "battery_Acer-Aspire-E1-571"" "Acer Aspire E1-571"
 tidy_execute "patch_acpi DSDT system "system_IRQ"" "IRQ Fix"
 tidy_execute "patch_acpi DSDT system "system_SMBUS"" "SMBus Fix"
-tidy_execute "patch_acpi DSDT system "system_OSYS"" "OS Check Fix"
+tidy_execute "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
 tidy_execute "patch_acpi DSDT system "system_ADP1"" "AC Adapter Fix"
 tidy_execute "patch_acpi DSDT system "system_MCHC"" "Add MCHC"
 tidy_execute "patch_acpi DSDT system "system_WAK2"" "Fix _WAK Arg0 v2"
