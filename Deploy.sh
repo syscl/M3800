@@ -39,6 +39,7 @@ EFI_INFO="${REPO}/DSDT/EFIINFO"
 gProductVersion=""
 target_website=""
 target_website_status=""
+RETURN_VAL=""
 #
 # Sync all files from https://github.com/syscl/M3800
 #
@@ -88,7 +89,7 @@ patch_acpi()
 
 tidy_execute()
 {
-    $1 >./DSDT/report 2>&1
+    $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
 #
 # -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
 #  grep -i "Error" ./DSDT/report : grep -i "patch complete" ./DSDT/report : ! `test -s ./DSDT/report` : grep -i "mounted" ./DSDT/report : grep -i "complete" ./DSDT/report
@@ -96,13 +97,23 @@ tidy_execute()
 #  iasl failure                  : patchmatic failure                     : cp, rm, grep, touch, mk...: diskutil mount                  : codesign status
 # -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
 #
-    if [[ `grep -i "0 Errors" ./DSDT/report` || `grep -i "patch complete" ./DSDT/report` || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` || `grep -i "complete" ./DSDT/report` ]]
+#    if [[ `grep -i "0 Errors" ./DSDT/report` || `grep -i "patch complete" ./DSDT/report` || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` || `grep -i "complete" ./DSDT/report` ]]
+#    then
+#        echo "[  ${GREEN}OK${OFF}  ] $2."
+#    else
+#    echo "[${RED}FAILED${OFF}] $2."
+#    grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
+#    cat ./DSDT/report.tmp
+#    fi
+#
+
+    if [ "${RETURN_VAL}" == 0 ]
     then
         echo "[  ${GREEN}OK${OFF}  ] $2."
     else
-    echo "[${RED}FAILED${OFF}] $2."
-    grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
-    cat ./DSDT/report.tmp
+        echo "[${RED}FAILED${OFF}] $2."
+        grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
+        cat ./DSDT/report.tmp
     fi
     rm ./DSDT/report.tmp ./DSDT/report &> /dev/null
 }
@@ -244,8 +255,8 @@ tidy_execute ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${RE
 
 for num in $(seq 1 20)
 do
-grep "DptfTa" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && result=0 || result=1
-if [ "${result}" == 0 ];then
+grep "DptfTa" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+if [ "${RETURN_VAL}" == 0 ];then
 DptfTa=SSDT-$num
 fi
 done
@@ -256,8 +267,8 @@ done
 
 for num in $(seq 1 20)
 do
-grep "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && result=0 || result=1
-if [ "${result}" == 0 ];then
+grep "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+if [ "${RETURN_VAL}" == 0 ];then
 SaSsdt=SSDT-$num
 fi
 done
@@ -268,8 +279,8 @@ done
 
 for num in $(seq 1 20)
 do
-grep "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && result=0 || result=1
-if [ "${result}" == 0 ];then
+grep "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+if [ "${RETURN_VAL}" == 0 ];then
 SgRef=SSDT-$num
 fi
 done
@@ -280,8 +291,8 @@ done
 
 for num in $(seq 1 20)
 do
-grep "OptRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && result=0 || result=1
-if [ "${result}" == 0 ];then
+grep "OptRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+if [ "${RETURN_VAL}" == 0 ];then
 OptRef=SSDT-$num
 fi
 done
