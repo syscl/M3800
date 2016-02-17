@@ -3,6 +3,24 @@ OS X on DELL M3800 and XPS15 (9530)
 
 * [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
 
+2016-2-17
+
+- Improved the configuration of ApplePS2SmartTouchPad.kext/Contents/config.plist and ApplePS2SmartTouchPad.kext/Contents/PlugIns/ApplePS2Keyboard.kext/Contents/config.plist:
+- Set FinerFnBrightnessControl = NO and FinerFnVolumeControl = NO such that Keyboard performs/mute brightness and volume as OS X.
+- 3 finger swipe up = Open Mission Control.
+- 3 finger swipe down = Open Launchpad.
+- 3 finger swipe left = Switch Previous Application.
+- 3 finger swipe right = Switch Next Application. 
+- 4 finger swipe up = Hide all Windows/Applications.
+- 4 finger swipe down = Hide current Window/Application.
+- 4 finger swipe left = Back.
+- 4 finger swipe right = Go.
+- 4 finger pinch = Open Mission Control.
+- 5 finger pinch = Open Dashboard.
+- My next step is going to find more details of touchpad of M3800/XPS9530 under Linux to make the ApplePS2SmartTouchPad.kext more comfortable to use than ever. (Coming soon!)
+- Another problem is that after a full sleep, I can't reproduce the fix I made to fix the HP lose sound problem after a cold boot, really boring since I usually plug in HP all the time. I'm finding new way to fix this annoying problem. (After extensive explore, I believe this bug is produced by AppleHDA, since there's no such problem under Windows and Linux. Actually, Linux has this bug, but it can be fixed through a re-plugged-in HP.)
+
+
 2016-2-12
 
 - Solve the injected headphone will lose sound problem after a cold boot. (syscl)
