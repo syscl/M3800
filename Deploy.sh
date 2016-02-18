@@ -112,7 +112,7 @@ tidy_execute()
         echo "[  ${GREEN}OK${OFF}  ] $2."
     else
         echo "[${RED}FAILED${OFF}] $2."
-        grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
+        grep -i -E "Error    |patchmatic|cp|rm" ./DSDT/report >./DSDT/report.tmp
         cat ./DSDT/report.tmp
     fi
     rm ./DSDT/report.tmp ./DSDT/report &> /dev/null
@@ -255,7 +255,7 @@ tidy_execute ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${RE
 
 for num in $(seq 1 20)
 do
-grep "DptfTa" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+grep -i "DptfTa" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 if [ "${RETURN_VAL}" == 0 ];then
 DptfTa=SSDT-$num
 fi
@@ -267,7 +267,7 @@ done
 
 for num in $(seq 1 20)
 do
-grep "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+grep -i "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 if [ "${RETURN_VAL}" == 0 ];then
 SaSsdt=SSDT-$num
 fi
@@ -279,7 +279,7 @@ done
 
 for num in $(seq 1 20)
 do
-grep "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+grep -i "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 if [ "${RETURN_VAL}" == 0 ];then
 SgRef=SSDT-$num
 fi
@@ -291,7 +291,7 @@ done
 
 for num in $(seq 1 20)
 do
-grep "OptRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+grep -i "OptRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 if [ "${RETURN_VAL}" == 0 ];then
 OptRef=SSDT-$num
 fi
