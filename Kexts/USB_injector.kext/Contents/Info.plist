@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleGetInfoString</key>
-	<string>1.0.1, Copyright © 2000-2015 syscl/Yating Zhou. All Rights Reserved.</string>
+	<string>1.1.1, Copyright © 2000-2015 syscl/Yating Zhou. All Rights Reserved.</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.syscl.injector.USBXHCI</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>XHCI injector for M3800 and XPS9530</string>
+	<string>EHC/XHCI injector for M3800 and XPS9530</string>
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
@@ -22,7 +22,7 @@
 	<string>1.0.1</string>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<key>MacBookPro11,2-EH01</key>
+		<key>MacBookPro11,4-EH01</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBMergeNub</string>
@@ -35,7 +35,7 @@
 			<key>IOProviderMergeProperties</key>
 			<dict>
 				<key>kUSBSleepSupported</key>
-				<true/>
+				<false/>
 				<key>port-count</key>
 				<data>AQAAAA==</data>
 				<key>ports</key>
@@ -50,9 +50,9 @@
 				</dict>
 			</dict>
 			<key>model</key>
-			<string>MacBookPro11,2</string>
+			<string>MacBookPro11,4</string>
 		</dict>
-		<key>MacBookPro11,2-EH01-hub</key>
+		<key>MacBookPro11,4-EH01-hub</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBHostMergeProperties</string>
@@ -108,9 +108,9 @@
 			<key>locationID</key>
 			<integer>487587840</integer>
 			<key>model</key>
-			<string>MacBookPro11,2</string>
+			<string>MacBookPro11,4</string>
 		</dict>
-		<key>MacBookPro11,2-EH02</key>
+		<key>MacBookPro11,4-EH02</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBMergeNub</string>
@@ -123,7 +123,7 @@
 			<key>IOProviderMergeProperties</key>
 			<dict>
 				<key>kUSBSleepSupported</key>
-				<true/>
+				<false/>
 				<key>port-count</key>
 				<data>AQAAAA==</data>
 				<key>ports</key>
@@ -138,9 +138,9 @@
 				</dict>
 			</dict>
 			<key>model</key>
-			<string>MacBookPro11,2</string>
+			<string>MacBookPro11,4</string>
 		</dict>
-		<key>MacBookPro11,2-EH02-hub</key>
+		<key>MacBookPro11,4-EH02-hub</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBHostMergeProperties</string>
@@ -175,9 +175,9 @@
 			<key>locationID</key>
 			<integer>437256192</integer>
 			<key>model</key>
-			<string>MacBookPro11,2</string>
+			<string>MacBookPro11,4</string>
 		</dict>
-		<key>MacBookPro11,2-XHC</key>
+		<key>MacBookPro11,4-XHC</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.driver.AppleUSBMergeNub</string>
@@ -192,7 +192,7 @@
 				<key>kUSBMuxEnabled</key>
 				<true/>
 				<key>kUSBSleepSupported</key>
-				<true/>
+				<false/>
 				<key>port-count</key>
 				<data>FQAAAA==</data>
 				<key>ports</key>
@@ -290,7 +290,7 @@
 				</dict>
 			</dict>
 			<key>model</key>
-			<string>MacBookPro11,2</string>
+			<string>MacBookPro11,4</string>
 		</dict>
 	</dict>
 	<key>OSBundleRequired</key>
