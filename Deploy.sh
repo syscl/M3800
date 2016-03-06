@@ -40,6 +40,13 @@ gProductVersion=""
 target_website=""
 target_website_status=""
 RETURN_VAL=""
+gEDID=""
+gHorizontalRez_pr=""
+gHorizontalRez_st=""
+gHorizontalRez=""
+gVerticalRez_pr=""
+gVerticalRez_st=""
+gVerticalRez=""
 #
 # Sync all files from https://github.com/syscl/M3800
 #
@@ -56,7 +63,7 @@ target_website=https://github.com/syscl/M3800
 # Detect whether the website is available
 echo "[ ${GREEN}--->${OFF} ] Updating files from ${BLUE}${target_website}...${OFF}"
 target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
-if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} |grep -i "Status"` == *"200"* ]]
+if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} | grep -i "Status"` == *"200"* ]]
 then
 cd ${REPO}
 git pull
@@ -66,7 +73,7 @@ fi
 
 locate_esp(){
     diskutil info $1 |grep -i "Partition UUID" >${EFI_INFO}
-    targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
+    targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} | awk -F':' '{print $2}')
 }
 
 create_dir()
@@ -90,22 +97,6 @@ patch_acpi()
 tidy_execute()
 {
     $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
-#
-# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
-#  grep -i "Error" ./DSDT/report : grep -i "patch complete" ./DSDT/report : ! `test -s ./DSDT/report` : grep -i "mounted" ./DSDT/report : grep -i "complete" ./DSDT/report
-# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
-#  iasl failure                  : patchmatic failure                     : cp, rm, grep, touch, mk...: diskutil mount                  : codesign status
-# -------------------------------:----------------------------------------:---------------------------:---------------------------------:----------------------------------
-#
-#    if [[ `grep -i "0 Errors" ./DSDT/report` || `grep -i "patch complete" ./DSDT/report` || ! `test -s ./DSDT/report` || `grep -i "mounted" ./DSDT/report` || `grep -i "complete" ./DSDT/report` ]]
-#    then
-#        echo "[  ${GREEN}OK${OFF}  ] $2."
-#    else
-#    echo "[${RED}FAILED${OFF}] $2."
-#    grep -i -E "Error    |patchmatic|cp" ./DSDT/report >./DSDT/report.tmp
-#    cat ./DSDT/report.tmp
-#    fi
-#
 
     if [ "${RETURN_VAL}" == 0 ]
     then
@@ -126,25 +117,9 @@ compile_table()
 
 rebuild_kernel_cache()
 {
-#
-# Repair the permission by syscl/Yating Zhou
-#
-    if [ "$1" == *"force"* ]
-    then
-    ls /System/Library/Extensions |xargs -I{} sudo chmod -R 755 /System/Library/Extensions/{}
-    ls /System/Library/Extensions |xargs -I{} sudo chown -R root:wheel /System/Library/Extensions/{}
-    ls /Library/Extensions |xargs -I{} sudo chmod -R 755 /Library/Extensions/{}
-    ls /Library/Extensions |xargs -I{} sudo chown -R root:wheel /Library/Extensions/{}
-    fi
-
-    if [ "$1" == *"hda"* ]
-    then
-    sudo chmod -R 755 /Library/Extensions/AppleHDA_ALC668.kext
-    sudo chown -R root:wheel /Library/Extensions/AppleHDA_ALC668.kext
-    sudo chmod -R 755 /Library/Extensions/CodecCommander.kext
-    sudo chown -R root:wheel /Library/Extensions/CodecCommander.kext
-    fi
-
+    #
+    # Repair the permission & refresh kernelcache
+    #
     sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
@@ -182,6 +157,41 @@ install_audio()
     sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
 }
 
+function _initIntel()
+{
+	if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"Intel = false"* ]];
+		then
+    		/usr/libexec/plistbuddy -c "Set ':Graphics:Inject:Intel' true" "${config_plist}"
+    fi
+}
+
+function _getEDID()
+{
+	#
+	# Get raw EDID.
+	#
+	gEDID=$(ioreg -lw0 | grep -i "IODisplayEDID" | sed -e 's/.*<//' -e 's/>//')
+
+	#
+	# Get native resolution(Rez) from $gEDID.
+	#
+
+	#
+	# Get horizontal resolution.
+	#
+	gHorizontalRez_pr=$(echo $gEDID | cut -c 117)
+	gHorizontalRez_st=$(echo $gEDID | cut -c 113-114)
+	gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
+
+	#
+	# Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the 
+	# progress clear.
+	#
+	gVerticalRez_pr=$(echo $gEDID | cut -c 123)
+	gVerticalRez_st=$(echo $gEDID | cut -c 119-120)
+	gVerticalRez=$((0x$gVerticalRez_pr$gVerticalRez_st))
+}
+
 #
 # Decide which progress to finish [syscl/Yating]
 # Merge two step Initialstep.sh and Finalstep.sh into one.
@@ -210,15 +220,18 @@ tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 #
 # Ensure / Force Graphics card to power
 #
-if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
-then
-    /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
-else
-    /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
-    if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]]
-    then
-    echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
-    fi
+_initIntel
+_getEDID
+
+if [[ $gHorizontalRez == "1920" ]];
+	then
+    	/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
+	else
+    	/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
+    	if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]];
+    		then
+    			echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
+    	fi
 fi
 
 ########################
@@ -472,31 +485,32 @@ tidy_execute "install_audio" "Install audio"
 ########################
 
 echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache "hda"" "Rebuild kernel extensions cache"
+tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
 
 #
-# Check if your resolution is 1920*1080 or 3200 x 1800 by syscl/Yating Zhou.
+# Check if your resolution is 1920*1080 or 3200 x 1800 or 3840x2160 by syscl/Yating Zhou.
 # Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
 #
 echo "[ ${RED}NOTE${OFF} ] You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
-if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
-then
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 1920 x 1080p model, progress will finish instantly...${OFF}"
-tidy_execute "cp ./CLOVER/1920x1080_config.plist ${config_plist}" "Update configuration for 1920 x 1080p model"
-#
-# You fool: don't use <em>rm -rf</em> commands in a script!
-#
-tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
-echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
-else
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for 3200 x 1800 model, progress will finish instantly...${OFF}"
-#
-# Patch IOKit.
-#
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
-sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-echo "[ ${RED}NOTE${OFF} ] ${RED}REBOOT${OFF}! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
+if [[ $gHorizontalRez == "1920" ]];
+	then
+		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for $gHorizontalRez x $gVerticalRez model, progress will finish instantly...${OFF}"
+		tidy_execute "cp ./CLOVER/1920x1080_config.plist ${config_plist}" "Update configuration for $gHorizontalRez x $gVerticalRez model"
+
+		#
+		# You fool: don't use <em>rm -rf</em> commands in a script!
+		#
+		tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
+		echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
+	else
+		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for $gHorizontalRez x $gVerticalRez model, progress will finish instantly...${OFF}"
+		#
+		# Patch IOKit.
+		#
+		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
+		sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
+		tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+		echo "[ ${RED}NOTE${OFF} ] ${RED}REBOOT${OFF}! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
 fi
 
 ########################
@@ -513,53 +527,56 @@ else
 ########################
 
 #
+# Get EDID information.
+#
+_getEDID
+
+#
 # Note: Added this "if" to terminate the script if the model is 1920*1080
 #
-if [[ `system_profiler SPDisplaysDataType` == *"1920 x 1080"* ]]
-then
-echo "[ ${RED}NOTE${OFF} ] You do not need to run this script again since all the operations on your laptop have done!"
-else
+if [[ $gHorizontalRez == "1920" ]];
+	then
+		echo "[ ${RED}NOTE${OFF} ] You do not need to run this script again since all the operations on your laptop have done!"
+	else
 
-########################
-# Detect whether the QE/CI is enabled [syscl/Yating Zhou]
-########################
+	#
+	# Detect whether the QE/CI is enabled [syscl/Yating Zhou]
+	#
 
-if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]]
-then
-echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
-targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
-tidy_execute "diskutil mount ${targetUUID}" "Mount ${targetUUID}"
-tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
+	if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]];
+		then
+			echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
+			targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
+			tidy_execute "diskutil mount ${targetUUID}" "Mount ${targetUUID}"
+			tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
 
-########################
-# Lead to lid wake by syscl/Yating Zhou
-########################
+			#
+			# Lead to lid wake by syscl/Yating Zhou
+			#
+			echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
+			tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+			echo "[ ${GREEN}--->${OFF} ] ${BLUE}Leading to lid wake by syscl/Lighting/Yating Zhou ...${OFF}"
+			/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
 
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Leading to lid wake by syscl/Lighting/Yating Zhou ...${OFF}"
-/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
+			if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a260006"* ]];
+				then
+					echo "[  ${GREEN}OK${OFF}  ] Lead to lid wake by syscl/Lighting/Yating Zhou."
+					#
+					# Rebuilding kernel extensions cache.
+					#
+					echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
+					tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+					echo "[ ${RED}NOTE${OFF} ] FINISH! ${RED}REBOOT${OFF}!"
+					
+				else
+					echo "[${RED}FAILED${OFF}] Ensure ${config_plist} has right config."
+					echo "[ ${RED}NOTE${OFF} ] Try the script again!"
+			fi
+		else
+			echo "[ ${RED}NOTE${OFF} ] It seems that QE/EC has not been powered up yet."
+			exit -1
 
-if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a260006"* ]]
-then
-
-echo "[  ${GREEN}OK${OFF}  ] Lead to lid wake by syscl/Lighting/Yating Zhou."
-########################
-# Rebuilding kernel extensions cache.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache "force"" "Rebuild kernel extensions cache"
-echo "[ ${RED}NOTE${OFF} ] FINISH! ${RED}REBOOT${OFF}!"
-else
-echo "[${RED}FAILED${OFF}] Ensure ${config_plist} has right config."
-echo "[ ${RED}NOTE${OFF} ] Try the script again!"
-fi
-else
-echo "[ ${RED}NOTE${OFF} ] It seems that QE/EC has not been powered up yet."
-exit -1
-#
-fi
+	fi
 #
 # You fool: don't use <em>rm -rf</em> commands in a script!
 #
