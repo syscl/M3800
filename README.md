@@ -1,7 +1,54 @@
 OS X on DELL M3800 and XPS15 (9530)
 ====================================
 
-* [Change Log] (https://github.com/syscl/M3800/blob/M3800/README.md)
+
+This project targets at giving the relatively complete functional OS X for both Dell Precision M3800 and XPS15 9530. Before you start, there's a brief introduction of how to finish power up OS X on your laptop:
+
+1. Create a vanilla installation disk(removable disk)
+2. Install Clover with UEFI only and UEFI64Drivers to the installation disk just created 
+3. Replace the origin Clover folder with the one under my Git/M3800/CLOVER
+4. Patch bios to unlock bios menu
+5. BIOS: set Advanced/CFG Lock = Disabled, System Agent (SA) Configuration/Graphics Configuration/Graphics Configuration/DVMT Pre-Allocated = 128MB, Advanced/SATA Operation = AHCI. To improve battery life, set Advanced(unlocked Menu)/CPU Configuration/LakeTiny Feature = Enabled.
+6. Install OS X
+7. Once you finish installation of OS X, you can do the following to finish the post installation of OS X:
+
+How to use Deploy.sh?
+----------------
+
+Download the latest version installation package/directory by entering the following command in a terminal window:
+
+```sh
+git clone https://github.com/syscl/M3800
+```
+This will download the whole installation directory to your home directory(~) and the next step is to change the permissions of the file (add +x) so that it can be run.
+
+
+```sh
+chmod +x ./M3800/Deploy.sh
+```
+
+
+Run the script in a terminal windows by(Note: You should dump the ACPI tables by pressing F4/Fn+F4 under Clover first and then execute the following command lines):
+
+```sh
+cd M3800
+./Deploy.sh
+```
+
+If you have a model other than the resolution of 1920 x 1080p, please run the deploy.sh again after a fresh reboot by:
+
+```sh
+cd M3800
+./Deploy.sh
+```
+
+Change Log
+----------------
+2016-3-6
+
+- Added 4K(3840 x 2160) support for M3800 credit SimplyLab(see issue #6).
+- Changed config.plist/Graphics/Inject/Intel = false to fix installation stucks at booting stage.(Wait for feedback).
+- Changed config.plist/KernelAndKextPatches/KextsToPatch/AppleIntelFramebufferAzul for enabling port 0x05 DP to HDMI (87000000 - > 06000000). 
 
 2016-2-17
 
