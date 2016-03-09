@@ -182,7 +182,33 @@
 		<array>
 			<dict>
 				<key>Comment</key>
+				<string>Enable Realtek ALC668 #1</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>hAjsEA==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Boot graphics glitch, 10.10.x/10.11.x (credit lisai9093, cecekpawon)</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>AQAAdRc=</data>
+				<key>Name</key>
+				<string>IOGraphicsFamily</string>
+				<key>Replace</key>
+				<data>AQAA6xc=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>IOBluetoothFamily - Continuity &amp; Hand-off</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
 				<data>SIXAdFwPt0gQg8kEg/kGdVBIiw==</data>
 				<key>Name</key>
@@ -193,6 +219,8 @@
 			<dict>
 				<key>Comment</key>
 				<string>Enable Realtek ALC668 #3</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
 				<data>gxnUEQ==</data>
 				<key>Name</key>
@@ -202,37 +230,9 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Boot graphics glitch, 10.10.x/10.11.x (credit lisai9093, cecekpawon)</string>
-				<key>Find</key>
-				<data>AQAAdRc=</data>
-				<key>Name</key>
-				<string>IOGraphicsFamily</string>
-				<key>Replace</key>
-				<data>AQAA6xc=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #1</string>
-				<key>Find</key>
-				<data>hAjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a260006</string>
-				<key>Find</key>
-				<data>BgAmCgEDAwMAAAACAAAwAQAAYAA=</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>BgAmCgEDAwMAAAAIAAAAAwAAAAM=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>AirPortBrcm4360 5ghz</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
 				<data>QYP8/3QsSA==</data>
 				<key>Name</key>
@@ -243,6 +243,8 @@
 			<dict>
 				<key>Comment</key>
 				<string>Enable Realtek ALC668 #2</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
 				<data>hQjsEA==</data>
 				<key>Name</key>
@@ -252,23 +254,51 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable eDP port 0x00, HDMI port 0x05 for Azul framebuffer 0x0a260006</string>
-				<key>Find</key>
-				<data>AAAIAAIAAAAwAAAAAQUJAAAEAACHAAAA</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>AAAIAAQAAAAwAAAAAQUJAAAIAAAGAAAA</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Enable Realtek ALC668 #4</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
 				<data>hBnUEQ==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
 				<data>aAbsEA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable HD4600 HDMI Audio </string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>PQwKAAA=</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
+				<key>Replace</key>
+				<data>PQwMAAA=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAE=</data>
+				<key>Name</key>
+				<string>disable:AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>CAAuCgEDAwMAAAAIAAAAAwAAAAM=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable lid wake after sleep for 0a2e0008 (c) syscl/lighting/Yating Zhou</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>QAAAAB4AAAAFBQkB</data>
+				<key>Name</key>
+				<string>disable:AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>QAAAAA8AAAAFBQkB</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -279,36 +309,6 @@
 				<string>IOAHCIBlockStorage</string>
 				<key>Replace</key>
 				<data>AAAAAAAAAAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Remove the limitation of the number of usb ports</string>
-				<key>Find</key>
-				<data>g72M/v//EA==</data>
-				<key>Name</key>
-				<string>AppleUSBXHCIPCI</string>
-				<key>Replace</key>
-				<data>g72M/v//Fg==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable HD4600_HDMI_Audio (patch 1)</string>
-				<key>Find</key>
-				<data>PQsMAAA=</data>
-				<key>Name</key>
-				<string>AppleHDAController</string>
-				<key>Replace</key>
-				<data>PQwMAAA=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable HD4600_HDMI_Audio (patch 2)</string>
-				<key>Find</key>
-				<data>PQwKAAA=</data>
-				<key>Name</key>
-				<string>AppleHDAController</string>
-				<key>Replace</key>
-				<data>PQwMAAA=</data>
 			</dict>
 		</array>
 	</dict>
