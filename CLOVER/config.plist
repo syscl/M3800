@@ -284,7 +284,7 @@
 				<key>Find</key>
 				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAE=</data>
 				<key>Name</key>
-				<string>disable:AppleIntelFramebufferAzul</string>
+				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
 				<data>CAAuCgEDAwMAAAAIAAAAAwAAAAM=</data>
 			</dict>
@@ -296,7 +296,7 @@
 				<key>Find</key>
 				<data>QAAAAB4AAAAFBQkB</data>
 				<key>Name</key>
-				<string>disable:AppleIntelFramebufferAzul</string>
+				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
 				<data>QAAAAA8AAAAFBQkB</data>
 			</dict>
