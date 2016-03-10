@@ -5,6 +5,14 @@
 # Merge for Dell Precision M3800 and XPS15 (9530).
 #
 export LC_NUMERIC="en_US.UTF-8"
+
+#
+# Prevent non-printable/control characters.
+#
+unset GREP_OPTIONS
+unset GREP_COLORS
+unset GREP_COLOR
+
 #
 # Display style setting.
 #
@@ -15,12 +23,12 @@ BLUE="\033[1;34m"
 OFF="\033[m"
 
 #
-# Repository location
+# Located repository.
 #
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 #
-# Define place
+# Path and filename setup.
 #
 decompile="${REPO}/DSDT/raw/"
 precompile="${REPO}/DSDT/precompile/"
@@ -31,10 +39,12 @@ prepare="${REPO}/DSDT/prepare"
 plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
 config_plist="/Volumes/EFI/EFI/CLOVER/config.plist"
 EFI_INFO="${REPO}/DSDT/EFIINFO"
+patch_config_plist="${REPO}/DSDT/tmp.plist"
 
 #
-# Define variables
-# Gvariables stands for getting datas from OS X
+# Define variables.
+#
+# Gvariables stands for getting datas from OS X.
 #
 gProductVersion=""
 target_website=""
@@ -47,86 +57,180 @@ gHorizontalRez=""
 gVerticalRez_pr=""
 gVerticalRez_st=""
 gVerticalRez=""
-#
-# Sync all files from https://github.com/syscl/M3800
-#
+gSystemRez=""
+gSystemHorizontalRez=""
+gSystemVerticalRez=""
+gPatchIOKit=0
+gClover_ig_platform_id=""
+target_ig_platform_id=""
+find_lid_byte_ENCODE=""
+replace_lid_byte_ENCODE=""
+replace_framebuffer_data_byte=""
+replace_framebuffer_data_byte_ENCODE=""
+find_hdmi_bytes=""
+replace_hdmi_bytes=""
+find_hdmi_bytes_ENCODE=""
+replace_hdmi_bytes_ENCODE=""
+find_Azul_data=""
+replace_Azul_data=""
+find_Azul_data_ENCODE=""
+replace_Azul_data_ENCODE=""
 
-#
-# Check if github is available
-#
-timeout=5
 #
 # Define target website
 #
 target_website=https://github.com/syscl/M3800
 
-# Detect whether the website is available
-echo "[ ${GREEN}--->${OFF} ] Updating files from ${BLUE}${target_website}...${OFF}"
-target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
-if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} | grep -i "Status"` == *"200"* ]]
-then
-cd ${REPO}
-git pull
-else
-echo "[ ${RED}Note${OFF} ] ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
-fi
+#
+#--------------------------------------------------------------------------------
+#
 
-locate_esp(){
+function _PRINT_MSG()
+{
+    local message=$1
+
+    if [[ $message =~ 'OK' ]];
+      then
+        local message=$(echo $message | sed -e 's/.*OK://')
+        echo "[  ${GREEN}OK${OFF}  ] ${message}."
+      else
+        if [[ $message =~ 'FAILED' ]];
+          then
+            local message=$(echo $message | sed -e 's/.*://')
+            echo "[${RED}FAILED${OFF}] ${message}."
+          else
+            if [[ $message =~ '--->' ]];
+              then
+                local message=$(echo $message | sed -e 's/.*--->://')
+                echo "[ ${GREEN}--->${OFF} ] ${message}"
+              else
+                if [[ $message =~ 'NOTE' ]];
+                  then
+                    local message=$(echo $message | sed -e 's/.*NOTE://')
+                    echo "[ ${RED}Note${OFF} ] ${message}."
+                fi
+            fi
+        fi
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _update()
+{
+    #
+    # Sync all files from https://github.com/syscl/M3800
+    #
+    # Check if github is available
+    #
+    local timeout=5
+
+    #
+    # Detect whether the website is available
+    #
+    _PRINT_MSG "--->: Updating files from ${BLUE}${target_website}...${OFF}"
+    target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
+    if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} | grep -i "Status"` == *"200"* ]]
+      then
+        cd ${REPO}
+        git pull
+      else
+        _PRINT_MSG "NOTE: ${BLUE}${target_website}${OFF} is not ${RED}available${OFF} at this time, please link ${BLUE}${target_website}${OFF} again next time."
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function locate_esp()
+{
     diskutil info $1 |grep -i "Partition UUID" >${EFI_INFO}
     targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} | awk -F':' '{print $2}')
 }
 
-create_dir()
+#
+#--------------------------------------------------------------------------------
+#
+
+function create_dir()
 {
-    if [ ! -d "$1" ];then
-    echo "${BLUE}[Creating directory]${OFF}: $1"
-    mkdir "$1"
+    if [ ! -d "$1" ];
+      then
+        mkdir "$1"
     fi
 }
 
-patch_acpi()
+#
+#--------------------------------------------------------------------------------
+#
+
+function patch_acpi()
 {
-    if [ "$2" == "syscl" ]
-    then
-    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$3.txt "${REPO}"/DSDT/raw/$1.dsl
-    else
-    "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$2/$3.txt "${REPO}"/DSDT/raw/$1.dsl
+    if [ "$2" == "syscl" ];
+      then
+        "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$3.txt "${REPO}"/DSDT/raw/$1.dsl
+      else
+        "${REPO}"/tools/patchmatic "${REPO}"/DSDT/raw/$1.dsl "${REPO}"/DSDT/patches/$2/$3.txt "${REPO}"/DSDT/raw/$1.dsl
     fi
 }
 
-tidy_execute()
+#
+#--------------------------------------------------------------------------------
+#
+
+function tidy_execute()
 {
+    #
+    # Make the output clear.
+    #
     $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
 
-    if [ "${RETURN_VAL}" == 0 ]
-    then
-        echo "[  ${GREEN}OK${OFF}  ] $2."
-    else
-        echo "[${RED}FAILED${OFF}] $2."
-        grep -i -E "Error    |patchmatic|cp|rm" ./DSDT/report >./DSDT/report.tmp
-        cat ./DSDT/report.tmp
+    if [ "${RETURN_VAL}" == 0 ];
+      then
+        _PRINT_MSG "OK: $2"
+      else
+        _PRINT_MSG "FAILED: $2"
+        cat ./DSDT/report
     fi
-    rm ./DSDT/report.tmp ./DSDT/report &> /dev/null
+
+    rm ./DSDT/report &> /dev/null
 }
 
-compile_table()
+#
+#--------------------------------------------------------------------------------
+#
+
+function compile_table()
 {
-    echo "${BLUE}[Compiling]${OFF}: $1.dsl"
     "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
 }
+
+#
+#--------------------------------------------------------------------------------
+#
 
 rebuild_kernel_cache()
 {
     #
-    # Repair the permission & refresh kernelcache
+    # Repair the permission & refresh kernelcache.
     #
     sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
 }
 
+#
+#--------------------------------------------------------------------------------
+#
+
 install_audio()
 {
+    #
+    # Generate audio from current system.
+    #
     rm -rf ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
     cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
     rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
@@ -157,436 +261,516 @@ install_audio()
     sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
 }
 
+#
+#--------------------------------------------------------------------------------
+#
+
 function _initIntel()
 {
 	if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"Intel = false"* ]];
-		then
-    		/usr/libexec/plistbuddy -c "Set ':Graphics:Inject:Intel' true" "${config_plist}"
+      then
+        /usr/libexec/plistbuddy -c "Set ':Graphics:Inject:Intel' true" "${config_plist}"
     fi
 }
 
+#
+#--------------------------------------------------------------------------------
+#
+
 function _getEDID()
 {
-	#
-	# Get raw EDID.
-	#
-	gEDID=$(ioreg -lw0 | grep -i "IODisplayEDID" | sed -e 's/.*<//' -e 's/>//')
+    #
+    # Whether the Intel Graphics kernel extensions are loaded in cache?
+    #
+    if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]];
+      then
+        #
+        # Yes. Then we can directly assess EDID from ioreg.
+        #
+        # Get raw EDID.
+        #
+        gEDID=$(ioreg -lw0 | grep -i "IODisplayEDID" | sed -e 's/.*<//' -e 's/>//')
 
-	#
-	# Get native resolution(Rez) from $gEDID.
-	#
+        #
+        # Get native resolution(Rez) from $gEDID.
+        #
+        # Get horizontal resolution.
+        #
+        gHorizontalRez_pr=$(echo $gEDID | cut -c 117)
+        gHorizontalRez_st=$(echo $gEDID | cut -c 113-114)
+        gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
 
-	#
-	# Get horizontal resolution.
-	#
-	gHorizontalRez_pr=$(echo $gEDID | cut -c 117)
-	gHorizontalRez_st=$(echo $gEDID | cut -c 113-114)
-	gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
+        #
+        # Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the
+        # progress clear.
+        #
+        gVerticalRez_pr=$(echo $gEDID | cut -c 123)
+        gVerticalRez_st=$(echo $gEDID | cut -c 119-120)
+        gVerticalRez=$((0x$gVerticalRez_pr$gVerticalRez_st))
+      else
+        #
+        # No, we cannot assess EDID from ioreg. But now the resolution of current display has been forced to the highest resolution as vendor designed.
+        #
+        gSystemRez=$(system_profiler SPDisplaysDataType | grep -i "Resolution" | sed -e 's/.*://')
+        gSystemHorizontalRez=$(echo $gSystemRez | sed -e 's/x.*//')
+        gSystemVerticalRez=$(echo $gSystemRez | sed -e 's/.*x//')
+    fi
 
-	#
-	# Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the 
-	# progress clear.
-	#
-	gVerticalRez_pr=$(echo $gEDID | cut -c 123)
-	gVerticalRez_st=$(echo $gEDID | cut -c 119-120)
-	gVerticalRez=$((0x$gVerticalRez_pr$gVerticalRez_st))
+    #
+    # Patch IOKit?
+    #
+    if [[ $gHorizontalRez -gt 1920 || $gSystemHorizontalRez -gt 1920 ]];
+      then
+        #
+        # Yes, We indeed require a patch to unlock the limitation of flash rate of IOKit to power up the QHD+/4K display.
+        #
+        # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all model being powered up.
+        #
+        gPatchIOKit=0
+      else
+        #
+        # No, patch IOKit is not required, we won't touch IOKit(for a more intergration/clean system since less is more).
+        #
+        gPatchIOKit=1
+    fi
+
 }
 
 #
-# Decide which progress to finish [syscl/Yating]
-# Merge two step Initialstep.sh and Finalstep.sh into one.
-#
-# Note : This "if" is to make two steps clear.
-#
-if [ ! -f ${EFI_INFO} ];then
-########################
-# Generate define directionaries
-########################
-
-tidy_execute "create_dir "${REPO}/DSDT"" "Create ./DSDT"
-tidy_execute "create_dir "${prepare}"" "Create ./DSDT/prepare"
-tidy_execute "create_dir "${precompile}"" "Create ./DSDT/precompile"
-tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
-
-########################
-# Choose ESP by syscl/Yating
-########################
-
-diskutil list
-read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
-locate_esp ${targetEFI}
-tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
-
-#
-# Ensure / Force Graphics card to power
-#
-_initIntel
-_getEDID
-
-if [[ $gHorizontalRez == "1920" ]];
-	then
-    	/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
-	else
-    	/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a2e0008" "${config_plist}"
-    	if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a2e0008"* ]];
-    		then
-    			echo "[  ${GREEN}OK${OFF}  ] Force Graphics card to power(Second stage will lead the lid wake) by syscl/Lighting/Yating Zhou."
-    	fi
-fi
-
-########################
-# Copy origin aml to raw
-########################
-
-if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];then
-tidy_execute "cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
-else
-echo "[ ${RED}NOTE${OFF} ] Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
-# ERROR.
-#
-# Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
-#       but we use -1 here to make it clear (obviously) that something went wrong.
-#
-exit -1
-fi
-
-########################
-# Decompile dsdt
-########################
-
-cd "${REPO}"
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Disassembling tables...${OFF}"
-tidy_execute ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml" "Disassemble tables"
-
-########################
-# Search specification tables by syscl/Yating Zhou
-########################
-
-########################
-# Search DptfTa
-########################
-
-for num in $(seq 1 20)
-do
-grep -i "DptfTa" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
-if [ "${RETURN_VAL}" == 0 ];then
-DptfTa=SSDT-$num
-fi
-done
-
-########################
-# Search SaSSDT
-########################
-
-for num in $(seq 1 20)
-do
-grep -i "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
-if [ "${RETURN_VAL}" == 0 ];then
-SaSsdt=SSDT-$num
-fi
-done
-
-########################
-# Search SgRef
-########################
-
-for num in $(seq 1 20)
-do
-grep -i "SgRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
-if [ "${RETURN_VAL}" == 0 ];then
-SgRef=SSDT-$num
-fi
-done
-
-########################
-# Search OptRef
-########################
-
-for num in $(seq 1 20)
-do
-grep -i "OptRef" "${REPO}"/DSDT/raw/SSDT-${num}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
-if [ "${RETURN_VAL}" == 0 ];then
-OptRef=SSDT-$num
-fi
-done
-
-########################
-# DSDT Patches
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching DSDT.dsl${OFF}"
-tidy_execute "patch_acpi DSDT syntax "fix_PARSEOP_ZERO"" "Fix PARSEOP_ZERO"
-tidy_execute "patch_acpi DSDT syntax "fix_ADBG"" "Fix ADBG Error"
-# patch_acpi DSDT syscl "Insert_DTGP"
-tidy_execute "patch_acpi DSDT graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-tidy_execute "patch_acpi DSDT usb "usb_7-series"" "7-series/8-series USB"
-tidy_execute "patch_acpi DSDT usb "usb_prw_0x0d_xhc"" "Fix USB _PRW"
-# patch_acpi DSDT usb "usb_8-series_prw"
-tidy_execute "patch_acpi DSDT battery "battery_Acer-Aspire-E1-571"" "Acer Aspire E1-571"
-tidy_execute "patch_acpi DSDT system "system_IRQ"" "IRQ Fix"
-tidy_execute "patch_acpi DSDT system "system_SMBUS"" "SMBus Fix"
-tidy_execute "patch_acpi DSDT system "system_ADP1"" "AC Adapter Fix"
-tidy_execute "patch_acpi DSDT system "system_MCHC"" "Add MCHC"
-tidy_execute "patch_acpi DSDT system "system_WAK2"" "Fix _WAK Arg0 v2"
-tidy_execute "patch_acpi DSDT system "system_IMEI"" "Add IMEI"
-tidy_execute "patch_acpi DSDT system "system_Mutex"" "Fix Non-zero Mutex"
-# tidy_execute "patch_acpi DSDT misc "misc_Haswell-LPC"" "Add HM87 LPC (8086:8c4b)"
-tidy_execute "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
-tidy_execute "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
-tidy_execute "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
-tidy_execute "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
-
-########################
-# DptfTa Patches
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${DptfTa}.dsl${OFF}"
-tidy_execute "patch_acpi ${DptfTa} syscl "_BST-package-size"" "_BST package size"
-tidy_execute "patch_acpi ${DptfTa} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-
-########################
-# SaSsdt Patches
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${SaSsdt}.dsl${OFF}"
-tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-tidy_execute "patch_acpi ${SaSsdt} syscl "syscl_Iris_Pro"" "Rename HD4600 to Iris Pro"
-tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
-tidy_execute "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
-tidy_execute "patch_acpi ${SaSsdt} syscl "audio_Intel_HD4600"" "Insert HDAU device"
-
-########################
-# SgRef Patches
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${SgRef}.dsl${OFF}"
-tidy_execute "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-
-########################
-# OptRef Patches
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching ${OptRef}.dsl${OFF}"
-tidy_execute "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
-tidy_execute "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-tidy_execute "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
-
-########################
-# Copying all tables to precompile.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying tables to precompile...${OFF}"
-tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
-
-########################
-# Copying raw tables to compile.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
-tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
-
-
-########################
-# Compiling tables
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Compiling tables...${OFF}"
-tidy_execute "compile_table "DSDT"" "Compiling DSDT"
-tidy_execute "compile_table "${DptfTa}"" "Compile DptfTa"
-tidy_execute "compile_table "${SaSsdt}"" "Compile SaSsdt"
-tidy_execute "compile_table "${SgRef}"" "Compile SgRef"
-tidy_execute "compile_table "${OptRef}"" "Compile OptRef"
-
-########################
-# Copying SSDT-rmne.aml.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Copying SSDT-rmne.aml to ./DSDT/compile...${OFF}"
-tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
-
-########################
-# Detect which SSDT for processor to be installed.
-########################
-
-if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]]
-then
-tidy_execute "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
-fi
-
-if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
-then
-tidy_execute "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
-fi
-
-########################
-# Clean up dynamic SSDTs.
-########################
-
-tidy_execute "rm "${compile}"SSDT-*x.aml" "Clean dynamic SSDTs"
-
-########################
-
-
-########################
-# Check if Clover is in place [syscl/Yating Zhou]
-########################
-
-if [ ! -d /Volumes/EFI/EFI/CLOVER ];then
-#
-# Not installed
-#
-    echo "[ ${RED}NOTE${OFF} ] Clover does not install on EFI, please reinstall Clover to EFI and try again."
-# ERROR.
-#
-# Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
-#       but we use -1 here to make it clear (obviously) that something went wrong.
-#
-exit -1
-fi
-
-tidy_execute "create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
-
-########################
-# Copy AML to Destination Place
-########################
-
-tidy_execute "cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched" "Copy tables to /Volumes/EFI/EFI/CLOVER/ACPI/patched"
-
-########################
-# Gain OS generation
-########################
-
-gProductVersion="$(sw_vers -productVersion)"
-OS_Version=$(echo ${gProductVersion:0:5})
-KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
-
-########################
-# Updating kexts. NOTE: This progress will remove any previous kexts.
-########################
-
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating kexts...${OFF}"
-tidy_execute "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
-tidy_execute "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
-tidy_execute "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
-
-#
-# Finish operation of configuration on booting progress [syscl/Yating Zhou]
+#--------------------------------------------------------------------------------
 #
 
-########################
-# Installing audio
-########################
+function _check_and_fix_config()
+{
+    #
+    # Check if the ig-platform-id is correct(i.e. ig-platform-id = 0x0a2e0008).
+    #
+    target_ig_platform_id="0x0a2e0008"
+    gClover_ig_platform_id=$(awk '/<key>ig-platform-id<\/key>.*/,/<\/string>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
 
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Installing audio...${OFF}"
-tidy_execute "install_audio" "Install audio"
+    if [[ $gClover_ig_platform_id != $target_ig_platform_id ]];
+      then
+        #
+        # Yes, we have to touch/modify the config.plist.
+        #
+        sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
+    fi
 
-########################
-# Rebuilding kernel extensions cache.
-########################
+    #
+    # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
+    #
+    # Check if the binary patch for AppleIntelFramebufferAzul is in the right place.
+    #
+    gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
+    find_lid_byte="40000000 1e000000 05050901"
+    replace_lid_byte="40000000 0f000000 05050901"
 
-echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+    #
+    # Convert to base64.
+    #
+    find_lid_byte_ENCODE=$(echo $find_lid_byte | xxd -r -p | base64)
+    replace_lid_byte_ENCODE=$(echo $replace_lid_byte | xxd -r -p | base64)
+
+    if [[ $gClover_kexts_to_patch_data != *"$find_lid_byte_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_lid_byte_ENCODE"* ]];
+      then
+        #
+        # No patch existed in config.plist, add patch for it:
+        #
+        _add_kexts_to_patch_infoplist "Enable lid wake after sleep for 0a2e0008 (c) syscl/lighting/Yating Zhou" "$find_lid_byte_ENCODE" "$replace_lid_byte_ENCODE" "AppleIntelFramebufferAzul"
+    fi
+
+    #
+    # Check if "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008" is in config.plist.
+    #
+    find_Azul_data="08002e0a 01030303 00000004 00002002 00005001"
+    replace_Azul_data="08002e0a 01030303 00000008 00000003 00000003"
+
+    #
+    # Convert to base64.
+    #
+    find_Azul_data_ENCODE=$(echo $find_Azul_data | xxd -r -p | base64)
+    replace_Azul_data_ENCODE=$(echo $replace_Azul_data | xxd -r -p | base64)
+
+    if [[ $gClover_kexts_to_patch_data != *"$find_Azul_data_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_Azul_data_ENCODE"* ]];
+      then
+        #
+        # No patch existed in config.plist, add patch for it:
+        #
+        _add_kexts_to_patch_infoplist "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
+    fi
+
+    #
+    # Check if "Enable HD4600 HDMI Audio" is located in config.plist.
+    #
+    find_hdmi_bytes="3D0C0A00 00"
+    replace_hdmi_bytes="3D0C0C00 00"
+
+    #
+    # Convert to base64.
+    #
+    find_hdmi_bytes_ENCODE=$(echo $find_hdmi_bytes | xxd -r -p | base64)
+    replace_hdmi_bytes_ENCODE=$(echo $replace_hdmi_bytes | xxd -r -p | base64)
+
+    if [[ $gClover_kexts_to_patch_data != *"$find_hdmi_bytes_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_hdmi_bytes_ENCODE"* ]];
+      then
+        #
+        # No patch existed in config.plist, add patch for it:
+        #
+        _add_kexts_to_patch_infoplist "Enable HD4600 HDMI Audio" "$find_hdmi_bytes_ENCODE" "$replace_hdmi_bytes_ENCODE" "AppleHDAController"
+    fi
+}
 
 #
-# Check if your resolution is 1920*1080 or 3200 x 1800 or 3840x2160 by syscl/Yating Zhou.
-# Note: You need to change System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->『128MB』
+#--------------------------------------------------------------------------------
 #
-echo "[ ${RED}NOTE${OFF} ] You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
-if [[ $gHorizontalRez == "1920" ]];
-	then
-		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for $gHorizontalRez x $gVerticalRez model, progress will finish instantly...${OFF}"
-		tidy_execute "cp ./CLOVER/1920x1080_config.plist ${config_plist}" "Update configuration for $gHorizontalRez x $gVerticalRez model"
 
-		#
-		# You fool: don't use <em>rm -rf</em> commands in a script!
-		#
-		tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
-		echo "Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl PCBeta"
-	else
-		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Updating configuration for $gHorizontalRez x $gVerticalRez model, progress will finish instantly...${OFF}"
-		#
-		# Patch IOKit.
-		#
-		echo "[ ${GREEN}--->${OFF} ] ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
-		sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-		tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-		echo "[ ${RED}NOTE${OFF} ] ${RED}REBOOT${OFF}! Then run the Deploy.sh ${RED}AGAIN${OFF} to finish the installation."
-fi
+function _add_kexts_to_patch_infoplist()
+{
+    local comment=$1
+    local find_binary_ENCODE=$2
+    local replace_binary_ENCODE=$3
+    local binary_name=$4
+    index=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist} | grep -i "Name" | wc -l)
 
-########################
-# Operation complete!
-########################
+    #
+    # Inject comment.
+    #
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index' dict" ${config_plist}
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Comment' string" ${config_plist}
+    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Comment' $comment" ${config_plist}
+
+    #
+    # Disabled = Nope.
+    #
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Disabled' bool" ${config_plist}
+    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Disabled' false" ${config_plist}
+
+    #
+    # Inject find binary.
+    #
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Find' data" ${config_plist}
+    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Find' syscl" ${config_plist}
+    sed -ig "s/c3lzY2w=/$find_binary_ENCODE/g" ${config_plist}
+
+    #
+    # Inject name.
+    #
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Name' string" ${config_plist}
+    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Name' $binary_name" ${config_plist}
+
+    #
+    # Inject replace binary.
+    #
+    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Replace' data" ${config_plist}
+    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Replace' syscl" ${config_plist}
+    sed -ig "s/c3lzY2w=/$replace_binary_ENCODE/g" ${config_plist}
+}
 
 #
-# Note: This "else" is for the first "if" just to separate/make two step clear.
+#--------------------------------------------------------------------------------
 #
-else
 
-########################
-# Finalstep.sh : lead to lid wake
-########################
+function _find_acpi()
+{
+    #
+    # Search specification tables by syscl/Yating Zhou.
+    #
+    number=$(ls "${REPO}"/DSDT/raw/SSDT*.dsl | wc -l)
+
+    #
+    # Search DptfTa.
+    #
+    for ((index = 1; index <= ${number}; index++))
+    do
+      grep -i "DptfTa" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+
+      if [ "${RETURN_VAL}" == 0 ];
+        then
+          DptfTa=SSDT-${index}
+      fi
+    done
+
+    #
+    # Search SaSsdt.
+    #
+    for ((index = 1; index <= ${number}; index++))
+    do
+      grep -i "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+
+      if [ "${RETURN_VAL}" == 0 ];
+        then
+          SaSsdt=SSDT-${index}
+      fi
+    done
+
+    #
+    # Search SgRef.
+    #
+    for ((index = 1; index <= ${number}; index++))
+    do
+      grep -i "SgRef" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+
+      if [ "${RETURN_VAL}" == 0 ];
+        then
+          SgRef=SSDT-${index}
+      fi
+    done
+
+    #
+    # Search OptRef.
+    #
+    for ((index = 1; index <= ${number}; index++))
+    do
+      grep -i "OptRef" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+
+      if [ "${RETURN_VAL}" == 0 ];
+        then
+          OptRef=SSDT-${index}
+      fi
+    done
+}
 
 #
-# Get EDID information.
+#--------------------------------------------------------------------------------
 #
-_getEDID
+
+function _update_clover_kext()
+{
+    #
+    # Gain OS generation.
+    #
+    gProductVersion="$(sw_vers -productVersion)"
+    OS_Version=$(echo ${gProductVersion:0:5})
+    KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
+
+    #
+    # Updating kexts. NOTE: This progress will remove any previous kexts.
+    #
+    _PRINT_MSG "--->: ${BLUE}Updating kexts...${OFF}"
+    tidy_execute "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
+    tidy_execute "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
+    tidy_execute "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
+}
 
 #
-# Note: Added this "if" to terminate the script if the model is 1920*1080
+#--------------------------------------------------------------------------------
 #
-if [[ $gHorizontalRez == "1920" ]];
-	then
-		echo "[ ${RED}NOTE${OFF} ] You do not need to run this script again since all the operations on your laptop have done!"
-	else
 
-	#
-	# Detect whether the QE/CI is enabled [syscl/Yating Zhou]
-	#
+function main()
+{
+    #
+    # Sync all files from https://github.com/syscl/M3800
+    #
+    # Check if github is available
+    #
+    _update
 
-	if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]];
-		then
-			echo "[ ${RED}NOTE${OFF} ] After this step finish, reboot system and enjoy your OS X! --syscl PCBeta"
-			targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} |awk -F':' '{print $2}')
-			tidy_execute "diskutil mount ${targetUUID}" "Mount ${targetUUID}"
-			tidy_execute "rm /Volumes/EFI/EFI/CLOVER/1920x1080_config.plist" "Remove redundant plist"
+    #
+    # Generate dir.
+    #
+    tidy_execute "create_dir "${REPO}/DSDT"" "Create ./DSDT"
+    tidy_execute "create_dir "${prepare}"" "Create ./DSDT/prepare"
+    tidy_execute "create_dir "${precompile}"" "Create ./DSDT/precompile"
+    tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
 
-			#
-			# Lead to lid wake by syscl/Yating Zhou
-			#
-			echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-			tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
-			echo "[ ${GREEN}--->${OFF} ] ${BLUE}Leading to lid wake by syscl/Lighting/Yating Zhou ...${OFF}"
-			/usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' 0x0a260006" "${config_plist}"
+    #
+    # Mount esp.
+    #
+    diskutil list
+    read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
+    locate_esp ${targetEFI}
+    tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
-			if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"ig-platform-id = 0x0a260006"* ]];
-				then
-					echo "[  ${GREEN}OK${OFF}  ] Lead to lid wake by syscl/Lighting/Yating Zhou."
-					#
-					# Rebuilding kernel extensions cache.
-					#
-					echo "[ ${GREEN}--->${OFF} ] ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-					tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
-					echo "[ ${RED}NOTE${OFF} ] FINISH! ${RED}REBOOT${OFF}!"
-					
-				else
-					echo "[${RED}FAILED${OFF}] Ensure ${config_plist} has right config."
-					echo "[ ${RED}NOTE${OFF} ] Try the script again!"
-			fi
-		else
-			echo "[ ${RED}NOTE${OFF} ] It seems that QE/EC has not been powered up yet."
-			exit -1
+    #
+    # Ensure / Force Graphics card to power.
+    #
+    _initIntel
+    _getEDID
 
-	fi
-#
-# You fool: don't use <em>rm -rf</em> commands in a script!
-#
-tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
-#
-# Note: this "fi" is just for 1920 x 1080p one
-#
-fi
-#
-# Note: this "fi" is just to terminate the whole "if".
-#
-fi
-exit 0
+    #
+    # Copy origin aml to raw.
+    #
+    if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];
+      then
+        tidy_execute "cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
+      else
+        _PRINT_MSG "NOTE: Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
+        # ERROR.
+        #
+        # Note: The exit value can be anything between 0 and 255 and thus -1 is actually 255
+        #       but we use -1 here to make it clear (obviously) that something went wrong.
+        #
+        exit -1
+    fi
+
+    #
+    # Decompile dsdt.
+    #
+    cd "${REPO}"
+    _PRINT_MSG "--->: ${BLUE}Disassembling tables...${OFF}"
+    tidy_execute ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml" "Disassemble tables"
+
+    #
+    # Search specification tables by syscl/Yating Zhou.
+    #
+    tidy_execute "_find_acpi" "Search specification tables by syscl/Yating Zhou"
+
+    #
+    # DSDT Patches.
+    #
+    _PRINT_MSG "--->: ${BLUE}Patching DSDT.dsl${OFF}"
+    tidy_execute "patch_acpi DSDT syntax "fix_PARSEOP_ZERO"" "Fix PARSEOP_ZERO"
+    tidy_execute "patch_acpi DSDT syntax "fix_ADBG"" "Fix ADBG Error"
+    tidy_execute "patch_acpi DSDT graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    tidy_execute "patch_acpi DSDT usb "usb_7-series"" "7-series/8-series USB"
+    tidy_execute "patch_acpi DSDT usb "usb_prw_0x0d_xhc"" "Fix USB _PRW"
+    tidy_execute "patch_acpi DSDT battery "battery_Acer-Aspire-E1-571"" "Acer Aspire E1-571"
+    tidy_execute "patch_acpi DSDT system "system_IRQ"" "IRQ Fix"
+    tidy_execute "patch_acpi DSDT system "system_SMBUS"" "SMBus Fix"
+    tidy_execute "patch_acpi DSDT system "system_ADP1"" "AC Adapter Fix"
+    tidy_execute "patch_acpi DSDT system "system_MCHC"" "Add MCHC"
+    tidy_execute "patch_acpi DSDT system "system_WAK2"" "Fix _WAK Arg0 v2"
+    tidy_execute "patch_acpi DSDT system "system_IMEI"" "Add IMEI"
+    tidy_execute "patch_acpi DSDT system "system_Mutex"" "Fix Non-zero Mutex"
+    tidy_execute "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
+    tidy_execute "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
+    tidy_execute "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
+    tidy_execute "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
+
+    #
+    # DptfTa Patches.
+    #
+    _PRINT_MSG "--->: ${BLUE}Patching ${DptfTa}.dsl${OFF}"
+    tidy_execute "patch_acpi ${DptfTa} syscl "_BST-package-size"" "_BST package size"
+    tidy_execute "patch_acpi ${DptfTa} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+
+    #
+    # SaSsdt Patches.
+    #
+    _PRINT_MSG "--->: ${BLUE}Patching ${SaSsdt}.dsl${OFF}"
+    tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    tidy_execute "patch_acpi ${SaSsdt} syscl "syscl_Iris_Pro"" "Rename HD4600 to Iris Pro"
+    tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
+    tidy_execute "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
+    tidy_execute "patch_acpi ${SaSsdt} syscl "audio_Intel_HD4600"" "Insert HDAU device"
+
+    #
+    # SgRef Patches.
+    #
+    _PRINT_MSG "--->: ${BLUE}Patching ${SgRef}.dsl${OFF}"
+    tidy_execute "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+
+    #
+    # OptRef Patches.
+    #
+    _PRINT_MSG "--->: ${BLUE}Patching ${OptRef}.dsl${OFF}"
+    tidy_execute "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
+    tidy_execute "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    tidy_execute "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
+
+    #
+    # Copy all tables to precompile.
+    #
+    _PRINT_MSG "--->: ${BLUE}Copying tables to precompile...${OFF}"
+    tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
+
+    #
+    # Copying raw tables to compile.
+    #
+    _PRINT_MSG "--->: ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
+    tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
+
+    #
+    # Compile tables.
+    #
+    _PRINT_MSG "--->: ${BLUE}Compiling tables...${OFF}"
+    tidy_execute "compile_table "DSDT"" "Compiling DSDT"
+    tidy_execute "compile_table "${DptfTa}"" "Compile DptfTa"
+    tidy_execute "compile_table "${SaSsdt}"" "Compile SaSsdt"
+    tidy_execute "compile_table "${SgRef}"" "Compile SgRef"
+    tidy_execute "compile_table "${OptRef}"" "Compile OptRef"
+
+    #
+    # Copy SSDT-rmne.aml.
+    #
+    _PRINT_MSG "--->: ${BLUE}Copying SSDT-rmne.aml to ./DSDT/compile...${OFF}"
+    tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
+
+    #
+    # Detect which SSDT for processor to be installed.
+    #
+    if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]];
+      then
+        tidy_execute "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
+    fi
+
+    if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
+      then
+        tidy_execute "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
+    fi
+
+    #
+    # Clean up dynamic SSDTs.
+    #
+    tidy_execute "rm "${compile}"SSDT-*x.aml" "Clean dynamic SSDTs"
+
+    #
+    # Copy AML to destination place.
+    #
+    tidy_execute "create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
+    tidy_execute "cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched" "Copy tables to /Volumes/EFI/EFI/CLOVER/ACPI/patched"
+
+    #
+    # Refresh kext in Clover.
+    #
+    _update_clover_kext
+
+    #
+    # Install audio.
+    #
+    _PRINT_MSG "--->: ${BLUE}Installing audio...${OFF}"
+    tidy_execute "install_audio" "Install audio"
+
+    #
+    # Rebuild kernel extensions cache.
+    #
+    _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
+    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+
+    #
+    # Patch IOKit.
+    #
+    _PRINT_MSG "NOTE: You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
+
+    if [[ $gPatchIOKit ]];
+      then
+        #
+        # Patch IOKit.
+        #
+        _PRINT_MSG "--->: ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
+        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
+        tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+    fi
+
+    #
+    # Lead to lid wake on 0x0a2e0008 by syscl/lighting/Yating Zhou
+    #
+    _PRINT_MSG "--->: ${BLUE}Leading to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou...${OFF}"
+    tidy_execute "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
+
+    #
+    # Clean up.
+    #
+    tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
+
+    _PRINT_MSG "NOTE: Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl/lighting/Yating Zhou @PCBeta"
+
+}
+
+#==================================== START =====================================
+
+main
+
+#================================================================================
+
+exit ${RETURN_VAL}
