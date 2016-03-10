@@ -12,7 +12,7 @@ This project targets at giving the relatively complete functional OS X for both 
 6. Install OS X
 7. Once you finish installation of OS X, you can do the following to finish the post installation of OS X:
 
-How to use Deploy.sh?
+How to use deploy.sh?
 ----------------
 
 Download the latest version installation package/directory by entering the following command in a terminal window:
@@ -24,7 +24,7 @@ This will download the whole installation directory to your home directory(~) an
 
 
 ```sh
-chmod +x ./M3800/Deploy.sh
+chmod +x ./M3800/deploy.sh
 ```
 
 
@@ -32,18 +32,22 @@ Run the script in a terminal windows by(Note: You should dump the ACPI tables by
 
 ```sh
 cd M3800
-./Deploy.sh
+./deploy.sh
 ```
 
-If you have a model other than the resolution of 1920 x 1080p, please run the deploy.sh again after a fresh reboot by:
+Reboot your OS X to see the change. If you have sound problem, run the deploy.sh again to update the HDA.
 
-```sh
-cd M3800
-./Deploy.sh
-```
 
 Change Log
 ----------------
+
+2016-3-11
+
+- Finally, M3800/XPS15(9530) can use ig-platform-id 0x0a2e0008(OS Version >= 10.10.2) with the lid wake function after sleep(credit syscl/lighting/Yating Zhou).
+- Huge style change! We don't have to reboot 2x due to the change of ig-platform-id! Once you update your OS X(do not reboot), and run the deploy.sh again, then, you can enjoy every functions of OS X you want.
+- If you have sound card problem, run the deploy.sh again and reboot to see if it can fix the problem.
+- Removed FakePCIID_Intel_HDMI_Audio.kext since we have a better way to power up the HDMI audio.
+
 2016-3-6
 
 - Added 4K(3840 x 2160) support for M3800 credit SimplyLab(see issue #6).
@@ -86,7 +90,7 @@ Change Log
 
 2015-12-25
 
-- Huge change in Deploy.sh, added function method to make the script easy to read, and yes, the script is faster than ever.
+- Huge change in deploy.sh, added function method to make the script easy to read, and yes, the script is faster than ever.
 
 
 2015-12-24
