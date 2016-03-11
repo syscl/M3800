@@ -4,6 +4,13 @@
 # syscl/Yating Zhou/lighting from bbs.PCBeta.com
 # Merge for Dell Precision M3800 and XPS15 (9530).
 #
+
+#================================= GLOBAL VARS ==================================
+
+#
+# The script expects '0.5' but non-US localizations use '0,5' so we export
+# LC_NUMERIC here (for the duration of the deploy.sh) to prevent errors.
+#
 export LC_NUMERIC="en_US.UTF-8"
 
 #
@@ -220,6 +227,7 @@ function rebuild_kernel_cache()
     sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
+    sudo /usr/libexec/repair_packages --repair --standard-pkgs --volume /
 }
 
 #
@@ -324,7 +332,7 @@ function _getEDID()
         #
         # Yes, We indeed require a patch to unlock the limitation of flash rate of IOKit to power up the QHD+/4K display.
         #
-        # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all model being powered up.
+        # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all models being powered up.
         #
         gPatchIOKit=0
       else
