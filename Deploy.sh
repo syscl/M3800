@@ -132,7 +132,7 @@ function _update()
     #
     _PRINT_MSG "--->: Updating files from ${BLUE}${target_website}...${OFF}"
     target_website_status=`curl -I -s --connect-timeout $timeout ${target_website} -w %{http_code}`
-    if [[ `echo ${target_website_status} |grep -i "Status"` == *"OK"* && `echo ${target_website_status} | grep -i "Status"` == *"200"* ]]
+    if [[ `echo ${target_website_status} | grep -i "Status"` == *"OK"* && `echo ${target_website_status} | grep -i "Status"` == *"200"* ]]
       then
         cd ${REPO}
         git pull
@@ -147,7 +147,7 @@ function _update()
 
 function locate_esp()
 {
-    diskutil info $1 |grep -i "Partition UUID" >${EFI_INFO}
+    diskutil info $1 | grep -i "Partition UUID" >${EFI_INFO}
     targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} | awk -F':' '{print $2}')
 }
 
@@ -212,7 +212,7 @@ function compile_table()
 #--------------------------------------------------------------------------------
 #
 
-rebuild_kernel_cache()
+function rebuild_kernel_cache()
 {
     #
     # Repair the permission & refresh kernelcache.
@@ -226,7 +226,7 @@ rebuild_kernel_cache()
 #--------------------------------------------------------------------------------
 #
 
-install_audio()
+function install_audio()
 {
     #
     # Generate audio from current system.
@@ -267,7 +267,7 @@ install_audio()
 
 function _initIntel()
 {
-	if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"Intel = false"* ]];
+    if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"Intel = false"* ]];
       then
         /usr/libexec/plistbuddy -c "Set ':Graphics:Inject:Intel' true" "${config_plist}"
     fi
@@ -333,7 +333,6 @@ function _getEDID()
         #
         gPatchIOKit=1
     fi
-
 }
 
 #
@@ -675,7 +674,7 @@ function main()
     tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
 
     #
-    # Copying raw tables to compile.
+    # Copy raw tables to compile.
     #
     _PRINT_MSG "--->: ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
     tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
@@ -764,7 +763,6 @@ function main()
     tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
 
     _PRINT_MSG "NOTE: Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl/lighting/Yating Zhou @PCBeta"
-
 }
 
 #==================================== START =====================================
