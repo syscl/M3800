@@ -82,6 +82,11 @@ find_Azul_data=""
 replace_Azul_data=""
 find_Azul_data_ENCODE=""
 replace_Azul_data_ENCODE=""
+gMINOR_VER=""
+find_handoff_bytes=""
+replace_handoff_bytes=""
+find_handoff_bytes_ENCODE=""
+replace_handoff_bytes_ENCODE=""
 
 #
 # Define target website
@@ -383,11 +388,11 @@ function _check_and_fix_config()
         #
         # No patch existed in config.plist, add patch for it:
         #
-        _add_kexts_to_patch_infoplist "Enable lid wake after sleep for 0a2e0008 (c) syscl/lighting/Yating Zhou" "$find_lid_byte_ENCODE" "$replace_lid_byte_ENCODE" "AppleIntelFramebufferAzul"
+        _add_kexts_to_patch_infoplist "Enable lid wake after sleep for 0x0a2e0008 (c) syscl/lighting/Yating Zhou" "$find_lid_byte_ENCODE" "$replace_lid_byte_ENCODE" "AppleIntelFramebufferAzul"
     fi
 
     #
-    # Check if "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008" is in config.plist.
+    # Check if "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" is in config.plist.
     #
     find_Azul_data="08002e0a 01030303 00000004 00002002 00005001"
     replace_Azul_data="08002e0a 01030303 00000008 00000003 00000003"
@@ -403,7 +408,7 @@ function _check_and_fix_config()
         #
         # No patch existed in config.plist, add patch for it:
         #
-        _add_kexts_to_patch_infoplist "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
+        _add_kexts_to_patch_infoplist "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
     fi
 
     #
@@ -424,6 +429,42 @@ function _check_and_fix_config()
         # No patch existed in config.plist, add patch for it:
         #
         _add_kexts_to_patch_infoplist "Enable HD4600 HDMI Audio" "$find_hdmi_bytes_ENCODE" "$replace_hdmi_bytes_ENCODE" "AppleHDAController"
+    fi
+
+    #
+    # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
+    #
+    # The first step is to check the minor version of OS X(e.g. 10.10 vs. 10.11).
+    #
+    gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
+
+    if [[ $gMINOR_VER -ge 11 ]];
+      then
+        #
+        # OS X is 10.11+.
+        #
+        find_handoff_bytes="4885ff74 47488b07"
+        replace_handoff_bytes="41be0f00 0000eb44"
+      else
+        #
+        # OS X is 10.10-.
+        #
+        find_handoff_bytes="4885c074 5c0fb748"
+        replace_handoff_bytes="41be0f00 0000eb59"
+    fi
+
+    #
+    # Convert to base64.
+    #
+    find_handoff_bytes_ENCODE=$(echo $find_handoff_bytes | xxd -r -p | base64)
+    replace_handoff_bytes_ENCODE=$(echo $replace_handoff_bytes | xxd -r -p | base64)
+
+    if [[ $gClover_kexts_to_patch_data != *"$find_handoff_bytes_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_handoff_bytes_ENCODE"* ]];
+      then
+        #
+        # No patch existed in config.plist, add patch for it:
+        #
+        _add_kexts_to_patch_infoplist "Enable BT4LE-Handoff-Hotspot" "$find_handoff_bytes_ENCODE" "$replace_handoff_bytes_ENCODE" "IOBluetoothFamily"
     fi
 }
 
@@ -457,7 +498,7 @@ function _add_kexts_to_patch_infoplist()
     #
     /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Find' data" ${config_plist}
     /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Find' syscl" ${config_plist}
-    sed -ig "s/c3lzY2w=/$find_binary_ENCODE/g" ${config_plist}
+    sed -ig "s|c3lzY2w=|$find_binary_ENCODE|g" ${config_plist}
 
     #
     # Inject name.
@@ -470,7 +511,7 @@ function _add_kexts_to_patch_infoplist()
     #
     /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Replace' data" ${config_plist}
     /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Replace' syscl" ${config_plist}
-    sed -ig "s/c3lzY2w=/$replace_binary_ENCODE/g" ${config_plist}
+    sed -ig "s|c3lzY2w=|$replace_binary_ENCODE|g" ${config_plist}
 }
 
 #
