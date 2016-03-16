@@ -41,6 +41,12 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 Change Log
 ----------------
 
+2016-3-13
+
+- Added magic number "01470c02" as PMheart/neycwcy10's suggestion to try to fix the issue #10.
+- Refined configdata from dump codec from linux.
+- Enable BT4LE-Handoff-Hotspot by kextstopatch.
+
 2016-3-11
 
 - Finally, M3800/XPS15(9530) can use ig-platform-id 0x0a2e0008(OS Version >= 10.10.2) with the lid wake function after sleep(credit syscl/lighting/Yating Zhou).

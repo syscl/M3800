@@ -232,7 +232,7 @@ function rebuild_kernel_cache()
     sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
-    sudo /usr/libexec/repair_packages --repair --standard-pkgs --volume /
+    # sudo /usr/libexec/repair_packages --repair --standard-pkgs --volume /
 }
 
 #
