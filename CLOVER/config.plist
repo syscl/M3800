@@ -48,7 +48,7 @@
 		<key>Debug</key>
 		<false/>
 		<key>DefaultVolume</key>
-		<string>Mackintosh HD</string>
+		<string>Macintosh HD</string>
 		<key>Legacy</key>
 		<string>LegacyBiosDefault</string>
 		<key>Secure</key>
@@ -370,6 +370,8 @@
 	</dict>
 	<key>RtVariables</key>
 	<dict>
+		<key>BooterConfig</key>
+		<string>0x28</string>
 		<key>CsrActiveConfig</key>
 		<string>0x03</string>
 	</dict>
