@@ -47,6 +47,10 @@ plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
 config_plist="/Volumes/EFI/EFI/CLOVER/config.plist"
 EFI_INFO="${REPO}/DSDT/EFIINFO"
 patch_config_plist="${REPO}/DSDT/tmp.plist"
+gInstallDameon="/usr/local/sbin"
+gFrom="${REPO}/tools"
+gUSBSleepConfig="/tmp/de.bernhard-baehr.sleepwatcher.plist"
+gUSBSleepScript="/tmp/sysclusbfix.sleep"
 
 #
 # Define variables.
@@ -108,7 +112,7 @@ function _PRINT_MSG()
       else
         if [[ $message =~ 'FAILED' ]];
           then
-            local message=$(echo $message | sed -e 's/.*://')
+            local message=$(echo $message | sed -e 's/.*FAILED://')
             echo "[${RED}FAILED${OFF}] ${message}."
           else
             if [[ $message =~ '--->' ]];
@@ -119,7 +123,7 @@ function _PRINT_MSG()
                 if [[ $message =~ 'NOTE' ]];
                   then
                     local message=$(echo $message | sed -e 's/.*NOTE://')
-                    echo "[ ${RED}Note${OFF} ] ${message}."
+                    echo "[ ${RED}NOTE${OFF} ] ${message}."
                 fi
             fi
         fi
@@ -604,6 +608,97 @@ function _update_clover_kext()
 #--------------------------------------------------------------------------------
 #
 
+function _printUSBSleepConfig()
+{
+    if [ -f ${gUSBSleepConfig} ];
+      then
+        rm ${gUSBSleepConfig}
+    fi
+
+    echo '<?xml version="1.0" encoding="UTF-8"?>'                                                                                                           > "$gUSBSleepConfig"
+    echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'                                          >> "$gUSBSleepConfig"
+    echo '<plist version="1.0">'                                                                                                                           >> "$gUSBSleepConfig"
+    echo '<dict>'                                                                                                                                          >> "$gUSBSleepConfig"
+    echo '	<key>KeepAlive</key>'                                                                                                                          >> "$gUSBSleepConfig"
+    echo '	<true/>'                                                                                                                                       >> "$gUSBSleepConfig"
+    echo '	<key>Label</key>'                                                                                                                              >> "$gUSBSleepConfig"
+    echo '	<string>de.bernhard-baehr.sleepwatcher</string>'                                                                                               >> "$gUSBSleepConfig"
+    echo '	<key>ProgramArguments</key>'                                                                                                                   >> "$gUSBSleepConfig"
+    echo '	<array>'                                                                                                                                       >> "$gUSBSleepConfig"
+    echo '		<string>/usr/local/sbin/sleepwatcher</string>'                                                                                             >> "$gUSBSleepConfig"
+    echo '		<string>-V</string>'                                                                                                                       >> "$gUSBSleepConfig"
+    echo '		<string>-s /etc/sysclusbfix.sleep</string>'                                                                                                >> "$gUSBSleepConfig"
+    echo '	</array>'                                                                                                                                      >> "$gUSBSleepConfig"
+    echo '	<key>RunAtLoad</key>'                                                                                                                          >> "$gUSBSleepConfig"
+    echo '	<true/>'                                                                                                                                       >> "$gUSBSleepConfig"
+    echo '</dict>'                                                                                                                                         >> "$gUSBSleepConfig"
+    echo '</plist>'                                                                                                                                        >> "$gUSBSleepConfig"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _createUSB_Sleep_Script()
+{
+    if [ -f ${gUSBSleepScript} ];
+      then
+        rm ${gUSBSleepScript}
+    fi
+
+    echo '#!/bin/sh'                                                                                                                                         > "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo '# This script aims to unmount all external devices automatically before sleep.'                                                                   >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo '# Without this procedure, various computers with OS X/Mac OS X(even on a real Mac) suffer from "Disk not ejected properly"'                       >> "$gUSBSleepScript"
+    echo '# issue when there're external devices plugged-in. That's the reason why I created this script to fix this issue. (syscl/lighting/Yating Zhou)'   >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo '# All credit to Bernhard Baehr (bernhard.baehr@gmx.de), without his great sleepwatcher dameon, this fix will not be created.'                     >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo '# Added unmount Disk for "OS X" (c) syscl/lighting/Yating Zhou.'                                                                                  >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil unmountDisk {}'                                   >> "$gUSBSleepScript"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _fix_usb_ejected_improperly()
+{
+    #
+    # This function fix the issue that usb ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
+    #
+    # Generate configuration file of sleepwatcher launch demon.
+    #
+    _PRINT_MSG "--->: Generating configuration file of sleepwatcher launch daemon..."
+    tidy_execute "_printUSBSleepConfig" "Generate configuration file of sleepwatcher launch daemon"
+
+    #
+    # Generate script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou.
+    #
+    _PRINT_MSG "--->: Generating script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou..."
+    tidy_execute "_createUSB_Sleep_Script" "Generating script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou"
+
+    #
+    # Install sleepwatcher daemon.
+    #
+    _PRINT_MSG "--->: Install sleepwatcher daemon..."
+    tidy_execute "sudo cp "${gFrom}/sleepwatcher" "${gInstallDameon}"" "Install sleepwatcher daemon"
+
+    #
+    # Clean up.
+    #
+    tidy_execute "rm $gConfig $gUSBSleepScript" "Clean up temporary files of the progress of fixing usb sleep problem"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function main()
 {
     #
@@ -780,12 +875,6 @@ function main()
     tidy_execute "install_audio" "Install audio"
 
     #
-    # Rebuild kernel extensions cache.
-    #
-    _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
-
-    #
     # Patch IOKit.
     #
     _PRINT_MSG "NOTE: You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
@@ -807,9 +896,20 @@ function main()
     tidy_execute "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
 
     #
+    # Fix issue that external devices ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
+    #
+    _fix_usb_ejected_improperly
+
+    #
+    # Rebuild kernel extensions cache.
+    #
+    _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
+    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+
+    #
     # Clean up.
     #
-    tidy_execute "rm ${EFI_INFO}" "Clean up after installation"
+    tidy_execute "rm ${EFI_INFO}" "Clean up"
 
     _PRINT_MSG "NOTE: Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl/lighting/Yating Zhou @PCBeta"
 }

@@ -20,7 +20,7 @@ Download the latest version installation package/directory by entering the follo
 ```sh
 git clone https://github.com/syscl/M3800
 ```
-This will download the whole installation directory to your home directory(~) and the next step is to change the permissions of the file (add +x) so that it can be run.
+This will download the whole installation directory to your current directory(./) and the next step is to change the permissions of the file (add +x) so that it can be run.
 
 
 ```sh
@@ -40,6 +40,10 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 
 Change Log
 ----------------
+
+2016-3-18
+
+- Fixed issue that external devices ejected improperly upon resume from sleep credit syscl/lighting/Yating Zhou. (More details should be found [here] (https://github.com/syscl/Fix-usb-sleep). 
 
 2016-3-13
 
