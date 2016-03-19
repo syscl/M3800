@@ -660,7 +660,7 @@ function _createUSB_Sleep_Script()
     echo '# Added unmount Disk for "OS X" (c) syscl/lighting/Yating Zhou.'                                                                                  >> "$gUSBSleepScript"
     echo '#'                                                                                                                                                >> "$gUSBSleepScript"
     echo ''                                                                                                                                                 >> "$gUSBSleepScript"
-    echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil unmountDisk {}'                                   >> "$gUSBSleepScript"
+    echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil eject {}'                                         >> "$gUSBSleepScript"
 }
 
 #
@@ -688,6 +688,8 @@ function _fix_usb_ejected_improperly()
     #
     _PRINT_MSG "--->: Install sleepwatcher daemon..."
     tidy_execute "sudo cp "${gFrom}/sleepwatcher" "${gInstallDameon}"" "Install sleepwatcher daemon"
+    tidy_execute "sudo cp "${gUSBSleepConfig}" "/Library/LaunchDaemons"" "Install configuration of sleepwatcher daemon"
+    tidy_execute "sudo cp "${gUSBSleepScript}" "/etc"" "Install sleepwatcher script"
 
     #
     # Clean up.

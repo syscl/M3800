@@ -41,6 +41,10 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 Change Log
 ----------------
 
+2016-3-19
+
+- Used "eject" command line to boost the mount disk progress upon sleep, faster than ever! No more external devices lost upon sleep. (c) syscl/lighting/Yating Zhou
+
 2016-3-18
 
 - Fixed issue that external devices ejected improperly upon resume from sleep credit syscl/lighting/Yating Zhou. (More details should be found [here] (https://github.com/syscl/Fix-usb-sleep). 
