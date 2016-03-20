@@ -276,6 +276,17 @@ function install_audio()
     /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
     sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
     sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+
+    #
+    # Detect if CodecCommander.kext is in /System/Library/Extensions/.
+    #
+    if [ -f /System/Library/Extensions/CodecCommander.kext ];
+      then
+        #
+        # Yes, remove it to prevent no audio from sleep.
+        #
+        sudo rm -rf /System/Library/Extensions/CodecCommander.kext
+    fi
 }
 
 #
