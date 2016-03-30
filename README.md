@@ -8,7 +8,8 @@ This project targets at giving the relatively complete functional OS X for both 
 2. Install Clover with UEFI only and UEFI64Drivers to the installation disk just created. 
 3. Replace the origin Clover folder with the one under my Git/M3800/CLOVER.
 4. Patch bios to unlock bios menu.
-5. BIOS settings: 
+5. BIOS settings:
+```sh
 - Advanced:
     CPU Configuration/CFG Lock = Disabled
     CPU Configuration/LakeTiny Feature = Enabled
@@ -22,8 +23,8 @@ This project targets at giving the relatively complete functional OS X for both 
         Aperture Size = 512MB
         DVMT Pre-Allocated = 160MB
         DVMT Total Gfx Mem = MAX
--NOTE: Once you modify your settings in BIOS(especially Graphics Configuration in SA), you have to remove previous ACPI tables first, redump ACPI tables by press Fn+F4/F4 under Clover, and run deploy.sh again to patch your ACPI tables again.
-
+NOTE: Once you modify your settings in BIOS(especially Graphics Configuration in SA), you have to remove previous ACPI tables first, redump ACPI tables by press Fn+F4/F4 under Clover, and run deploy.sh again to patch your ACPI tables again.
+```
 6. Install OS X.
 7. Once you finish installation of OS X, you can do the following steps to finish the post installation of OS X.
 
