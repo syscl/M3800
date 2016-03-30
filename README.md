@@ -4,13 +4,28 @@ OS X on DELL M3800 and XPS15 (9530)
 
 This project targets at giving the relatively complete functional OS X for both Dell Precision M3800 and XPS15 9530. Before you start, there's a brief introduction of how to finish power up OS X on your laptop:
 
-1. Create a vanilla installation disk(removable disk)
-2. Install Clover with UEFI only and UEFI64Drivers to the installation disk just created 
-3. Replace the origin Clover folder with the one under my Git/M3800/CLOVER
-4. Patch bios to unlock bios menu
-5. BIOS: set Advanced/CFG Lock = Disabled, System Agent (SA) Configuration/Graphics Configuration/Graphics Configuration/DVMT Pre-Allocated = 128MB, Advanced/SATA Operation = AHCI. To improve battery life, set Advanced(unlocked Menu)/CPU Configuration/LakeTiny Feature = Enabled.
-6. Install OS X
-7. Once you finish installation of OS X, you can do the following to finish the post installation of OS X:
+1. Create a vanilla installation disk(removable disk).
+2. Install Clover with UEFI only and UEFI64Drivers to the installation disk just created. 
+3. Replace the origin Clover folder with the one under my Git/M3800/CLOVER.
+4. Patch bios to unlock bios menu.
+5. BIOS settings: 
+-Advanced:
+    CPU Configuration/CFG Lock = Disabled
+    CPU Configuration/LakeTiny Feature = Enabled
+
+    SATA Operation = AHCI 
+
+-Chipset:
+    PCH-IO Configuration/XHCI Mode = Smart Auto
+
+    System Agent (SA) Configuration/Graphics Configuration:
+        Aperture Size = 512MB
+        DVMT Pre-Allocated = 160MB
+        DVMT Total Gfx Mem = MAX
+NOTE: Once you modify your settings in BIOS(especially Graphics Configuration in SA), you have to remove previous ACPI tables first, redump ACPI tables by press Fn+F4/F4 under Clover, and run deploy.sh again to patch your ACPI tables again.
+
+6. Install OS X.
+7. Once you finish installation of OS X, you can do the following steps to finish the post installation of OS X.
 
 How to use deploy.sh?
 ----------------
@@ -40,6 +55,10 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 
 Change Log
 ----------------
+
+2016-3-30
+
+- Added the latest version of DisplayLink kext for enable the power of usb3.0 docking station on DELL Precsion M3800/XPS 15(9530).
 
 2016-3-19
 
