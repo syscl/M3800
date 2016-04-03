@@ -57,6 +57,10 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 Change Log
 ----------------
 
+2016-4-3
+
+- Fixed an issue that light indicator of front facing camera will not turn off after accessing it. (c) syscl/lighting/Yating Zhou
+
 2016-3-30
 
 - Added the latest version of DisplayLink kext for enable the power of usb3.0 docking station on DELL Precsion M3800/XPS 15(9530).
