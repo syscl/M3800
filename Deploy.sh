@@ -233,10 +233,9 @@ function rebuild_kernel_cache()
     #
     # Repair the permission & refresh kernelcache.
     #
-    sudo touch /System/Library/Extensions
+    sudo touch /Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
-    # sudo /usr/libexec/repair_packages --repair --standard-pkgs --volume /
 }
 
 #
@@ -248,34 +247,46 @@ function install_audio()
     #
     # Generate audio from current system.
     #
-    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
-    cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
-    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
-    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
-    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
-    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-    rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
-    ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-    cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
-    replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    /usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
-    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    /usr/libexec/plistbuddy -c "Set :CFBundleGetInfoString '$replace'" $plist
-    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleVersion" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    /usr/libexec/plistbuddy -c "Set :CFBundleVersion '$replace'" $plist
-    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    /usr/libexec/plistbuddy -c "Set :CFBundleShortVersionString '$replace'" $plist
-    /usr/libexec/plistbuddy -c "Add ':HardwareConfigDriver_Temp' dict" $plist
-    /usr/libexec/plistbuddy -c "Merge /System/Library/Extensions/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" $plist
-    /usr/libexec/plistbuddy -c "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-    /usr/libexec/plistbuddy -c "Delete ':HardwareConfigDriver_Temp'" $plist
-    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" $plist
-    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" $plist
-    /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
-    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
-    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-    sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
-    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
+#    cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
+#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
+#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
+#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
+#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
+#    rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
+#    ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
+#    cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
+#    replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+#    /usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
+#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+#    /usr/libexec/plistbuddy -c "Set :CFBundleGetInfoString '$replace'" $plist
+#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleVersion" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+#    /usr/libexec/plistbuddy -c "Set :CFBundleVersion '$replace'" $plist
+#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
+#    /usr/libexec/plistbuddy -c "Set :CFBundleShortVersionString '$replace'" $plist
+#    /usr/libexec/plistbuddy -c "Add ':HardwareConfigDriver_Temp' dict" $plist
+#    /usr/libexec/plistbuddy -c "Merge /System/Library/Extensions/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" $plist
+#    /usr/libexec/plistbuddy -c "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
+#    /usr/libexec/plistbuddy -c "Delete ':HardwareConfigDriver_Temp'" $plist
+#    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" $plist
+#    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" $plist
+#    /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
+#    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
+#    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
+#    sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
+#    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+
+    #
+    # Removed Previous AppleHDA_ALC668.kext.
+    #
+    if [ -f /Library/Extensions/AppleHDA_ALC668.kext ];
+      then
+        #
+        # Yes, remove it to prevent conflict audio drivers.
+        #
+        sudo rm -rf /Library/Extensions/AppleHDA_ALC668.kext
+
+    fi
 
     #
     # Detect if CodecCommander.kext is in /System/Library/Extensions/.
