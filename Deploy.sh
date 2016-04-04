@@ -273,8 +273,11 @@ function install_audio()
 #    /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
 #    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
 #    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-#    sudo cp -R ./Kexts/audio/AppleHDA_ALC668.kext /Library/Extensions
-#    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+
+    #
+    # Fixed Headphone noise issue.
+    #
+    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
 
     #
     # Removed Previous AppleHDA_ALC668.kext.

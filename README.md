@@ -57,6 +57,10 @@ Reboot your OS X to see the change. If you have sound problem, run the deploy.sh
 Change Log
 ----------------
 
+2016-4-4
+
+- vit9696 has updated M3800/XPS15(9530) ALC668 with my configdata. see [here] (https://github.com/vit9696/AppleALC/commit/878c2083497262938eeb2b406de5daac699f571b)
+
 2016-4-3
 
 - Using a totally new way(insert pre-linked-kext at the startup stage to power up the audio which means the only unsigned kernel extension we have to install under /L*/E* is CodecCommander.kext to prevent noise from headphone! (Now, we don't have to worry full SIP eanble!!) credit vit9696's great project "dynamic AppleHDA patching" and syscl to modify the configuration for both M3800 and XPS15(9530).
