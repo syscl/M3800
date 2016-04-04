@@ -51,11 +51,30 @@ cd M3800
 ./deploy.sh
 ```
 
-Reboot your OS X to see the change. If you have sound problem, run the deploy.sh again to update the HDA.
-
+Reboot your OS X to see the change. If you have any problem about the script, try to run deploy in DEBUG mode by 
+```sh
+./deploy.sh -d
+```
+or
+```sh
+./deploy.sh -debug
+```
 
 Change Log
 ----------------
+
+2016-4-5
+
+- Added debug mode for deploy.sh. Usage:
+```sh
+./deploy.sh -d
+```
+or
+```sh
+./deploy.sh -debug
+```
+- Fixed the Apple_ALC668.kext problem that will prevent AppleHDA.kext from loading at startup. (Actually remove it)
+- Removed redundant resource files in AppleALC.kext and rebuild it to boost the booting progress. (Size 848KB->345KB)
 
 2016-4-4
 

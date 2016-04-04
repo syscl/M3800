@@ -43,7 +43,6 @@ compile="${REPO}/DSDT/compile/"
 tools="${REPO}/tools/"
 raw="${REPO}/DSDT/raw"
 prepare="${REPO}/DSDT/prepare"
-plist="${REPO}/Kexts/audio/AppleHDA_ALC668.kext/Contents/Info.plist"
 config_plist="/Volumes/EFI/EFI/CLOVER/config.plist"
 EFI_INFO="${REPO}/DSDT/EFIINFO"
 patch_config_plist="${REPO}/DSDT/tmp.plist"
@@ -57,6 +56,8 @@ gUSBSleepScript="/tmp/sysclusbfix.sleep"
 #
 # Gvariables stands for getting datas from OS X.
 #
+gArgv=""
+gDebug=1
 gProductVersion=""
 target_website=""
 target_website_status=""
@@ -199,20 +200,28 @@ function patch_acpi()
 
 function tidy_execute()
 {
-    #
-    # Make the output clear.
-    #
-    $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
-
-    if [ "${RETURN_VAL}" == 0 ];
+    if [ $gDebug -eq 0 ];
       then
-        _PRINT_MSG "OK: $2"
+        #
+        # Using debug mode to output all the details.
+        #
+        $1
       else
-        _PRINT_MSG "FAILED: $2"
-        cat ./DSDT/report
-    fi
+        #
+        # Make the output clear.
+        #
+        $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
 
-    rm ./DSDT/report &> /dev/null
+        if [ "${RETURN_VAL}" == 0 ];
+          then
+            _PRINT_MSG "OK: $2"
+          else
+            _PRINT_MSG "FAILED: $2"
+            cat ./DSDT/report
+        fi
+
+        rm ./DSDT/report &> /dev/null
+    fi
 }
 
 #
@@ -275,32 +284,21 @@ function install_audio()
 #    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
 
     #
-    # Fixed Headphone noise issue.
+    # Remove previous AppleHDA_ALC668.kext.
     #
-    sudo cp -R ./Kexts/audio/CodecCommander.kext /Library/Extensions
+    sudo rm -R /Library/Extensions/Apple_ALC668.kext
+    sudo rm -R /System/Library/Extensions/Apple_ALC668.kext
+
 
     #
-    # Removed Previous AppleHDA_ALC668.kext.
+    # Remove CodecCommander.kext in /System/Library/Extensions/.
     #
-    if [ -f /Library/Extensions/AppleHDA_ALC668.kext ];
-      then
-        #
-        # Yes, remove it to prevent conflict audio drivers.
-        #
-        sudo rm -rf /Library/Extensions/AppleHDA_ALC668.kext
-
-    fi
+    sudo rm -R /System/Library/Extensions/CodecCommander.kext
 
     #
-    # Detect if CodecCommander.kext is in /System/Library/Extensions/.
+    # Fixed headphone noise issue.
     #
-    if [ -f /System/Library/Extensions/CodecCommander.kext ];
-      then
-        #
-        # Yes, remove it to prevent no audio from sleep.
-        #
-        sudo rm -rf /System/Library/Extensions/CodecCommander.kext
-    fi
+    sudo cp -RX ./Kexts/audio/CodecCommander.kext /Library/Extensions
 }
 
 #
@@ -730,6 +728,24 @@ function _fix_usb_ejected_improperly()
 function main()
 {
     #
+    # Get argument.
+    #
+    gArgv=$(echo "$@" | tr '[:lower:]' '[:upper:]')
+    if [[ $# -eq 1 && "$gArgv" == "-D" || "$gArgv" == "-DEBUG" ]];
+      then
+        #
+        # Yes, we do need a debug mode.
+        #
+        _PRINT_MSG "NOTE: Use ${BLUE}DEBUG${OFF} mode"
+        gDebug=0
+      else
+        #
+        # No, we need a clean output style.
+        #
+        gDebug=1
+    fi
+
+    #
     # Sync all files from https://github.com/syscl/M3800
     #
     # Check if github is available
@@ -905,14 +921,14 @@ function main()
     #
     # Patch IOKit.
     #
-    _PRINT_MSG "NOTE: You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『128MB』${OFF}"
+    _PRINT_MSG "NOTE: You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
 
-    if [[ $gPatchIOKit ]];
+    if [ $gPatchIOKit -eq 0 ];
       then
         #
         # Patch IOKit.
         #
-        _PRINT_MSG "--->: ${BLUE}Patching IOKit for maximum pixel clock...${OFF}"
+        _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
         sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
         tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
     fi
@@ -932,7 +948,9 @@ function main()
     # Rebuild kernel extensions cache.
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+    tidy_execute "sudo touch /Library/Extensions" "Trigger kernel extensions in /Library/Extensions to refresh"
+    tidy_execute "sudo touch /System/Library/Extensions" "Trigger kernel extensions in /System/Library/Extensions to refresh"
+    tidy_execute "sudo kextcache -u /" "Refresh kernel extensions"
 
     #
     # Clean up.
@@ -944,7 +962,7 @@ function main()
 
 #==================================== START =====================================
 
-main
+main "$@"
 
 #================================================================================
 
