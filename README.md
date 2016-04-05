@@ -2,7 +2,7 @@ OS X on DELL M3800 and XPS15 (9530)
 ====================================
 
 
-This project targets at giving the relatively complete functional OS X for both Dell Precision M3800 and XPS15 9530. Before you start, there's a brief introduction of how to finish power up OS X on your laptop:
+This project targets at giving the relatively complete functional OS X for both Dell Precision M3800 and XPS15 9530. Before you start, there's a brief introduction of how to finish powering up OS X on your laptop:
 
 1. Create a vanilla installation disk(removable disk).
 2. Install Clover with UEFI only and UEFI64Drivers to the installation disk just created. 
@@ -62,6 +62,12 @@ or
 
 Change Log
 ----------------
+
+2016-4-6
+
+- Moved CodecCommander.kext to Clover folder, a totally vanilla root directory "/".(The same as real Mac's OS X).
+- Added support for DELL 1820A wireless & bluetooth.
+- Updated theme for a more clear GUI during clover counting down.
 
 2016-4-5
 

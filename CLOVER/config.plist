@@ -144,7 +144,7 @@
 			<true/>
 		</dict>
 		<key>Theme</key>
-		<string>bootcamp</string>
+		<string>BootCamp</string>
 	</dict>
 	<key>Graphics</key>
 	<dict>
@@ -186,15 +186,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				hAjsEA==
-				</data>
+				<data>hAjsEA==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
-				<data>
-				AAAAAA==
-				</data>
+				<data>AAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -202,15 +198,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				AQAAdRc=
-				</data>
+				<data>AQAAdRc=</data>
 				<key>Name</key>
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
-				<data>
-				AQAA6xc=
-				</data>
+				<data>AQAA6xc=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -218,15 +210,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				gxnUEQ==
-				</data>
+				<data>gxnUEQ==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
-				<data>
-				AAAAAA==
-				</data>
+				<data>AAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -234,15 +222,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				QYP8/3QsSA==
-				</data>
+				<data>QYP8/3QsSA==</data>
 				<key>Name</key>
 				<string>AirPortBrcm4360</string>
 				<key>Replace</key>
-				<data>
-				ZscGVVPrKw==
-				</data>
+				<data>ZscGVVPrKw==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -250,15 +234,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				hQjsEA==
-				</data>
+				<data>hQjsEA==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
-				<data>
-				AAAAAA==
-				</data>
+				<data>AAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -266,15 +246,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				hBnUEQ==
-				</data>
+				<data>hBnUEQ==</data>
 				<key>Name</key>
 				<string>AppleHDA</string>
 				<key>Replace</key>
-				<data>
-				aAbsEA==
-				</data>
+				<data>aAbsEA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -282,15 +258,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				PQwKAAA=
-				</data>
+				<data>PQwKAAA=</data>
 				<key>Name</key>
 				<string>AppleHDAController</string>
 				<key>Replace</key>
-				<data>
-				PQwMAAA=
-				</data>
+				<data>PQwMAAA=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -298,15 +270,11 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				CAAuCgEDAwMAAAAEAAAgAgAAUAE=
-				</data>
+				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAE=</data>
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>
-				CAAuCgEDAwMAAAAIAAAAAwAAAAM=
-				</data>
+				<data>CAAuCgEDAwMAAAAIAAAAAwAAAAM=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -314,57 +282,41 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>
-				QAAAAB4AAAAFBQkB
-				</data>
+				<data>QAAAAB4AAAAFBQkB</data>
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>
-				QAAAAA8AAAAFBQkB
-				</data>
+				<data>QAAAAA8AAAAFBQkB</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
 				<string>Enable TRIM support for non-Apple SSD</string>
 				<key>Find</key>
-				<data>
-				QVBQTEUgU1NEAA==
-				</data>
+				<data>QVBQTEUgU1NEAA==</data>
 				<key>Name</key>
 				<string>IOAHCIBlockStorage</string>
 				<key>Replace</key>
-				<data>
-				AAAAAAAAAAAAAA==
-				</data>
+				<data>AAAAAAAAAAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
 				<string>10.10.2+ BT4LE-Handoff-Hotspot, Dokterdok</string>
 				<key>Find</key>
-				<data>
-				SIXAdFwPt0g=
-				</data>
+				<data>SIXAdFwPt0g=</data>
 				<key>Name</key>
 				<string>IOBluetoothFamily</string>
 				<key>Replace</key>
-				<data>
-				Qb4PAAAA61k=
-				</data>
+				<data>Qb4PAAAA61k=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
 				<string>10.11.dp1+ BT4LE-Handoff-Hotspot, credit RehabMan based on Dokterdok original</string>
 				<key>Find</key>
-				<data>
-				SIX/dEdIiwc=
-				</data>
+				<data>SIX/dEdIiwc=</data>
 				<key>Name</key>
 				<string>IOBluetoothFamily</string>
 				<key>Replace</key>
-				<data>
-				Qb4PAAAA60Q=
-				</data>
+				<data>Qb4PAAAA60Q=</data>
 			</dict>
 		</array>
 	</dict>

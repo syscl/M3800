@@ -92,6 +92,7 @@ find_handoff_bytes=""
 replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
+gTriggerLE=1
 
 #
 # Define target website
@@ -242,7 +243,18 @@ function rebuild_kernel_cache()
     #
     # Repair the permission & refresh kernelcache.
     #
-    sudo touch /Library/Extensions
+    if [ $gTriggerLE -eq 0 ];
+      then
+        #
+        # Yes, we do touch /L*/E*.
+        #
+        sudo touch /Library/Extensions
+    fi
+
+    #
+    # /S*/L*/E* must be touched to prevent some potential issue.
+    #
+    sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
     sudo kextcache -u /
 }
@@ -283,22 +295,34 @@ function install_audio()
 #    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
 #    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
 
-    #
-    # Remove previous AppleHDA_ALC668.kext.
-    #
-    sudo rm -R /Library/Extensions/Apple_ALC668.kext
-    sudo rm -R /System/Library/Extensions/Apple_ALC668.kext
-
 
     #
-    # Remove CodecCommander.kext in /System/Library/Extensions/.
+    # Remove previous AppleHDA_ALC668.kext & CodecCommander.kext.
     #
-    sudo rm -R /System/Library/Extensions/CodecCommander.kext
+    if [ -d /Library/Extensions/Apple_ALC668.kext ];
+      then
+        gTriggerLE=0
+        sudo rm -R /Library/Extensions/Apple_ALC668.kext
+    fi
+
+    if [ -d /Library/Extensions/CodecCommander.kext ];
+      then
+        gTriggerLE=0
+        sudo rm -R /Library/Extensions/CodecCommander.kext
+    fi
 
     #
-    # Fixed headphone noise issue.
+    # Added detection to prevent failure of remove.
     #
-    sudo cp -RX ./Kexts/audio/CodecCommander.kext /Library/Extensions
+    if [ -d /System/Library/Extensions/Apple_ALC668.kext ];
+      then
+        sudo rm -R /System/Library/Extensions/Apple_ALC668.kext
+    fi
+
+    if [ -d /System/Library/Extensions/CodecCommander.kext ];
+      then
+        sudo rm -R /System/Library/Extensions/CodecCommander.kext
+    fi
 }
 
 #
@@ -625,12 +649,63 @@ function _update_clover_kext()
     tidy_execute "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
     tidy_execute "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
     tidy_execute "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
+
+    #
+    # Decide which BT kext to use.
+    #
+    if [[ `ioreg` == *"BCM20702A3"* ]];
+      then
+        #
+        # BCM20702A3 found.
+        #
+        tidy_execute "rm -R ${KEXT_DIR}/BrcmFirmwareRepo.kext" "BCM20702A3 found"
+      else
+        #
+        # BCM2045A0 found. We remove BrcmFirmwareData.kext to prevent this driver crashes the whole system during boot.
+        #
+        tidy_execute "rm -R ${KEXT_DIR}/BrcmFirmwareData.kext" "BCM2045A0 found"
+    fi
+
+    #
+    # Decide which kext to be installed for BT.
+    #
+    gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
+    if [[ $gMINOR_VER -ge 11 ]];
+      then
+        #
+        # OS X is 10.11+.
+        #
+        tidy_execute "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver: BrcmPatchRAM.kext"
+      else
+        #
+        # OS X is 10.10-.
+        #
+        tidy_execute "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver: BrcmPatchRAM2.kext"
+    fi
 }
 
 #
 #--------------------------------------------------------------------------------
 #
 
+function _update_thm()
+{
+    if [ -d /Volumes/EFI/EFI/CLOVER/themes/bootcamp ];
+      then
+        if [[ `cat /Volumes/EFI/EFI/CLOVER/themes/bootcamp/theme.plist` != *"syscl"* ]];
+          then
+            #
+            # Yes we need to update themes.
+            #
+            rm -R /Volumes/EFI/EFI/CLOVER/themes/bootcamp
+            cp -R ${REPO}/CLOVER/themes/BootCamp /Volumes/EFI/EFI/CLOVER/themes
+        fi
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
 function _printUSBSleepConfig()
 {
     if [ -f ${gUSBSleepConfig} ];
@@ -913,6 +988,11 @@ function main()
     _update_clover_kext
 
     #
+    # Refresh BootCamp theme.
+    #
+    _update_thm
+
+    #
     # Install audio.
     #
     _PRINT_MSG "--->: ${BLUE}Installing audio...${OFF}"
@@ -948,9 +1028,7 @@ function main()
     # Rebuild kernel extensions cache.
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-    tidy_execute "sudo touch /Library/Extensions" "Trigger kernel extensions in /Library/Extensions to refresh"
-    tidy_execute "sudo touch /System/Library/Extensions" "Trigger kernel extensions in /System/Library/Extensions to refresh"
-    tidy_execute "sudo kextcache -u /" "Refresh kernel extensions"
+    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
 
     #
     # Clean up.
