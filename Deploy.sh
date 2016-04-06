@@ -50,6 +50,10 @@ gInstallDameon="/usr/local/sbin"
 gFrom="${REPO}/tools"
 gUSBSleepConfig="/tmp/de.bernhard-baehr.sleepwatcher.plist"
 gUSBSleepScript="/tmp/sysclusbfix.sleep"
+drivers64UEFI="${REPO}/CLOVER/drivers64UEFI"
+t_drivers64UEFI="/Volumes/EFI/EFI/CLOVER/drivers64UEFI"
+clover_tools="${REPO}/CLOVER/tools"
+t_clover_tools="/Volumes/EFI/EFI/CLOVER/tools"
 
 #
 # Define variables.
@@ -403,6 +407,30 @@ function _getEDID()
 #--------------------------------------------------------------------------------
 #
 
+function _upd_EFI()
+{
+    #
+    # Update EFI drivers/Clover.
+    #
+    local gMD_st=$(md5 -q "$1")
+    #
+    # Target EFI/Clover files.
+    #
+    local gMD_nd=$(md5 -q "$2")
+
+    if [[ $gMD_st != $gMD_nd ]];
+      then
+        #
+        # Yes, ne, update Clover.
+        #
+        tidy_execute "cp "$1" "$2"" "Update $2"
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function _check_and_fix_config()
 {
     #
@@ -516,6 +544,24 @@ function _check_and_fix_config()
         # No patch existed in config.plist, add patch for it:
         #
         _add_kexts_to_patch_infoplist "Enable BT4LE-Handoff-Hotspot" "$find_handoff_bytes_ENCODE" "$replace_handoff_bytes_ENCODE" "IOBluetoothFamily"
+    fi
+
+    #
+    # Gain boot argv.
+    #
+    local gBootArgv=$(awk '/<key>NoEarlyProgress<\/key>.*/,/<*\/>/' ${config_plist})
+
+    if [[ $gBootArgv != *"NoEarlyProgress"* ]];
+      then
+        #
+        # Add argv to prevent/remove "Welcome to Clover... Scan Entries" at early startup.
+        #
+        /usr/libexec/plistbuddy -c "Add ':Boot:NoEarlyProgress' true" "${config_plist}"
+      else
+        if [[ $gBootArgv == *"false"* ]];
+          then
+            /usr/libexec/plistbuddy -c "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
+        fi
     fi
 }
 
@@ -633,7 +679,7 @@ function _find_acpi()
 #--------------------------------------------------------------------------------
 #
 
-function _update_clover_kext()
+function _update_clover()
 {
     #
     # Gain OS generation.
@@ -682,6 +728,30 @@ function _update_clover_kext()
         #
         tidy_execute "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver: BrcmPatchRAM2.kext"
     fi
+
+    #
+    # gEFI.
+    #
+    drvEFI=("FSInject-64.efi" "HFSPlus.efi" "OsxAptioFix2Drv-64.efi" "OsxFatBinaryDrv-64.efi")
+    efiTOOL=("Shell.inf" "Shell32.efi" "Shell64.efi" "Shell64U.efi" "bdmesg-32.efi" "bdmesg.efi")
+
+    #
+    # Check if necessary to update Clover.
+    #
+    for ((index = 0; index <= 3; index++))
+    do
+      _upd_EFI "${drivers64UEFI}/${drvEFI[$index]}" "${t_drivers64UEFI}/${drvEFI[$index]}"
+    done
+
+    for ((index = 0; index <= 5; index++))
+    do
+      _upd_EFI "${clover_tools}/${efiTOOL[$index]}" "${t_clover_tools}/${efiTOOL[$index]}"
+    done
+
+    #
+    # Update CLOVERX64.efi
+    #
+    _upd_EFI "${REPO}/CLOVER/CLOVERX64.efi" "/Volumes/EFI/EFI/CLOVER/CLOVERX64.efi"
 }
 
 #
@@ -985,7 +1055,7 @@ function main()
     #
     # Refresh kext in Clover.
     #
-    _update_clover_kext
+    _update_clover
 
     #
     # Refresh BootCamp theme.

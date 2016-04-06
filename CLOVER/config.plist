@@ -57,6 +57,10 @@
 		<integer>5</integer>
 		<key>XMPDetection</key>
 		<false/>
+		<key>Fast</key>
+		<false/>
+		<key>NoEarlyProgress</key>
+		<true/>
 	</dict>
 	<key>Devices</key>
 	<dict>
