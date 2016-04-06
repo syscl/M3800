@@ -65,9 +65,12 @@ Change Log
 
 2016-4-6
 
+- Remove "Welcome to Clover... Scan Entries" by argv "NoEarlyProgress=Yes".
 - Moved CodecCommander.kext to Clover folder, a totally vanilla root directory "/".(The same as real Mac's OS X).
 - Added support for DELL 1820A wireless & bluetooth.
+- Deploy.sh can now update your Clover folder automatically.
 - Updated theme for a more clear GUI during clover counting down.
+- Updated Clover to 3411.
 
 2016-4-5
 
