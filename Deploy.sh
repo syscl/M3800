@@ -556,7 +556,8 @@ function _check_and_fix_config()
         #
         # Add argv to prevent/remove "Welcome to Clover... Scan Entries" at early startup.
         #
-        /usr/libexec/plistbuddy -c "Add ':Boot:NoEarlyProgress' true" "${config_plist}"
+        /usr/libexec/plistbuddy -c "Add ':Boot:NoEarlyProgress' bool" "${config_plist}"
+        /usr/libexec/plistbuddy -c "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
       else
         if [[ $gBootArgv == *"false"* ]];
           then
