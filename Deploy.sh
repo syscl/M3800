@@ -471,7 +471,7 @@ function _check_and_fix_config()
     fi
 
     #
-    # Check if "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" is in config.plist.
+    # Check if "Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" is in config.plist.
     #
     find_Azul_data="08002e0a 01030303 00000004 00002002 00005001"
     replace_Azul_data="08002e0a 01030303 00000008 00000003 00000003"
@@ -487,7 +487,7 @@ function _check_and_fix_config()
         #
         # No patch existed in config.plist, add patch for it:
         #
-        _add_kexts_to_patch_infoplist "Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
+        _add_kexts_to_patch_infoplist "Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
     fi
 
     #
