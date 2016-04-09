@@ -130,6 +130,12 @@ function _PRINT_MSG()
                   then
                     local message=$(echo $message | sed -e 's/.*NOTE://')
                     echo "[ ${RED}NOTE${OFF} ] ${message}."
+                  else
+                    if [[ $message =~ 'DEBUG' ]];
+                      then
+                        local message=$(echo $message | sed -e 's/.*DEBUG://')
+                        echo "[${BLUE}DEBLOG${OFF}] ${message}."
+                    fi
                 fi
             fi
         fi
@@ -210,6 +216,7 @@ function tidy_execute()
         #
         # Using debug mode to output all the details.
         #
+        _PRINT_MSG "DEBUG: $2"
         $1
       else
         #
