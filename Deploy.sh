@@ -223,14 +223,14 @@ function _tidy_exec()
         #
         # Make the output clear.
         #
-        $1 >./DSDT/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
+        $1 >/tmp/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
 
         if [ "${RETURN_VAL}" == 0 ];
           then
             _PRINT_MSG "OK: $2"
           else
             _PRINT_MSG "FAILED: $2"
-            cat ./DSDT/report
+            cat /tmp/report
         fi
 
         rm /tmp/report &> /dev/null
@@ -788,7 +788,7 @@ function _update_thm()
 
 function _printUSBSleepConfig()
 {
-    _del ${gConfig}
+    _del ${gUSBSleepConfig}
 
     echo '<?xml version="1.0" encoding="UTF-8"?>'                                                                                                           > "$gUSBSleepConfig"
     echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'                                          >> "$gUSBSleepConfig"
@@ -883,7 +883,7 @@ function _fix_usb_ejected_improperly()
     # Generate configuration file of sleepwatcher launch demon.
     #
     _PRINT_MSG "--->: Generating configuration file of sleepwatcher launch daemon..."
-    _tidy_exec "_printConfig" "Generate configuration file of sleepwatcher launch daemon"
+    _tidy_exec "_printUSBSleepConfig" "Generate configuration file of sleepwatcher launch daemon"
 
     #
     # Generate script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou.
@@ -906,7 +906,7 @@ function _fix_usb_ejected_improperly()
     #
     # Clean up.
     #
-    _tidy_exec "rm $gConfig $gUSBSleepScript" "Clean up"
+    _tidy_exec "rm $gUSBSleepConfig $gUSBSleepScript" "Clean up"
 }
 
 #
@@ -1114,7 +1114,7 @@ function main()
     #
     # Patch IOKit.
     #
-    _PRINT_MSG "NOTE: You need to change ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
+    _PRINT_MSG "NOTE: Set ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
 
     if [ $gPatchIOKit -eq 0 ];
       then
@@ -1123,14 +1123,14 @@ function main()
         #
         _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
         sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-        _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+        _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit"
     fi
 
     #
-    # Lead to lid wake on 0x0a2e0008 by syscl/lighting/Yating Zhou
+    # Lead to lid wake on 0x0a2e0008 by syscl/lighting/Yating Zhou.
     #
     _PRINT_MSG "--->: ${BLUE}Leading to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou...${OFF}"
-    _tidy_exec "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
+    _tidy_exec "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008"
 
     #
     # Fix issue that external devices ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
@@ -1148,7 +1148,8 @@ function main()
     #
     _tidy_exec "rm ${EFI_INFO}" "Clean up"
 
-    _PRINT_MSG "NOTE: Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl/lighting/Yating Zhou @PCBeta"
+    _PRINT_MSG "NOTE: Congratulations! All operation has been completed"
+    _PRINT_MSG "NOTE: Reboot now. Then enjoy your OS X! -${BOLD}syscl/lighting/Yating Zhou @PCBeta${OFF}"
 }
 
 #==================================== START =====================================
