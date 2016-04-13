@@ -45,11 +45,12 @@ raw="${REPO}/DSDT/raw"
 prepare="${REPO}/DSDT/prepare"
 config_plist="/Volumes/EFI/EFI/CLOVER/config.plist"
 EFI_INFO="${REPO}/DSDT/EFIINFO"
-patch_config_plist="${REPO}/DSDT/tmp.plist"
-gInstallDameon="/usr/local/sbin"
+gInstall_Repo="/usr/local/sbin/"
 gFrom="${REPO}/tools"
-gUSBSleepConfig="/tmp/de.bernhard-baehr.sleepwatcher.plist"
+gUSBSleepConfig="/tmp/com.syscl.externalfix.sleepwatcher.plist"
 gUSBSleepScript="/tmp/sysclusbfix.sleep"
+to_Plist="/Library/LaunchDaemons/com.syscl.externalfix.sleepwatcher.plist"
+to_shell="/etc/sysclusbfix.sleep"
 drivers64UEFI="${REPO}/CLOVER/drivers64UEFI"
 t_drivers64UEFI="/Volumes/EFI/EFI/CLOVER/drivers64UEFI"
 clover_tools="${REPO}/CLOVER/tools"
@@ -209,7 +210,7 @@ function patch_acpi()
 #--------------------------------------------------------------------------------
 #
 
-function tidy_execute()
+function _tidy_exec()
 {
     if [ $gDebug -eq 0 ];
       then
@@ -232,7 +233,7 @@ function tidy_execute()
             cat ./DSDT/report
         fi
 
-        rm ./DSDT/report &> /dev/null
+        rm /tmp/report &> /dev/null
     fi
 }
 
@@ -263,7 +264,7 @@ function rebuild_kernel_cache()
     fi
 
     #
-    # /S*/L*/E* must be touched to prevent some potential issue.
+    # /S*/L*/E* must be touched to prevent some potential issues.
     #
     sudo touch /System/Library/Extensions
     sudo /bin/kill -1 `ps -ax | awk '{print $1" "$5}' | grep kextd | awk '{print $1}'`
@@ -430,7 +431,7 @@ function _upd_EFI()
         #
         # Yes, ne, update Clover.
         #
-        tidy_execute "cp "$1" "$2"" "Update $2"
+        _tidy_exec "cp "$1" "$2"" "Update $2"
     fi
 }
 
@@ -700,9 +701,9 @@ function _update_clover()
     # Updating kexts. NOTE: This progress will remove any previous kexts.
     #
     _PRINT_MSG "--->: ${BLUE}Updating kexts...${OFF}"
-    tidy_execute "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
-    tidy_execute "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
-    tidy_execute "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
+    _tidy_exec "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
+    _tidy_exec "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
+    _tidy_exec "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
 
     #
     # Decide which BT kext to use.
@@ -712,12 +713,12 @@ function _update_clover()
         #
         # BCM20702A3 found.
         #
-        tidy_execute "rm -R ${KEXT_DIR}/BrcmFirmwareRepo.kext" "BCM20702A3 found"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmFirmwareRepo.kext" "BCM20702A3 found"
       else
         #
         # BCM2045A0 found. We remove BrcmFirmwareData.kext to prevent this driver crashes the whole system during boot.
         #
-        tidy_execute "rm -R ${KEXT_DIR}/BrcmFirmwareData.kext" "BCM2045A0 found"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmFirmwareData.kext" "BCM2045A0 found"
     fi
 
     #
@@ -729,12 +730,12 @@ function _update_clover()
         #
         # OS X is 10.11+.
         #
-        tidy_execute "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver: BrcmPatchRAM.kext"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver: BrcmPatchRAM.kext"
       else
         #
         # OS X is 10.10-.
         #
-        tidy_execute "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver: BrcmPatchRAM2.kext"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver: BrcmPatchRAM2.kext"
     fi
 
     #
@@ -784,12 +785,10 @@ function _update_thm()
 #
 #--------------------------------------------------------------------------------
 #
+
 function _printUSBSleepConfig()
 {
-    if [ -f ${gUSBSleepConfig} ];
-      then
-        rm ${gUSBSleepConfig}
-    fi
+    _del ${gConfig}
 
     echo '<?xml version="1.0" encoding="UTF-8"?>'                                                                                                           > "$gUSBSleepConfig"
     echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'                                          >> "$gUSBSleepConfig"
@@ -798,7 +797,7 @@ function _printUSBSleepConfig()
     echo '	<key>KeepAlive</key>'                                                                                                                          >> "$gUSBSleepConfig"
     echo '	<true/>'                                                                                                                                       >> "$gUSBSleepConfig"
     echo '	<key>Label</key>'                                                                                                                              >> "$gUSBSleepConfig"
-    echo '	<string>de.bernhard-baehr.sleepwatcher</string>'                                                                                               >> "$gUSBSleepConfig"
+    echo '	<string>com.syscl.externalfix.sleepwatcher</string>'                                                                                           >> "$gUSBSleepConfig"
     echo '	<key>ProgramArguments</key>'                                                                                                                   >> "$gUSBSleepConfig"
     echo '	<array>'                                                                                                                                       >> "$gUSBSleepConfig"
     echo '		<string>/usr/local/sbin/sleepwatcher</string>'                                                                                             >> "$gUSBSleepConfig"
@@ -817,10 +816,10 @@ function _printUSBSleepConfig()
 
 function _createUSB_Sleep_Script()
 {
-    if [ -f ${gUSBSleepScript} ];
-      then
-        rm ${gUSBSleepScript}
-    fi
+    #
+    # Remove previous script.
+    #
+    _del ${gUSBSleepScript}
 
     echo '#!/bin/sh'                                                                                                                                         > "$gUSBSleepScript"
     echo '#'                                                                                                                                                >> "$gUSBSleepScript"
@@ -843,6 +842,39 @@ function _createUSB_Sleep_Script()
 #--------------------------------------------------------------------------------
 #
 
+function _del()
+{
+    local target_file=$1
+
+    if [ -d ${target_file} ];
+      then
+        _tidy_exec "sudo rm -R ${target_file}" "Remove ${target_file}"
+    else
+        if [ -f ${target_file} ];
+          then
+            _tidy_exec "sudo rm ${target_file}" "Remove ${target_file}"
+        fi
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _touch()
+{
+    local target_file=$1
+
+    if [ ! -d ${target_file} ];
+      then
+        _tidy_exec "sudo mkdir ${target_file}" "Create ${target_file}"
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function _fix_usb_ejected_improperly()
 {
     #
@@ -851,27 +883,30 @@ function _fix_usb_ejected_improperly()
     # Generate configuration file of sleepwatcher launch demon.
     #
     _PRINT_MSG "--->: Generating configuration file of sleepwatcher launch daemon..."
-    tidy_execute "_printUSBSleepConfig" "Generate configuration file of sleepwatcher launch daemon"
+    _tidy_exec "_printConfig" "Generate configuration file of sleepwatcher launch daemon"
 
     #
     # Generate script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou.
     #
-    _PRINT_MSG "--->: Generating script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou..."
-    tidy_execute "_createUSB_Sleep_Script" "Generating script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou"
+    _PRINT_MSG "--->: Generating script to unmount external devices before sleep..."
+    _tidy_exec "_createUSB_Sleep_Script" "Generating script to unmount external devices before sleep"
 
     #
     # Install sleepwatcher daemon.
     #
-    _PRINT_MSG "--->: Install sleepwatcher daemon..."
-    tidy_execute "sudo cp "${gFrom}/sleepwatcher" "${gInstallDameon}"" "Install sleepwatcher daemon"
-    tidy_execute "sudo cp "${gUSBSleepConfig}" "/Library/LaunchDaemons"" "Install configuration of sleepwatcher daemon"
-    tidy_execute "sudo cp "${gUSBSleepScript}" "/etc"" "Install sleepwatcher script"
-    tidy_execute "sudo chmod +x /etc/sysclusbfix.sleep" "Change the permissions of the script (add +x) so that it can be run before sleep"
+    _del /Library/LaunchDaemons/de.bernhard-baehr.sleepwatcher.plist
+    _PRINT_MSG "--->: Installing external devices sleep patch..."
+    _touch "${gInstall_Repo}"
+    _tidy_exec "sudo cp "${gFrom}/sleepwatcher" "${gInstall_Repo}"" "Install sleepwatcher daemon"
+    _tidy_exec "sudo cp "${gUSBSleepConfig}" "${to_Plist}"" "Install configuration of sleepwatcher daemon"
+    _tidy_exec "sudo cp "${gUSBSleepScript}" "${to_shell}"" "Install sleepwatcher script"
+    _tidy_exec "sudo chmod 744 ${to_shell}" "Fix the permissions of the file(s)"
+    _tidy_exec "sudo launchctl load ${to_Plist}" "Trigger startup service of syscl.usb.fix"
 
     #
     # Clean up.
     #
-    tidy_execute "rm $gConfig $gUSBSleepScript" "Clean up temporary files of the progress of fixing usb sleep problem"
+    _tidy_exec "rm $gConfig $gUSBSleepScript" "Clean up"
 }
 
 #
@@ -887,7 +922,7 @@ function main()
     if [[ $# -eq 1 && "$gArgv" == "-D" || "$gArgv" == "-DEBUG" ]];
       then
         #
-        # Yes, we do need a debug mode.
+        # Yes, we do need debug mode.
         #
         _PRINT_MSG "NOTE: Use ${BLUE}DEBUG${OFF} mode"
         gDebug=0
@@ -908,10 +943,10 @@ function main()
     #
     # Generate dir.
     #
-    tidy_execute "create_dir "${REPO}/DSDT"" "Create ./DSDT"
-    tidy_execute "create_dir "${prepare}"" "Create ./DSDT/prepare"
-    tidy_execute "create_dir "${precompile}"" "Create ./DSDT/precompile"
-    tidy_execute "create_dir "${compile}"" "Create ./DSDT/compile"
+    _tidy_exec "create_dir "${REPO}/DSDT"" "Create ./DSDT"
+    _tidy_exec "create_dir "${prepare}"" "Create ./DSDT/prepare"
+    _tidy_exec "create_dir "${precompile}"" "Create ./DSDT/precompile"
+    _tidy_exec "create_dir "${compile}"" "Create ./DSDT/compile"
 
     #
     # Mount esp.
@@ -919,7 +954,7 @@ function main()
     diskutil list
     read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
     locate_esp ${targetEFI}
-    tidy_execute "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
+    _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
     #
     # Ensure / Force Graphics card to power.
@@ -932,7 +967,7 @@ function main()
     #
     if [ -f /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml ];
       then
-        tidy_execute "cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
+        _tidy_exec "cp /Volumes/EFI/EFI/CLOVER/ACPI/origin/DSDT.aml /Volumes/EFI/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
       else
         _PRINT_MSG "NOTE: Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
         # ERROR.
@@ -948,117 +983,117 @@ function main()
     #
     cd "${REPO}"
     _PRINT_MSG "--->: ${BLUE}Disassembling tables...${OFF}"
-    tidy_execute ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml" "Disassemble tables"
+    _tidy_exec ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml" "Disassemble tables"
 
     #
     # Search specification tables by syscl/Yating Zhou.
     #
-    tidy_execute "_find_acpi" "Search specification tables by syscl/Yating Zhou"
+    _tidy_exec "_find_acpi" "Search specification tables by syscl/Yating Zhou"
 
     #
     # DSDT Patches.
     #
     _PRINT_MSG "--->: ${BLUE}Patching DSDT.dsl${OFF}"
-    tidy_execute "patch_acpi DSDT syntax "fix_PARSEOP_ZERO"" "Fix PARSEOP_ZERO"
-    tidy_execute "patch_acpi DSDT syntax "fix_ADBG"" "Fix ADBG Error"
-    tidy_execute "patch_acpi DSDT graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-    tidy_execute "patch_acpi DSDT usb "usb_7-series"" "7-series/8-series USB"
-    tidy_execute "patch_acpi DSDT usb "usb_prw_0x0d_xhc"" "Fix USB _PRW"
-    tidy_execute "patch_acpi DSDT battery "battery_Acer-Aspire-E1-571"" "Acer Aspire E1-571"
-    tidy_execute "patch_acpi DSDT system "system_IRQ"" "IRQ Fix"
-    tidy_execute "patch_acpi DSDT system "system_SMBUS"" "SMBus Fix"
-    tidy_execute "patch_acpi DSDT system "system_ADP1"" "AC Adapter Fix"
-    tidy_execute "patch_acpi DSDT system "system_MCHC"" "Add MCHC"
-    tidy_execute "patch_acpi DSDT system "system_WAK2"" "Fix _WAK Arg0 v2"
-    tidy_execute "patch_acpi DSDT system "system_IMEI"" "Add IMEI"
-    tidy_execute "patch_acpi DSDT system "system_Mutex"" "Fix Non-zero Mutex"
-    tidy_execute "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
-    tidy_execute "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
-    tidy_execute "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
-    tidy_execute "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
+    _tidy_exec "patch_acpi DSDT syntax "fix_PARSEOP_ZERO"" "Fix PARSEOP_ZERO"
+    _tidy_exec "patch_acpi DSDT syntax "fix_ADBG"" "Fix ADBG Error"
+    _tidy_exec "patch_acpi DSDT graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    _tidy_exec "patch_acpi DSDT usb "usb_7-series"" "7-series/8-series USB"
+    _tidy_exec "patch_acpi DSDT usb "usb_prw_0x0d_xhc"" "Fix USB _PRW"
+    _tidy_exec "patch_acpi DSDT battery "battery_Acer-Aspire-E1-571"" "Acer Aspire E1-571"
+    _tidy_exec "patch_acpi DSDT system "system_IRQ"" "IRQ Fix"
+    _tidy_exec "patch_acpi DSDT system "system_SMBUS"" "SMBus Fix"
+    _tidy_exec "patch_acpi DSDT system "system_ADP1"" "AC Adapter Fix"
+    _tidy_exec "patch_acpi DSDT system "system_MCHC"" "Add MCHC"
+    _tidy_exec "patch_acpi DSDT system "system_WAK2"" "Fix _WAK Arg0 v2"
+    _tidy_exec "patch_acpi DSDT system "system_IMEI"" "Add IMEI"
+    _tidy_exec "patch_acpi DSDT system "system_Mutex"" "Fix Non-zero Mutex"
+    _tidy_exec "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
+    _tidy_exec "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
+    _tidy_exec "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
+    _tidy_exec "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
 
     #
     # DptfTa Patches.
     #
     _PRINT_MSG "--->: ${BLUE}Patching ${DptfTa}.dsl${OFF}"
-    tidy_execute "patch_acpi ${DptfTa} syscl "_BST-package-size"" "_BST package size"
-    tidy_execute "patch_acpi ${DptfTa} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    _tidy_exec "patch_acpi ${DptfTa} syscl "_BST-package-size"" "_BST package size"
+    _tidy_exec "patch_acpi ${DptfTa} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
 
     #
     # SaSsdt Patches.
     #
     _PRINT_MSG "--->: ${BLUE}Patching ${SaSsdt}.dsl${OFF}"
-    tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-    tidy_execute "patch_acpi ${SaSsdt} syscl "syscl_Iris_Pro"" "Rename HD4600 to Iris Pro"
-    tidy_execute "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
-    tidy_execute "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
-    tidy_execute "patch_acpi ${SaSsdt} syscl "audio_Intel_HD4600"" "Insert HDAU device"
+    _tidy_exec "patch_acpi ${SaSsdt} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    _tidy_exec "patch_acpi ${SaSsdt} syscl "syscl_Iris_Pro"" "Rename HD4600 to Iris Pro"
+    _tidy_exec "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
+    _tidy_exec "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
+    _tidy_exec "patch_acpi ${SaSsdt} syscl "audio_Intel_HD4600"" "Insert HDAU device"
 
     #
     # SgRef Patches.
     #
     _PRINT_MSG "--->: ${BLUE}Patching ${SgRef}.dsl${OFF}"
-    tidy_execute "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    _tidy_exec "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
 
     #
     # OptRef Patches.
     #
     _PRINT_MSG "--->: ${BLUE}Patching ${OptRef}.dsl${OFF}"
-    tidy_execute "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
-    tidy_execute "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-    tidy_execute "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
+    _tidy_exec "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
+    _tidy_exec "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    _tidy_exec "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
 
     #
     # Copy all tables to precompile.
     #
     _PRINT_MSG "--->: ${BLUE}Copying tables to precompile...${OFF}"
-    tidy_execute "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
+    _tidy_exec "cp "${raw}/"*.dsl "${precompile}"" "Copy tables to precompile"
 
     #
     # Copy raw tables to compile.
     #
     _PRINT_MSG "--->: ${BLUE}Copying untouched tables to ./DSDT/compile...${OFF}"
-    tidy_execute "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
+    _tidy_exec "cp "${raw}"/SSDT-*.aml "$compile"" "Copy untouched tables to ./DSDT/compile"
 
     #
     # Compile tables.
     #
     _PRINT_MSG "--->: ${BLUE}Compiling tables...${OFF}"
-    tidy_execute "compile_table "DSDT"" "Compiling DSDT"
-    tidy_execute "compile_table "${DptfTa}"" "Compile DptfTa"
-    tidy_execute "compile_table "${SaSsdt}"" "Compile SaSsdt"
-    tidy_execute "compile_table "${SgRef}"" "Compile SgRef"
-    tidy_execute "compile_table "${OptRef}"" "Compile OptRef"
+    _tidy_exec "compile_table "DSDT"" "Compiling DSDT"
+    _tidy_exec "compile_table "${DptfTa}"" "Compile DptfTa"
+    _tidy_exec "compile_table "${SaSsdt}"" "Compile SaSsdt"
+    _tidy_exec "compile_table "${SgRef}"" "Compile SgRef"
+    _tidy_exec "compile_table "${OptRef}"" "Compile OptRef"
 
     #
     # Copy SSDT-rmne.aml.
     #
     _PRINT_MSG "--->: ${BLUE}Copying SSDT-rmne.aml to ./DSDT/compile...${OFF}"
-    tidy_execute "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
+    _tidy_exec "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
 
     #
     # Detect which SSDT for processor to be installed.
     #
     if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]];
       then
-        tidy_execute "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
+        _tidy_exec "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
     fi
 
     if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
       then
-        tidy_execute "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
+        _tidy_exec "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
     fi
 
     #
     # Clean up dynamic SSDTs.
     #
-    tidy_execute "rm "${compile}"SSDT-*x.aml" "Clean dynamic SSDTs"
+    _tidy_exec "rm "${compile}"SSDT-*x.aml" "Clean dynamic SSDTs"
 
     #
     # Copy AML to destination place.
     #
-    tidy_execute "create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
-    tidy_execute "cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched" "Copy tables to /Volumes/EFI/EFI/CLOVER/ACPI/patched"
+    _tidy_exec "create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
+    _tidy_exec "cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched" "Copy tables to /Volumes/EFI/EFI/CLOVER/ACPI/patched"
 
     #
     # Refresh kext in Clover.
@@ -1074,7 +1109,7 @@ function main()
     # Install audio.
     #
     _PRINT_MSG "--->: ${BLUE}Installing audio...${OFF}"
-    tidy_execute "install_audio" "Install audio"
+    _tidy_exec "install_audio" "Install audio"
 
     #
     # Patch IOKit.
@@ -1088,14 +1123,14 @@ function main()
         #
         _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
         sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-        tidy_execute "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+        _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
     fi
 
     #
     # Lead to lid wake on 0x0a2e0008 by syscl/lighting/Yating Zhou
     #
     _PRINT_MSG "--->: ${BLUE}Leading to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou...${OFF}"
-    tidy_execute "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
+    _tidy_exec "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
 
     #
     # Fix issue that external devices ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
@@ -1106,12 +1141,12 @@ function main()
     # Rebuild kernel extensions cache.
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
-    tidy_execute "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+    _tidy_exec "rebuild_kernel_cache" "Rebuild kernel extensions cache"
 
     #
     # Clean up.
     #
-    tidy_execute "rm ${EFI_INFO}" "Clean up"
+    _tidy_exec "rm ${EFI_INFO}" "Clean up"
 
     _PRINT_MSG "NOTE: Congratulations! All operation has been completed! Reboot now. Then enjoy your OS X! --syscl/lighting/Yating Zhou @PCBeta"
 }

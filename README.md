@@ -63,6 +63,12 @@ or
 Change Log
 ----------------
 
+2016-4-13
+
+- Fix the permission issue for sysclusbfix.sleep.
+- No more reboot required, the fix will take effect instantly after executing the fixusb.sh!
+- Added uninstall function for fixusb.sh.
+
 2016-4-6
 
 - Remove "Welcome to Clover... Scan Entries" by argv "NoEarlyProgress=Yes".
