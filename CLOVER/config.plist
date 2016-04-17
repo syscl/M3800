@@ -163,8 +163,6 @@
 		</dict>
 		<key>NvidiaSingle</key>
 		<false/>
-		<key>ig-platform-id</key>
-		<string>0x0a2e0008</string>
 	</dict>
 	<key>KernelAndKextPatches</key>
 	<dict>
@@ -186,18 +184,6 @@
 		<array>
 			<dict>
 				<key>Comment</key>
-				<string>Enable Realtek ALC668 #1</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>hAjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Boot graphics glitch, 10.10.x/10.11.x (credit lisai9093, cecekpawon)</string>
 				<key>Disabled</key>
 				<false/>
@@ -207,18 +193,6 @@
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
 				<data>AQAA6xc=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #3</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>gxnUEQ==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -234,30 +208,6 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable Realtek ALC668 #2</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>hQjsEA==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>AAAAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable Realtek ALC668 #4</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>hBnUEQ==</data>
-				<key>Name</key>
-				<string>AppleHDA</string>
-				<key>Replace</key>
-				<data>aAbsEA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Enable HD4600 HDMI Audio </string>
 				<key>Disabled</key>
 				<false/>
@@ -270,7 +220,7 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable 128MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
+				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>

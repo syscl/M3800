@@ -63,9 +63,15 @@ or
 Change Log
 ----------------
 
+2016-4-18
+
+- Moved ig-platform-id=0x0a2e0008 to ACPI tables. (Fast and reliable injection)
+- Cleaned up clover patches.
+- Updated FakePCI_ID.kext to 2016-4-14.
+
 2016-4-13
 
-- Fix the permission issue for sysclusbfix.sleep.
+- Fixed the permission issue for sysclusbfix.sleep.
 - No more reboot required, the fix will take effect instantly after executing the fixusb.sh!
 - Added uninstall function for fixusb.sh.
 
