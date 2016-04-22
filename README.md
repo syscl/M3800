@@ -63,6 +63,10 @@ or
 Change Log
 ----------------
 
+2016-4-22
+
+- Updated Clover to r3438.
+
 2016-4-18
 
 - Moved ig-platform-id=0x0a2e0008 to ACPI tables. (Fast and reliable injection)

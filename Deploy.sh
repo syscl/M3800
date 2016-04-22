@@ -849,7 +849,7 @@ function _del()
     if [ -d ${target_file} ];
       then
         _tidy_exec "sudo rm -R ${target_file}" "Remove ${target_file}"
-    else
+      else
         if [ -f ${target_file} ];
           then
             _tidy_exec "sudo rm ${target_file}" "Remove ${target_file}"
