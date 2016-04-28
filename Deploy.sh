@@ -741,20 +741,20 @@ function _update_clover()
     #
     # gEFI.
     #
-    drvEFI=("FSInject-64.efi" "HFSPlus.efi" "OsxAptioFix2Drv-64.efi" "OsxFatBinaryDrv-64.efi")
+    drvEFI=("FSInject-64.efi" "HFSPlus.efi" "OsxAptioFix2Drv-64.efi" "OsxFatBinaryDrv-64.efi" "DataHubDxe-64.efi")
     efiTOOL=("Shell.inf" "Shell32.efi" "Shell64.efi" "Shell64U.efi" "bdmesg-32.efi" "bdmesg.efi")
 
     #
     # Check if necessary to update Clover.
     #
-    for ((index = 0; index <= 3; index++))
+    for filename in "${drvEFI[@]}"
     do
-      _upd_EFI "${drivers64UEFI}/${drvEFI[$index]}" "${t_drivers64UEFI}/${drvEFI[$index]}"
+        _upd_EFI "${drivers64UEFI}/${filename}" "${t_drivers64UEFI}/${filename}"
     done
 
-    for ((index = 0; index <= 5; index++))
+    for filename in "${efiTOOL[@]}"
     do
-      _upd_EFI "${clover_tools}/${efiTOOL[$index]}" "${t_clover_tools}/${efiTOOL[$index]}"
+      _upd_EFI "${clover_tools}/${filename}" "${t_clover_tools}/${filename}"
     done
 
     #
