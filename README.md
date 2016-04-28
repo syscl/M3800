@@ -61,6 +61,11 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 Change Log
 ----------------
 
+2016-4-29
+
+- Added small utility for developers(Use ./M3800/tools/rebuild to rebuild kernel cache easily).
+- Updated ./M3800/tools/cleanup for developers.
+
 2016-4-28
 
 - Implemented touchpad with 3D Touch/Force Touch: now 2/3 finger long press/touch/pinch will trigger the "look up"/preview function. Really amazing/powerful function!
