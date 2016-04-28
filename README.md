@@ -55,13 +55,20 @@ Reboot your OS X to see the change. If you have any problem about the script, tr
 ```sh
 ./deploy.sh -d
 ```
-or
-```sh
-./deploy.sh -debug
-```
+
+Note: For two finger scrolling you need to change the speed of the Scrolling once to get it work and also have to enable them in Trackpad preferences.
 
 Change Log
 ----------------
+
+2016-4-28
+
+- Implemented touchpad with 3D Touch/Force Touch: now 2/3 finger long press/touch/pinch will trigger the "look up"/preview function. Really amazing/powerful function!
+- 3f swipe: left swipe = backward, right swipe = forward.
+- 4f swipe: left swipe = previous application, right swipe = next application.
+- Updated SmartTouchPad to 4.6 to fix some issues.
+- Added DataHubDxe-64.efi which is DataHub protocol support obligatory for OS X.
+- Updated Clover to r3489 to prevent clover writing argvs to nvram during each boot.
 
 2016-4-22
 
