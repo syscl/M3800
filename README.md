@@ -60,6 +60,16 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-06
+
+- Natural 4fingers action(left/right).
+- Optimised deploy.sh structure.
+- Fixed an issue that trackpad will sometimes lose respone due to the new function of SmartTouchPad.
+
+2016-4-29
+
+- Added small utility for developers(Use ./M3800/tools/rebuild to rebuild kernel cache easily).
+- Updated ./M3800/tools/cleanup for developers.
 
 2016-4-29
 

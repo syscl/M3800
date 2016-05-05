@@ -98,6 +98,7 @@ replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
 gTriggerLE=1
+gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
 
 #
 # Define target website
@@ -112,35 +113,23 @@ function _PRINT_MSG()
 {
     local message=$1
 
-    if [[ $message =~ 'OK' ]];
-      then
-        local message=$(echo $message | sed -e 's/.*OK://')
-        echo "[  ${GREEN}OK${OFF}  ] ${message}."
-      else
-        if [[ $message =~ 'FAILED' ]];
-          then
-            local message=$(echo $message | sed -e 's/.*FAILED://')
-            echo "[${RED}FAILED${OFF}] ${message}."
-          else
-            if [[ $message =~ '--->' ]];
-              then
-                local message=$(echo $message | sed -e 's/.*--->://')
-                echo "[ ${GREEN}--->${OFF} ] ${message}"
-              else
-                if [[ $message =~ 'NOTE' ]];
-                  then
-                    local message=$(echo $message | sed -e 's/.*NOTE://')
-                    echo "[ ${RED}NOTE${OFF} ] ${message}."
-                  else
-                    if [[ $message =~ 'DEBUG' ]];
-                      then
-                        local message=$(echo $message | sed -e 's/.*DEBUG://')
-                        echo "[${BLUE}DEBLOG${OFF}] ${message}."
-                    fi
-                fi
-            fi
-        fi
-    fi
+    case "$message" in
+      OK*    ) local message=$(echo $message | sed -e 's/.*OK://')
+               echo "[  ${GREEN}OK${OFF}  ] ${message}."
+               ;;
+
+      FAILED*) local message=$(echo $message | sed -e 's/.*://')
+               echo "[${RED}FAILED${OFF}] ${message}."
+               ;;
+
+      ---*   ) local message=$(echo $message | sed -e 's/.*--->://')
+               echo "[ ${GREEN}--->${OFF} ] ${message}"
+               ;;
+
+      NOTE*  ) local message=$(echo $message | sed -e 's/.*NOTE://')
+               echo "[ ${RED}Note${OFF} ] ${message}."
+               ;;
+    esac
 }
 
 #
@@ -278,63 +267,16 @@ function rebuild_kernel_cache()
 function install_audio()
 {
     #
-    # Generate audio from current system.
-    #
-#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext 2&>/dev/null
-#    cp -R /System/Library/Extensions/AppleHDA.kext ./Kexts/audio/AppleHDA_ALC668.kext
-#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/*
-#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/PlugIns
-#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/_CodeSignature
-#    rm -rf ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-#    rm ./Kexts/audio/AppleHDA_ALC668.kext/Contents/version.plist
-#    ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA ./Kexts/audio/AppleHDA_ALC668.kext/Contents/MacOS/AppleHDA
-#    cp ./Kexts/audio/*.zlib ./Kexts/audio/AppleHDA_ALC668.kext/Contents/Resources/
-#    replace=`/usr/libexec/plistbuddy -c "Print :NSHumanReadableCopyright" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-#    /usr/libexec/plistbuddy -c "Set :NSHumanReadableCopyright '$replace'" $plist
-#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleGetInfoString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-#    /usr/libexec/plistbuddy -c "Set :CFBundleGetInfoString '$replace'" $plist
-#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleVersion" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-#    /usr/libexec/plistbuddy -c "Set :CFBundleVersion '$replace'" $plist
-#    replace=`/usr/libexec/plistbuddy -c "Print :CFBundleShortVersionString" $plist | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-#    /usr/libexec/plistbuddy -c "Set :CFBundleShortVersionString '$replace'" $plist
-#    /usr/libexec/plistbuddy -c "Add ':HardwareConfigDriver_Temp' dict" $plist
-#    /usr/libexec/plistbuddy -c "Merge /System/Library/Extensions/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" $plist
-#    /usr/libexec/plistbuddy -c "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-#    /usr/libexec/plistbuddy -c "Delete ':HardwareConfigDriver_Temp'" $plist
-#    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" $plist
-#    /usr/libexec/plistbuddy -c "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" $plist
-#    /usr/libexec/plistbuddy -c "Add ':IOKitPersonalities:HDA Hardware Config Resource: IOProbeScore' integer" $plist
-#    /usr/libexec/plistbuddy -c "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" $plist
-#    /usr/libexec/plistbuddy -c "Merge ./Kexts/audio/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" $plist
-
-
-    #
     # Remove previous AppleHDA_ALC668.kext & CodecCommander.kext.
     #
-    if [ -d /Library/Extensions/Apple_ALC668.kext ];
-      then
-        gTriggerLE=0
-        sudo rm -R /Library/Extensions/Apple_ALC668.kext
-    fi
-
-    if [ -d /Library/Extensions/CodecCommander.kext ];
-      then
-        gTriggerLE=0
-        sudo rm -R /Library/Extensions/CodecCommander.kext
-    fi
+    _del /Library/Extensions/Apple_ALC668.kext
+    _del /Library/Extensions/CodecCommander.kext
 
     #
     # Added detection to prevent failure of remove.
     #
-    if [ -d /System/Library/Extensions/Apple_ALC668.kext ];
-      then
-        sudo rm -R /System/Library/Extensions/Apple_ALC668.kext
-    fi
-
-    if [ -d /System/Library/Extensions/CodecCommander.kext ];
-      then
-        sudo rm -R /System/Library/Extensions/CodecCommander.kext
-    fi
+    _del /System/Library/Extensions/Apple_ALC668.kext
+    _del /System/Library/Extensions/CodecCommander.kext
 }
 
 #
@@ -523,8 +465,6 @@ function _check_and_fix_config()
     #
     # The first step is to check the minor version of OS X(e.g. 10.10 vs. 10.11).
     #
-    gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
-
     if [[ $gMINOR_VER -ge 11 ]];
       then
         #
@@ -724,7 +664,6 @@ function _update_clover()
     #
     # Decide which kext to be installed for BT.
     #
-    gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
     if [[ $gMINOR_VER -ge 11 ]];
       then
         #
@@ -907,6 +846,30 @@ function _fix_usb_ejected_improperly()
     # Clean up.
     #
     _tidy_exec "rm $gUSBSleepConfig $gUSBSleepScript" "Clean up"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _check_external_eth()
+{
+    #
+    # Check if there's external devices/kexts get installed. If yes, sleep fix is needed.
+    #
+    local gExt_ETH=1
+
+    if [ -d /System/Library/Extensions/*RTL*.kext ];
+      then
+        gExt_ETH=0
+      else
+        if [ -d /Library/Extensions/*RTL*.kext ];
+          then
+            gExt_ETH=0
+          else
+            gExt_ETH=1
+        fi
+    fi
 }
 
 #

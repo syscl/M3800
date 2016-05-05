@@ -704,7 +704,7 @@
 					<key>CircularRotate</key>
 					<true/>
 					<key>DisableTPadOnLIDClose</key>
-					<true/>
+					<false/>
 					<key>MaxTouchEndDelta</key>
 					<dict>
 						<key>ELANv2</key>
@@ -1006,9 +1006,9 @@
 					<key>4FingerSwipeDownAction</key>
 					<integer>9</integer>
 					<key>4FingerSwipeLeftAction</key>
-					<integer>6</integer>
-					<key>4FingerSwipeRightAction</key>
 					<integer>7</integer>
+					<key>4FingerSwipeRightAction</key>
+					<integer>6</integer>
 					<key>4FingerSwipeUpAction</key>
 					<integer>13</integer>
 					<key>4FingerSwipes</key>
