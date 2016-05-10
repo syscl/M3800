@@ -49,8 +49,13 @@ gInstall_Repo="/usr/local/sbin/"
 gFrom="${REPO}/tools"
 gUSBSleepConfig="/tmp/com.syscl.externalfix.sleepwatcher.plist"
 gUSBSleepScript="/tmp/sysclusbfix.sleep"
+gUSBWakeScript="/tmp/sysclusbfix.wake"
+gRTWlan_kext=$(ls /Library/Extensions | grep -i "Rtw" | sed 's/.kext//')
+gRTWlan_Repo="/Library/Extensions"
 to_Plist="/Library/LaunchDaemons/com.syscl.externalfix.sleepwatcher.plist"
-to_shell="/etc/sysclusbfix.sleep"
+to_shell_sleep="/etc/sysclusbfix.sleep"
+to_shell_wake="/etc/sysclusbfix.wake"
+gRT_Config="/Applications/Wireless Network Utility.app"/${gMAC_adr}rfoff.rtl
 drivers64UEFI="${REPO}/CLOVER/drivers64UEFI"
 t_drivers64UEFI="/Volumes/EFI/EFI/CLOVER/drivers64UEFI"
 clover_tools="${REPO}/CLOVER/tools"
@@ -92,7 +97,6 @@ find_Azul_data=""
 replace_Azul_data=""
 find_Azul_data_ENCODE=""
 replace_Azul_data_ENCODE=""
-gMINOR_VER=""
 find_handoff_bytes=""
 replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
@@ -173,11 +177,13 @@ function locate_esp()
 #--------------------------------------------------------------------------------
 #
 
-function create_dir()
+function _touch()
 {
-    if [ ! -d "$1" ];
+    local target_file=$1
+
+    if [ ! -d ${target_file} ];
       then
-        mkdir "$1"
+        _tidy_exec "sudo mkdir ${target_file}" "Create ${target_file}"
     fi
 }
 
@@ -742,6 +748,7 @@ function _printUSBSleepConfig()
     echo '		<string>/usr/local/sbin/sleepwatcher</string>'                                                                                             >> "$gUSBSleepConfig"
     echo '		<string>-V</string>'                                                                                                                       >> "$gUSBSleepConfig"
     echo '		<string>-s /etc/sysclusbfix.sleep</string>'                                                                                                >> "$gUSBSleepConfig"
+    echo '		<string>-w /etc/sysclusbfix.wake</string>'                                                                                                 >> "$gUSBSleepConfig"
     echo '	</array>'                                                                                                                                      >> "$gUSBSleepConfig"
     echo '	<key>RunAtLoad</key>'                                                                                                                          >> "$gUSBSleepConfig"
     echo '	<true/>'                                                                                                                                       >> "$gUSBSleepConfig"
@@ -775,6 +782,75 @@ function _createUSB_Sleep_Script()
     echo '#'                                                                                                                                                >> "$gUSBSleepScript"
     echo ''                                                                                                                                                 >> "$gUSBSleepScript"
     echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil eject {}'                                         >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo '# Fix RTLWlanUSB sleep problem credit B1anker & syscl/lighting/Yating Zhou. @PCBeta.'                                                             >> "$gUSBSleepScript"
+    echo '#'                                                                                                                                                >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo "gRTWlan_kext=$(echo $gRTWlan_kext)"                                                                                                               >> "$gUSBSleepScript"
+    echo 'gMAC_adr=$(ioreg -rc $gRTWlan_kext | sed -n "/IOMACAddress/ s/.*= <\(.*\)>.*/\1/ p")'                                                             >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo 'if [[ "$gMAC_adr" != 0 ]];'                                                                                                                       >> "$gUSBSleepScript"
+    echo '  then'                                                                                                                                           >> "$gUSBSleepScript"
+    echo '    gRT_Config="/Applications/Wireless Network Utility.app"/${gMAC_adr}rfoff.rtl'                                                                 >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo '    if [ ! -f $gRT_Config ];'                                                                                                                     >> "$gUSBSleepScript"
+    echo '      then'                                                                                                                                       >> "$gUSBSleepScript"
+    echo '        gRT_Config=$(ls "/Applications/Wireless Network Utility.app"/*rfoff.rtl)'                                                                 >> "$gUSBSleepScript"
+    echo '    fi'                                                                                                                                           >> "$gUSBSleepScript"
+    echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    echo "    osascript -e 'quit app \"Wireless Network Utility\"'"                                                                                         >> "$gUSBSleepScript"
+    echo '    echo "1" > "$gRT_Config"'                                                                                                                     >> "$gUSBSleepScript"
+    echo '    open "/Applications/Wireless Network Utility.app"'                                                                                            >> "$gUSBSleepScript"
+    echo 'fi'  
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _RTLWlanU()
+{
+    _del ${gUSBWakeScript}
+    _del "/etc/syscl.usbfix.wake"
+
+    echo '#!/bin/sh'                                                                                                                                         > "$gUSBWakeScript"
+    echo '#'                                                                                                                                                >> "$gUSBWakeScript"
+    echo '# Fix RTLWlanUSB sleep problem credit B1anker & syscl/lighting/Yating Zhou. @PCBeta.'                                                             >> "$gUSBWakeScript"
+    echo '#'                                                                                                                                                >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo "gRTWlan_kext=$(echo $gRTWlan_kext)"                                                                                                               >> "$gUSBWakeScript"
+    echo 'gMAC_adr=$(ioreg -rc $gRTWlan_kext | sed -n "/IOMACAddress/ s/.*= <\(.*\)>.*/\1/ p")'                                                             >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo 'if [[ "$gMAC_adr" != 0 ]];'                                                                                                                       >> "$gUSBWakeScript"
+    echo '  then'                                                                                                                                           >> "$gUSBWakeScript"
+    echo '    gRT_Config="/Applications/Wireless Network Utility.app"/${gMAC_adr}rfoff.rtl'                                                                 >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo '    if [ ! -f $gRT_Config ];'                                                                                                                     >> "$gUSBWakeScript"
+    echo '      then'                                                                                                                                       >> "$gUSBWakeScript"
+    echo '        gRT_Config=$(ls "/Applications/Wireless Network Utility.app"/*rfoff.rtl)'                                                                 >> "$gUSBWakeScript"
+    echo '    fi'                                                                                                                                           >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo "    osascript -e 'quit app \"Wireless Network Utility\"'"                                                                                         >> "$gUSBWakeScript"
+    echo '    echo "0" > "$gRT_Config"'                                                                                                                     >> "$gUSBWakeScript"
+    echo '    open "/Applications/Wireless Network Utility.app"'                                                                                            >> "$gUSBWakeScript"
+    echo 'fi'                                                                                                                                               >> "$gUSBWakeScript"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _fnd_RTW_Repo()
+{
+    if [ -z $gRTWlan_kext ];
+      then
+        #
+        # RTWlan_kext is not in /Library/Extensions. Check /S*/L*/E*.
+        #
+        gRTWlan_kext=$(ls /System/Library/Extensions | grep -i "Rtw" | sed 's/.kext//')
+        gRTWlan_Repo="/System/Library/Extensions"
+    fi
 }
 
 #
@@ -800,76 +876,45 @@ function _del()
 #--------------------------------------------------------------------------------
 #
 
-function _touch()
-{
-    local target_file=$1
-
-    if [ ! -d ${target_file} ];
-      then
-        _tidy_exec "sudo mkdir ${target_file}" "Create ${target_file}"
-    fi
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
 function _fix_usb_ejected_improperly()
 {
     #
-    # This function fix the issue that usb ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
-    #
     # Generate configuration file of sleepwatcher launch demon.
     #
-    _PRINT_MSG "--->: Generating configuration file of sleepwatcher launch daemon..."
-    _tidy_exec "_printUSBSleepConfig" "Generate configuration file of sleepwatcher launch daemon"
+    _tidy_exec "_printConfig" "Generate configuration file of sleepwatcher launch daemon"
+
+    #
+    # Find RTW place.
+    #
+    _fnd_RTW_Repo
 
     #
     # Generate script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou.
     #
-    _PRINT_MSG "--->: Generating script to unmount external devices before sleep..."
-    _tidy_exec "_createUSB_Sleep_Script" "Generating script to unmount external devices before sleep"
+    _tidy_exec "_createUSB_Sleep_Script" "Generating script to unmount external devices before sleep (c) syscl/lighting/Yating Zhou"
+
+    #
+    # Generate script to load RTWlanUSB upon sleep.
+    #
+    _tidy_exec "_RTLWlanU" "Generate script to load RTWlanUSB upon sleep"
 
     #
     # Install sleepwatcher daemon.
     #
-    _del /Library/LaunchDaemons/de.bernhard-baehr.sleepwatcher.plist
     _PRINT_MSG "--->: Installing external devices sleep patch..."
     _touch "${gInstall_Repo}"
     _tidy_exec "sudo cp "${gFrom}/sleepwatcher" "${gInstall_Repo}"" "Install sleepwatcher daemon"
-    _tidy_exec "sudo cp "${gUSBSleepConfig}" "${to_Plist}"" "Install configuration of sleepwatcher daemon"
-    _tidy_exec "sudo cp "${gUSBSleepScript}" "${to_shell}"" "Install sleepwatcher script"
-    _tidy_exec "sudo chmod 744 ${to_shell}" "Fix the permissions of the file(s)"
+    _tidy_exec "sudo cp "${gConfig}" "${to_Plist}"" "Install configuration of sleepwatcher daemon"
+    _tidy_exec "sudo cp "${gUSBSleepScript}" "${to_shell_sleep}"" "Install sleep script"
+    _tidy_exec "sudo cp "${gUSBWakeScript}" "${to_shell_wake}"" "Install wake script"
+    _tidy_exec "sudo chmod 744 ${to_shell_sleep}" "Fix the permissions of ${to_shell_sleep}"
+    _tidy_exec "sudo chmod 744 ${to_shell_wake}" "Fix the permissions of ${to_shell_wake}"
     _tidy_exec "sudo launchctl load ${to_Plist}" "Trigger startup service of syscl.usb.fix"
 
     #
     # Clean up.
     #
-    _tidy_exec "rm $gUSBSleepConfig $gUSBSleepScript" "Clean up"
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _check_external_eth()
-{
-    #
-    # Check if there's external devices/kexts get installed. If yes, sleep fix is needed.
-    #
-    local gExt_ETH=1
-
-    if [ -d /System/Library/Extensions/*RTL*.kext ];
-      then
-        gExt_ETH=0
-      else
-        if [ -d /Library/Extensions/*RTL*.kext ];
-          then
-            gExt_ETH=0
-          else
-            gExt_ETH=1
-        fi
-    fi
+    _tidy_exec "rm $gConfig $gUSBSleepScript" "Clean up"
 }
 
 #
@@ -906,10 +951,10 @@ function main()
     #
     # Generate dir.
     #
-    _tidy_exec "create_dir "${REPO}/DSDT"" "Create ./DSDT"
-    _tidy_exec "create_dir "${prepare}"" "Create ./DSDT/prepare"
-    _tidy_exec "create_dir "${precompile}"" "Create ./DSDT/precompile"
-    _tidy_exec "create_dir "${compile}"" "Create ./DSDT/compile"
+    _tidy_exec "_touch "${REPO}/DSDT"" "Create ./DSDT"
+    _tidy_exec "_touch "${prepare}"" "Create ./DSDT/prepare"
+    _tidy_exec "_touch "${precompile}"" "Create ./DSDT/precompile"
+    _tidy_exec "_touch "${compile}"" "Create ./DSDT/compile"
 
     #
     # Mount esp.
@@ -1055,7 +1100,7 @@ function main()
     #
     # Copy AML to destination place.
     #
-    _tidy_exec "create_dir "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
+    _tidy_exec "_touch "/Volumes/EFI/EFI/CLOVER/ACPI/patched"" "Create /Volumes/EFI/EFI/CLOVER/ACPI/patched"
     _tidy_exec "cp "${compile}"*.aml /Volumes/EFI/EFI/CLOVER/ACPI/patched" "Copy tables to /Volumes/EFI/EFI/CLOVER/ACPI/patched"
 
     #

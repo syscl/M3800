@@ -60,6 +60,11 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-10
+
+- Fixed USB Wi-Fi sleep issue. 
+- Sync Fix-usb-sleep.sh to latest version 2016-4-18. 
+
 2016-5-06
 
 - Natural 4fingers action(left/right).
