@@ -33,7 +33,7 @@ OFF="\033[m"
 #
 # Located repository.
 #
-REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd | sed "s|\/tools||g" )
 
 #
 # Path and filename setup.
