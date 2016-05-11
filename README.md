@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-12
+
+- Fixed the touchpad sleep issue due to the latest SmartTouchPad driver.
+
 2016-5-10
 
 - Fixed USB Wi-Fi sleep issue. 

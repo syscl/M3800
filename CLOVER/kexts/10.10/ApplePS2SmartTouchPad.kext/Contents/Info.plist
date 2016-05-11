@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>
-	<string>4.6</string>
+	<string>4.5</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>4.6</string>
+	<string>4.5</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
@@ -619,8 +619,6 @@
 			<dict>
 				<key>Buttons</key>
 				<dict>
-					<key>2FingersClickAction</key>
-					<integer>2</integer>
 					<key>ClickpadVirtualButtons</key>
 					<true/>
 					<key>ClickpadVirtualButtonsArea</key>
@@ -658,6 +656,8 @@
 				</dict>
 				<key>FingersPress</key>
 				<dict>
+					<key>2FingersClickAction</key>
+					<integer>2</integer>
 					<key>2FingersPressAction</key>
 					<integer>31</integer>
 					<key>3FingersPressAction</key>
@@ -703,76 +703,10 @@
 					<integer>3</integer>
 					<key>CircularRotate</key>
 					<true/>
-					<key>DisableTPadOnLIDClose</key>
-					<false/>
-					<key>MaxTouchEndDelta</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>10</integer>
-						<key>ELANv3</key>
-						<integer>10</integer>
-						<key>ELANv4</key>
-						<integer>10</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>10</integer>
-						<key>FocalTech</key>
-						<integer>10</integer>
-						<key>Synaptics</key>
-						<integer>25</integer>
-						<key>SynapticsClickPad</key>
-						<integer>15</integer>
-					</dict>
-					<key>MaxTouchEndPressure</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>5</integer>
-						<key>ELANv3</key>
-						<integer>5</integer>
-						<key>ELANv4</key>
-						<integer>5</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>5</integer>
-						<key>FocalTech</key>
-						<integer>5</integer>
-						<key>Synaptics</key>
-						<integer>30</integer>
-						<key>SynapticsClickPad</key>
-						<integer>15</integer>
-					</dict>
 					<key>PalmCheckMinPressure</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>180</integer>
-						<key>ELANv3</key>
-						<integer>200</integer>
-						<key>ELANv4</key>
-						<integer>200</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>200</integer>
-						<key>FocalTech</key>
-						<integer>200</integer>
-						<key>Synaptics</key>
-						<integer>150</integer>
-						<key>SynapticsClickPad</key>
-						<integer>150</integer>
-					</dict>
+					<integer>200</integer>
 					<key>PalmCheckMinWidth</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>10</integer>
-						<key>ELANv3</key>
-						<integer>10</integer>
-						<key>ELANv4</key>
-						<integer>10</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>10</integer>
-						<key>FocalTech</key>
-						<integer>10</integer>
-						<key>Synaptics</key>
-						<integer>9</integer>
-						<key>SynapticsClickPad</key>
-						<integer>9</integer>
-					</dict>
+					<integer>10</integer>
 					<key>PalmDetection</key>
 					<true/>
 					<key>PinchDeltaScale</key>
@@ -789,8 +723,6 @@
 					<integer>350</integer>
 					<key>RotationMaxCFDelta</key>
 					<integer>85</integer>
-					<key>TPadStatusCheckPollRate</key>
-					<integer>1500</integer>
 				</dict>
 				<key>Pointing</key>
 				<dict>
@@ -800,12 +732,12 @@
 					<true/>
 					<key>DisableTrackPointButton</key>
 					<false/>
+					<key>EnhancedAcceleration</key>
+					<true/>
 					<key>EnhancedAccelerationLevel</key>
-					<integer>1</integer>
-					<key>EnhancedAccelerationMinDelta</key>
-					<integer>15</integer>
+					<integer>3</integer>
 					<key>PointerCustomAcceleration</key>
-					<integer>16</integer>
+					<integer>19</integer>
 					<key>PointerResolution</key>
 					<dict>
 						<key>ELANv2</key>
@@ -821,44 +753,10 @@
 						<key>Synaptics</key>
 						<integer>2400</integer>
 					</dict>
-					<key>PointerSmoothLevel</key>
-					<integer>7</integer>
 					<key>PointerSmoothSamples</key>
 					<integer>3</integer>
 					<key>Sensitivity</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>0</integer>
-						<key>ELANv3</key>
-						<integer>0</integer>
-						<key>ELANv4</key>
-						<integer>0</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>0</integer>
-						<key>FocalTech</key>
-						<integer>0</integer>
-						<key>Synaptics</key>
-						<integer>0</integer>
-						<key>SynapticsClickPad</key>
-						<integer>0</integer>
-					</dict>
-					<key>SlowMoveNoiseMaxDelta</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>0</integer>
-						<key>ELANv3</key>
-						<integer>0</integer>
-						<key>ELANv4</key>
-						<integer>0</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>3</integer>
-						<key>FocalTech</key>
-						<integer>3</integer>
-						<key>Synaptics</key>
-						<integer>5</integer>
-						<key>SynapticsClickPad</key>
-						<integer>3</integer>
-					</dict>
+					<integer>0</integer>
 					<key>TouchpadEdges</key>
 					<dict>
 						<key>DisableBottomEdgeActiveArea</key>
@@ -875,23 +773,6 @@
 				<dict>
 					<key>2FScroll</key>
 					<dict>
-						<key>2FContScrollMaxDelta</key>
-						<dict>
-							<key>ELANv2</key>
-							<integer>20</integer>
-							<key>ELANv3</key>
-							<integer>25</integer>
-							<key>ELANv4</key>
-							<integer>20</integer>
-							<key>ELANv4ClickPad</key>
-							<integer>15</integer>
-							<key>FocalTech</key>
-							<integer>15</integer>
-							<key>Synaptics</key>
-							<integer>30</integer>
-							<key>SynapticsClickPad</key>
-							<integer>15</integer>
-						</dict>
 						<key>2FScrollAccelMode</key>
 						<integer>0</integer>
 						<key>Auto2FingScroll</key>
@@ -900,8 +781,6 @@
 						<true/>
 						<key>Inertial2FingScroll</key>
 						<true/>
-						<key>ScrollSmoothSamples</key>
-						<integer>3</integer>
 						<key>Sling2FingScroll</key>
 						<false/>
 					</dict>
@@ -910,26 +789,7 @@
 						<key>AutoEdgeScroll</key>
 						<false/>
 						<key>ContinuousEdgeScroll</key>
-						<true/>
-						<key>EContScrollMaxDelta</key>
-						<dict>
-							<key>ELANv2</key>
-							<integer>10</integer>
-							<key>ELANv3</key>
-							<integer>10</integer>
-							<key>ELANv4</key>
-							<integer>10</integer>
-							<key>ELANv4ClickPad</key>
-							<integer>10</integer>
-							<key>FocalTech</key>
-							<integer>10</integer>
-							<key>Synaptics</key>
-							<integer>15</integer>
-							<key>SynapticsClickPad</key>
-							<integer>10</integer>
-						</dict>
-						<key>EScrolSpeedFactor</key>
-						<integer>100</integer>
+						<false/>
 						<key>EdgeCircularScroll</key>
 						<false/>
 						<key>EdgeCircularScrollDelta</key>
@@ -955,23 +815,6 @@
 					<integer>2</integer>
 					<key>NoInertiaForHScroll</key>
 					<true/>
-					<key>ScrollDirectionSamples</key>
-					<dict>
-						<key>ELANv2</key>
-						<integer>3</integer>
-						<key>ELANv3</key>
-						<integer>5</integer>
-						<key>ELANv4</key>
-						<integer>5</integer>
-						<key>ELANv4ClickPad</key>
-						<integer>5</integer>
-						<key>FocalTech</key>
-						<integer>5</integer>
-						<key>Synaptics</key>
-						<integer>5</integer>
-						<key>SynapticsClickPad</key>
-						<integer>5</integer>
-					</dict>
 					<key>ScrollLevelAtBoot</key>
 					<integer>0</integer>
 					<key>ScrollLevelFactor</key>
@@ -982,12 +825,31 @@
 					<integer>500</integer>
 					<key>ScrollMaxIdleStateDelta</key>
 					<integer>10</integer>
+					<key>ScrollSmoothSamples</key>
+					<integer>3</integer>
 					<key>ScrollStopDetectSamples</key>
 					<integer>3</integer>
 					<key>SlingScrollStartTimeOut</key>
 					<integer>800</integer>
 					<key>SlingTriggerArea</key>
 					<integer>15</integer>
+					<key>SlowScrollFilterMaxDelta</key>
+					<dict>
+						<key>ELANv2</key>
+						<integer>20</integer>
+						<key>ELANv3</key>
+						<integer>25</integer>
+						<key>ELANv4</key>
+						<integer>20</integer>
+						<key>ELANv4ClickPad</key>
+						<integer>15</integer>
+						<key>FocalTech</key>
+						<integer>15</integer>
+						<key>Synaptics</key>
+						<integer>20</integer>
+						<key>SynapticsClickPad</key>
+						<integer>15</integer>
+					</dict>
 				</dict>
 				<key>SleepInitDelay</key>
 				<integer>1500</integer>
@@ -1016,9 +878,9 @@
 					<key>EdgeSwipeBottom</key>
 					<integer>0</integer>
 					<key>EdgeSwipeDeltaX</key>
-					<integer>30</integer>
+					<integer>25</integer>
 					<key>EdgeSwipeDeltaY</key>
-					<integer>60</integer>
+					<integer>33</integer>
 					<key>EdgeSwipeDetectHArea</key>
 					<integer>7</integer>
 					<key>EdgeSwipeDetectVArea</key>
@@ -1044,10 +906,6 @@
 				</dict>
 				<key>Tapping</key>
 				<dict>
-					<key>12TapTimeOut</key>
-					<integer>150</integer>
-					<key>1FClickTimeOut</key>
-					<integer>130</integer>
 					<key>1FTapPressure</key>
 					<dict>
 						<key>ELANv2</key>
@@ -1088,7 +946,7 @@
 					<key>MulFingTapTimeOut</key>
 					<integer>180</integer>
 					<key>TapMaxDelta</key>
-					<integer>100</integer>
+					<integer>95</integer>
 					<key>TrackpadTappingCorners</key>
 					<false/>
 				</dict>
@@ -1112,9 +970,9 @@
 		<key>com.apple.kpi.mach</key>
 		<string>9.0.0</string>
 		<key>org.emlydinesh.driver.ApplePS2Controller</key>
-		<string>4.6</string>
+		<string>4.5</string>
 		<key>org.emlydinesh.driver.ApplePS2Keyboard</key>
-		<string>4.6</string>
+		<string>4.5</string>
 	</dict>
 	<key>OSBundleRequired</key>
 	<string>Safe Boot</string>
