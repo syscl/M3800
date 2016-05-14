@@ -275,13 +275,13 @@ function install_audio()
     #
     # Remove previous AppleHDA_ALC668.kext & CodecCommander.kext.
     #
-    _del /Library/Extensions/Apple_ALC668.kext
+    _del /Library/Extensions/AppleHDA_ALC668.kext
     _del /Library/Extensions/CodecCommander.kext
 
     #
     # Added detection to prevent failure of remove.
     #
-    _del /System/Library/Extensions/Apple_ALC668.kext
+    _del /System/Library/Extensions/AppleHDA_ALC668.kext
     _del /System/Library/Extensions/CodecCommander.kext
 }
 
@@ -694,7 +694,7 @@ function _update_clover()
     #
     for filename in "${drvEFI[@]}"
     do
-        _upd_EFI "${drivers64UEFI}/${filename}" "${t_drivers64UEFI}/${filename}"
+      _upd_EFI "${drivers64UEFI}/${filename}" "${t_drivers64UEFI}/${filename}"
     done
 
     for filename in "${efiTOOL[@]}"

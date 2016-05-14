@@ -60,6 +60,13 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-14
+
+- Added FixRegions argv. The presence of floating regions make impossible to use custom DSDT because this region may be shifted and will not correspond to current state. This patch is intended to find all such regions in BIOS and correct them in custom DSDT. (To prevent potential issues.)
+- Updated Clover to r3526.
+- Minor bug fixes.
+- Sync config.plist to fit the latest standard one.
+
 2016-5-12
 
 - Fixed the touchpad sleep issue due to the latest SmartTouchPad driver.

@@ -10,6 +10,11 @@
 			<false/>
 			<key>DropOEM_DSM</key>
 			<true/>
+			<key>Fixes</key>
+			<dict>
+				<key>FixRegions_10000000</key>
+				<true/>
+			</dict>
 			<key>Name</key>
 			<string>DSDT.aml</string>
 			<key>ReuseFFFF</key>
@@ -51,16 +56,19 @@
 		<string>Macintosh HD</string>
 		<key>Legacy</key>
 		<string>LegacyBiosDefault</string>
+		<key>NoEarlyProgress</key>
+		<true/>
 		<key>Secure</key>
 		<false/>
 		<key>Timeout</key>
 		<integer>5</integer>
 		<key>XMPDetection</key>
 		<false/>
-		<key>Fast</key>
+	</dict>
+	<key>CPU</key>
+	<dict>
+		<key>UseARTFrequency</key>
 		<false/>
-		<key>NoEarlyProgress</key>
-		<true/>
 	</dict>
 	<key>Devices</key>
 	<dict>
@@ -124,8 +132,8 @@
 		</dict>
 		<key>Hide</key>
 		<array>
-			<string>Windows</string>
 			<string>\EFI\BOOT\BOOTX64.EFI</string>
+			<string>Windows</string>
 		</array>
 		<key>Mouse</key>
 		<dict>
@@ -143,6 +151,8 @@
 			<key>Entries</key>
 			<true/>
 			<key>Legacy</key>
+			<false/>
+			<key>Linux</key>
 			<false/>
 			<key>Tool</key>
 			<true/>
@@ -184,51 +194,67 @@
 		<array>
 			<dict>
 				<key>Comment</key>
+				<string>Enable TRIM support for non-Apple SSD</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>
+				QVBQTEUgU1NEAA==
+				</data>
+				<key>Name</key>
+				<string>IOAHCIBlockStorage</string>
+				<key>Replace</key>
+				<data>
+				AAAAAAAAAAAAAA==
+				</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>10.10.2+ BT4LE-Handoff-Hotspot, Dokterdok</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>
+				SIXAdFwPt0g=
+				</data>
+				<key>Name</key>
+				<string>IOBluetoothFamily</string>
+				<key>Replace</key>
+				<data>
+				Qb4PAAAA61k=
+				</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>Boot graphics glitch, 10.10.x/10.11.x (credit lisai9093, cecekpawon)</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>AQAAdRc=</data>
+				<data>
+				AQAAdRc=
+				</data>
 				<key>Name</key>
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
-				<data>AQAA6xc=</data>
+				<data>
+				AQAA6xc=
+				</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>AirPortBrcm4360 5ghz</string>
+				<string>10.11.dp1+ BT4LE-Handoff-Hotspot, credit RehabMan based on Dokterdok original</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>QYP8/3QsSA==</data>
+				<data>
+				SIX/dEdIiwc=
+				</data>
 				<key>Name</key>
-				<string>AirPortBrcm4360</string>
+				<string>IOBluetoothFamily</string>
 				<key>Replace</key>
-				<data>ZscGVVPrKw==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable HD4600 HDMI Audio </string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>PQwKAAA=</data>
-				<key>Name</key>
-				<string>AppleHDAController</string>
-				<key>Replace</key>
-				<data>PQwMAAA=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAE=</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>CAAuCgEDAwMAAAAIAAAAAwAAAAM=</data>
+				<data>
+				Qb4PAAAA60Q=
+				</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -236,41 +262,63 @@
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>QAAAAB4AAAAFBQkB</data>
+				<data>
+				QAAAAB4AAAAFBQkB
+				</data>
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>QAAAAA8AAAAFBQkB</data>
+				<data>
+				QAAAAA8AAAAFBQkB
+				</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable TRIM support for non-Apple SSD</string>
+				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
-				<data>QVBQTEUgU1NEAA==</data>
+				<data>
+				CAAuCgEDAwMAAAAEAAAgAgAAUAE=
+				</data>
 				<key>Name</key>
-				<string>IOAHCIBlockStorage</string>
+				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>AAAAAAAAAAAAAA==</data>
+				<data>
+				CAAuCgEDAwMAAAAIAAAAAwAAAAM=
+				</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>10.10.2+ BT4LE-Handoff-Hotspot, Dokterdok</string>
+				<string>Enable HD4600 HDMI Audio </string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
-				<data>SIXAdFwPt0g=</data>
+				<data>
+				PQwKAAA=
+				</data>
 				<key>Name</key>
-				<string>IOBluetoothFamily</string>
+				<string>AppleHDAController</string>
 				<key>Replace</key>
-				<data>Qb4PAAAA61k=</data>
+				<data>
+				PQwMAAA=
+				</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>10.11.dp1+ BT4LE-Handoff-Hotspot, credit RehabMan based on Dokterdok original</string>
+				<string>AirPortBrcm4360 5ghz</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
-				<data>SIX/dEdIiwc=</data>
+				<data>
+				QYP8/3QsSA==
+				</data>
 				<key>Name</key>
-				<string>IOBluetoothFamily</string>
+				<string>AirPortBrcm4360</string>
 				<key>Replace</key>
-				<data>Qb4PAAAA60Q=</data>
+				<data>
+				ZscGVVPrKw==
+				</data>
 			</dict>
 		</array>
 	</dict>
