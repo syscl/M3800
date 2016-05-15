@@ -183,7 +183,7 @@ function _touch()
 
     if [ ! -d ${target_file} ];
       then
-        _tidy_exec "mkdir ${target_file}" "Create ${target_file}"
+        _tidy_exec "mkdir -p ${target_file}" "Create ${target_file}"
     fi
 }
 
@@ -902,7 +902,7 @@ function _fix_usb_ejected_improperly()
     # Install sleepwatcher daemon.
     #
     _PRINT_MSG "--->: Installing external devices sleep patch..."
-    _touch "${gInstall_Repo}"
+    sudo mkdir -p "${gInstall_Repo}"
     _tidy_exec "sudo cp "${gFrom}/sleepwatcher" "${gInstall_Repo}"" "Install sleepwatcher daemon"
     _tidy_exec "sudo cp "${gUSBSleepConfig}" "${to_Plist}"" "Install configuration of sleepwatcher daemon"
     _tidy_exec "sudo cp "${gUSBSleepScript}" "${to_shell_sleep}"" "Install sleep script"

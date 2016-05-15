@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-15
+
+- Fixed sleep watcher dir issue due to permission. 
+
 2016-5-14
 
 - Added FixRegions argv. The presence of floating regions make impossible to use custom DSDT because this region may be shifted and will not correspond to current state. This patch is intended to find all such regions in BIOS and correct them in custom DSDT. (To prevent potential issues.)
