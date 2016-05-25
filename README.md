@@ -60,6 +60,12 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-5-25
+
+- Huge update for the support of Recovery HD for DELL M3800/XPS9530 (c) syscl/lighting/Yating Zhou.
+- Reverted back to Clover injection for ig-platform-id(easier to turn off "Inject Intel under Graphics for update".
+
+
 2016-5-15
 
 - Fixed sleep watcher dir issue due to permission. 

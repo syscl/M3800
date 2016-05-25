@@ -103,6 +103,8 @@ find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
 gTriggerLE=1
 gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
+gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
+gBak_Dir="${REPO}/Backups/${gBak_Time}"
 
 #
 # Define target website
@@ -394,6 +396,15 @@ function _check_and_fix_config()
     #
     target_ig_platform_id="0x0a2e0008"
     gClover_ig_platform_id=$(awk '/<key>ig-platform-id<\/key>.*/,/<\/string>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
+
+    #
+    # Added ig-platform-id injection.
+    #
+    if [ -z $gClover_ig_platform_id ];
+      then
+        /usr/libexec/plistbuddy -c "Add ':Graphics:ig-platform-id' string" ${config_plist}
+        /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' $target_ig_platform_id" ${config_plist}
+    fi
 
     if [[ $gClover_ig_platform_id != $target_ig_platform_id ]];
       then
@@ -921,6 +932,67 @@ function _fix_usb_ejected_improperly()
 #--------------------------------------------------------------------------------
 #
 
+function _recoveryhd_fix()
+{
+    #
+    # Fixed RecoveryHD issues (c) syscl.
+    #
+    # Mount Recovery HD.
+    #
+    local gRecoveryHD=""
+    local gMountPoint="/tmp/RecoveryHD"
+    local gBaseSystem_RW="/tmp/BaseSystem_RW.dmg"
+    local gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
+    local gBaseSystem_PATCH="/tmp/BaseSystem_PATCHED.dmg"
+    diskutil list
+    printf "Enter ${RED}Recovery HD's ${OFF}IDENTIFIER, e.g. ${BOLD}disk0s3${OFF}"
+    read -p ": " gRecoveryHD
+    _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
+    _touch "${gMountPoint}"
+
+    #
+    # Gain origin file format(e.g. UDZO...).
+    #
+    local gBaseSystem_FS=$(hdiutil imageinfo "${gRecoveryHD_DMG}" | grep -i "Format:" | sed -e 's/.*://' -e 's/ //')
+    local gTarget_FS=$(echo 'UDRW')
+
+    #
+    # Backup origin BaseSystem.dmg to ${REPO}/Backups/.
+    #
+    _touch "${gBak_Dir}"
+    cp "${gRecoveryHD_DMG}" "${gBak_Dir}/"
+    local gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
+    _tidy_exec "chflags nohidden "${gBak_BaseSystem}"" "Show the dmg"
+
+    #
+    # Start to override.
+    #
+    _PRINT_MSG "--->: Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w) ..."
+    _tidy_exec "hdiutil convert "${gBak_BaseSystem}" -format ${gTarget_FS} -o ${gBaseSystem_RW} -quiet" "Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w)"
+    _tidy_exec "hdiutil attach "${gBaseSystem_RW}" -nobrowse -quiet -readwrite -noverify -mountpoint ${gMountPoint}" "Attach Recovery HD"
+    sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
+    _tidy_exec "sudo codesign -f -s - $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit for Recovery HD"
+    _tidy_exec "hdiutil detach $gMountPoint" "Detach mountpoint"
+    #
+    # Convert to origin format.
+    #
+    _PRINT_MSG "--->: Convert ${gTarget_FS}(r/w) to ${gBaseSystem_FS}(r/o) ..."
+    _tidy_exec "hdiutil convert "${gBaseSystem_RW}" -format ${gBaseSystem_FS} -o ${gBaseSystem_PATCH} -quiet" "Convert ${gTarget_FS}(r/w) to ${gBaseSystem_FS}(r/o)"
+    _PRINT_MSG "--->: Updating Recovery HD for DELL M3800/XPS9530..."
+    cp ${gBaseSystem_PATCH} "${gRecoveryHD_DMG}"
+    chflags hidden "${gRecoveryHD_DMG}"
+
+    #
+    # Clean redundant dmg files.
+    #
+    _tidy_exec "rm $gBaseSystem_RW $gBaseSystem_PATCH" "Clean redundant dmg files"
+    _tidy_exec "diskutil unmount ${gRecoveryHD}" "Unmount ${gRecoveryHD}"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function main()
 {
     #
@@ -960,7 +1032,8 @@ function main()
     # Mount esp.
     #
     diskutil list
-    read -p "Enter EFI's IDENTIFIER, e.g. disk0s1: " targetEFI
+    printf "Enter ${RED}EFI's${OFF} IDENTIFIER, e.g. ${BOLD}disk0s1${OFF}"
+    read -p ": " targetEFI
     locate_esp ${targetEFI}
     _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
@@ -1144,6 +1217,11 @@ function main()
     # Fix issue that external devices ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
     #
     _fix_usb_ejected_improperly
+
+    #
+    # Fixed Recovery HD entering issues (c) syscl.
+    #
+    _recoveryhd_fix
 
     #
     # Rebuild kernel extensions cache.

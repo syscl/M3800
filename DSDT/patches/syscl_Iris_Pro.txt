@@ -8,10 +8,8 @@ Method (_DSM, 4, NotSerialized)\n
     If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }\n
     Return (Package()\n
     {\n
-        "device-id", Buffer() { 0x12, 0x04, 0x00, 0x00 },\n
-        "AAPL,ig-platform-id", Buffer() { 0x08, 0x00, 0x2e, 0x0a },\n
-        "hda-gfx", Buffer() { "onboard-1" },\n
         "model", Buffer() { "Intel Iris Pro" },\n
+        "hda-gfx", Buffer() { "onboard-1" },\n
     })\n
 }\n
 end;
