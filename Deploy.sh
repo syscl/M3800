@@ -962,7 +962,7 @@ function _recoveryhd_fix()
             #
             # Yes, we have to touch/modify the config.plist.
             #
-            sed -ig "s/$gClover_BooterConfig/$target_BooterConfig/g" ${config_plist}
+            /usr/libexec/plistbuddy -c "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
         fi
     fi
 
