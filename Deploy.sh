@@ -404,15 +404,20 @@ function _check_and_fix_config()
       then
         /usr/libexec/plistbuddy -c "Add ':Graphics:ig-platform-id' string" ${config_plist}
         /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' $target_ig_platform_id" ${config_plist}
+      else
+        #
+        # ig-platform-id existed, check ig-platform-id.
+        #
+        if [[ $gClover_ig_platform_id != $target_ig_platform_id ]];
+          then
+            #
+            # Yes, we have to touch/modify the config.plist.
+            #
+            sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
+        fi
     fi
 
-    if [[ $gClover_ig_platform_id != $target_ig_platform_id ]];
-      then
-        #
-        # Yes, we have to touch/modify the config.plist.
-        #
-        sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
-    fi
+
 
     #
     # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
@@ -936,6 +941,31 @@ function _recoveryhd_fix()
 {
     #
     # Fixed RecoveryHD issues (c) syscl.
+    #
+    # Check BooterConfig = 0x2A.
+    #
+    local target_BooterConfig="0x2A"
+    local gClover_BooterConfig=$(awk '/<key>BooterConfig<\/key>.*/,/<\/string>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
+    #
+    # Added BooterConfig = 0x2A(0x00101010).
+    #
+    if [ -z $gClover_BooterConfig ];
+      then
+        /usr/libexec/plistbuddy -c "Add ':RtVariables:BooterConfig' string" ${config_plist}
+        /usr/libexec/plistbuddy -c "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
+      else
+        #
+        # Check if BooterConfig = 0x2A.
+        #
+        if [[ $gClover_BooterConfig != $target_BooterConfig ]];
+          then
+            #
+            # Yes, we have to touch/modify the config.plist.
+            #
+            sed -ig "s/$gClover_BooterConfig/$target_BooterConfig/g" ${config_plist}
+        fi
+    fi
+
     #
     # Mount Recovery HD.
     #

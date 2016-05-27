@@ -295,7 +295,7 @@
 	<key>RtVariables</key>
 	<dict>
 		<key>BooterConfig</key>
-		<string>0x28</string>
+		<string>0x2A</string>
 		<key>CsrActiveConfig</key>
 		<string>0x03</string>
 	</dict>
