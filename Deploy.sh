@@ -320,18 +320,18 @@ function _getEDID()
         #
         # Get native resolution(Rez) from $gEDID.
         #
-        # Get horizontal resolution.
+        # Get horizontal resolution. Arrays start from 0.
         #
-        gHorizontalRez_pr=$(echo $gEDID | cut -c 117)
-        gHorizontalRez_st=$(echo $gEDID | cut -c 113-114)
+        gHorizontalRez_pr=${gEDID:116:1}
+        gHorizontalRez_st=${gEDID:112:2}
         gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
 
         #
         # Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the
         # progress clear.
         #
-        gVerticalRez_pr=$(echo $gEDID | cut -c 123)
-        gVerticalRez_st=$(echo $gEDID | cut -c 119-120)
+        gVerticalRez_pr=${gEDID:122:1}
+        gVerticalRez_st=${gEDID:118:2}
         gVerticalRez=$((0x$gVerticalRez_pr$gVerticalRez_st))
       else
         #
@@ -359,6 +359,11 @@ function _getEDID()
         #
         gPatchIOKit=1
     fi
+
+    #
+    # Passing gPatchIOKit to gPatchRecoveryHD.
+    #
+    gPatchRecoveryHD=${gPatchIOKit}
 }
 
 #
@@ -1251,7 +1256,13 @@ function main()
     #
     # Fixed Recovery HD entering issues (c) syscl.
     #
-    _recoveryhd_fix
+    if [ $gPatchRecoveryHD -eq 0 ];
+      then
+        #
+        # Yes, patch Recovery HD.
+        #
+        _recoveryhd_fix
+    fi
 
     #
     # Rebuild kernel extensions cache.

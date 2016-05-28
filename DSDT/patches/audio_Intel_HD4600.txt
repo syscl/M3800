@@ -9,7 +9,7 @@ Method (_DSM, 4, NotSerialized)\n
     Return (Package()\n
     {\n
         "hda-gfx", Buffer() { "onboard-1" },\n
-        "device-id", Buffer() { 0x0c, 0x0d, 0x0, 0x0 }\n
+        "device-id", Buffer() { 0x0c, 0x0a, 0x0, 0x0 }\n
     })\n
 }\n
 end;
