@@ -421,8 +421,20 @@ function _check_and_fix_config()
             sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
         fi
     fi
-
-
+    #
+    # Check SSDT-m-M3800.aml
+    #
+    local dCheck_SSDT="SSDT-m-M3800.aml"
+    local gSortedOrder=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
+    local gSortedNumber=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g' | wc -l)
+    if [[ $gSortedOrder != *"$dCheck_SSDT" ]];
+      then
+        #
+        # $dCheck_SSDT no found. Insert it.
+        #
+        /usr/libexec/plistbuddy -c "Add ':ACPI:SortedOrder:' string" ${config_plist}
+        /usr/libexec/plistbuddy -c "Set ':ACPI:SortedOrder:$gSortedNumber' $dCheck_SSDT" ${config_plist}
+    fi
 
     #
     # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.

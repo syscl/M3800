@@ -62,9 +62,12 @@ Change Log
 ----------------
 2016-6-10
 
-- Added SSDT-m for injecting ALS0.
 - New patch for DSDT to fix MEM2 issue and also rename TPMX to MEM2 credit syscl.
 - Drop MCFG table and drop DMAR table.
+- Auto correct/add SSDT-m-M3800.aml in config.plist. 
+- Added SSDT-m for injecting ALS0.
+
+
 
 2016-5-27
 

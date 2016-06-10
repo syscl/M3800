@@ -10,15 +10,6 @@
 			<false/>
 			<key>DropOEM_DSM</key>
 			<true/>
-			<key>Fixes</key>
-			<dict>
-				<key>FixRegions_10000000</key>
-				<true/>
-			</dict>
-			<key>Name</key>
-			<string>DSDT.aml</string>
-			<key>ReuseFFFF</key>
-			<false/>
 			<key>DropTables</key>
 			<array>
 				<dict>
@@ -30,6 +21,15 @@
 					<string>DMAR</string>
 				</dict>
 			</array>
+			<key>Fixes</key>
+			<dict>
+				<key>FixRegions_10000000</key>
+				<true/>
+			</dict>
+			<key>Name</key>
+			<string>DSDT.aml</string>
+			<key>ReuseFFFF</key>
+			<false/>
 		</dict>
 		<key>SSDT</key>
 		<dict>
