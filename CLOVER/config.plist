@@ -55,6 +55,7 @@
 			<string>SSDT-15.aml</string>
 			<string>SSDT-pr.aml</string>
 			<string>SSDT-rmne.aml</string>
+			<string>SSDT-m-M3800.aml</string>
 		</array>
 	</dict>
 	<key>Boot</key>
