@@ -65,9 +65,8 @@ Change Log
 - New patch for DSDT to fix MEM2 issue and also rename TPMX to MEM2 credit syscl.
 - Drop MCFG table and drop DMAR table.
 - Auto correct/add SSDT-m-M3800.aml in config.plist. 
+- Added UHD patched BIOS for M3800 credit @ssmith353 see [here] (https://github.com/syscl/M3800/issues/22).
 - Added SSDT-m for injecting ALS0.
-
-
 
 2016-5-27
 
