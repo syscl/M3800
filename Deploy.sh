@@ -1127,6 +1127,7 @@ function main()
     _tidy_exec "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
     _tidy_exec "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
     _tidy_exec "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
+    _tidy_exec "patch_acpi DSDT syscl "syscl_iGPU_MEM2"" "iGPU TPMX to MEM2"
 
     #
     # DptfTa Patches.
@@ -1199,6 +1200,12 @@ function main()
       then
         _tidy_exec "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
     fi
+
+    #
+    # Install SSDT-m for ALS0.
+    #
+    _PRINT_MSG "--->: ${BLUE}Installing SSDT-m-M3800.aml to ./DSDT/compile...${OFF}"
+    _tidy_exec "cp "${prepare}"/SSDT-m-M3800.aml "${compile}"" "Copy SSDT-m-M3800.aml to ./DSDT/compile"
 
     #
     # Clean up dynamic SSDTs.

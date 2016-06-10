@@ -60,6 +60,12 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-6-10
+
+- Added SSDT-m for injecting ALS0.
+- New patch for DSDT to fix MEM2 issue and also rename TPMX to MEM2 credit syscl.
+- Drop MCFG table and drop DMAR table.
+
 2016-5-27
 
 - Fixed HiDPI(QHD+/UHD) Recovery HD by setting BooterConfig = 0x2A(0x00101010).
