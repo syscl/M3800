@@ -1213,6 +1213,11 @@ function main()
         _tidy_exec "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
     fi
 
+    if [[ `sysctl machdep.cpu.brand_string` == *"i5-4200H"* ]]
+      then
+        _tidy_exec "cp "${prepare}"/CpuPm-4200H.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i5-4200H${OFF}"
+    fi
+
     #
     # Install SSDT-m for ALS0.
     #

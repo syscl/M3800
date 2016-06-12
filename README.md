@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-6-12
+
+- Added i5-4200H model support credit busymilk for his hint[here] (https://github.com/syscl/M3800/issues/25) reminding me that there's i5 model existed in M3800/XPS9530. 
+
 2016-6-10
 
 - New patch for DSDT to fix MEM2 issue and also rename TPMX to MEM2 credit syscl.
