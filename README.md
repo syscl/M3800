@@ -60,6 +60,12 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-6-24
+
+- Replaced FakeSMC with slice's one for further 10.12 support.
+- Updated Clover to r3556 for further 10.12 support.
+- Updated AppleALC with my modification and optimisation for M3800/XPS9530.
+
 2016-6-12
 
 - Added i5-4200H model support credit busymilk for his [hint] (https://github.com/syscl/M3800/issues/25) reminding me that there's i5 model existed in M3800/XPS9530. 
