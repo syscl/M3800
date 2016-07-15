@@ -176,7 +176,7 @@ or
 
 2016-4-3
 
-- Using a totally new way(insert pre-linked-kext at the startup stage to power up the audio which means the only unsigned kernel extension we have to install under /L*/E* is CodecCommander.kext to prevent noise from headphone! (Now, we don't have to worry full SIP eanble!!) credit vit9696's great project "dynamic AppleHDA patching" and syscl to modify the configuration for both M3800 and XPS15(9530).
+- Using a totally new way(insert pre-linked-kext at the startup stage to power up the audio which means the only unsigned kernel extension we have to install under /L\*/E\* is CodecCommander.kext to prevent noise from headphone! (Now, we don't have to worry full SIP eanble!!) credit vit9696's great project "dynamic AppleHDA patching" and syscl to modify the configuration for both M3800 and XPS15(9530).
 - Fixed an issue that light indicator of front facing camera will not turn off after accessing it. (c) syscl/lighting/Yating Zhou
 
 2016-3-30
