@@ -60,6 +60,11 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-7-15
+
+- Added SMC Version (system) and smc-huronriver for FakeSMC.kext.
+- Updated Clover to r3625.
+
 2016-6-24
 
 - Replaced FakeSMC with slice's one for further 10.12 support.
