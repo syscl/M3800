@@ -105,6 +105,8 @@ gTriggerLE=1
 gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
 gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
 gBak_Dir="${REPO}/Backups/${gBak_Time}"
+gRecoveryHD=""
+gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
 
 #
 # Define target website
@@ -169,10 +171,19 @@ function _update()
 #--------------------------------------------------------------------------------
 #
 
-function locate_esp()
+function _locate_rhd()
 {
-    diskutil info $1 | grep -i "Partition UUID" >${EFI_INFO}
-    targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} | awk -F':' '{print $2}')
+    #
+    # Passing gRecoveryHD from ${targetEFI}
+    #
+    local gDisk_INF="$1"
+
+    #
+    # Example:
+    #
+    # disk0s3
+    # ^^^^^
+    diskutil list | grep -i "${gDisk_INF:0:5}" | grep "Recovery HD" |sed 's/.*MB   //'
 }
 
 #
@@ -954,6 +965,60 @@ function _fix_usb_ejected_improperly()
 #--------------------------------------------------------------------------------
 #
 
+function _printBackupLOG()
+{
+    local gDAY="${gBak_Time:5:2}/${gBak_Time:8:2}/${gBak_Time:0:4}"
+    local gTIME="${gBak_Time:12:2}:${gBak_Time:15:2}:${gBak_Time:18:2}"
+    local gBackupLOG=$(echo "${gBak_Dir}/BackupLOG.txt")
+
+    #
+    # Print Header.
+    #
+    echo "  Backup Recovery HD(BaseSystem.dmg)"                                                   > "${gBackupLOG}"
+    echo ''                                                                                       >>"${gBackupLOG}"
+    echo "  DATE:                     $gDAY"                                                      >>"${gBackupLOG}"
+    echo "  TIME:                     $gTIME"                                                     >>"${gBackupLOG}"
+    local gRecentFileMD5=$(md5 -q "${gBak_BaseSystem}")
+    echo "  Origin Recovery HD MD5:   ${gRecentFileMD5}"                                          >>"${gBackupLOG}"
+    local gPatchedFileMD5=$(md5 -q "${gBaseSystem_PATCH}")
+    echo "  Patched Recovery HD MD5:  ${gPatchedFileMD5}"                                         >>"${gBackupLOG}"
+    echo ''                                                                                       >>"${gBackupLOG}"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _bakBaseSystem()
+{
+    gLastOpenedFileMD5=$(md5 -q "${gRecoveryHD_DMG}")
+
+    if [ -d "${REPO}/Backups" ];
+      then
+        if [[ `ls ${REPO}/Backups/*` == *'.txt'* ]];
+          then
+            gBakFileNames=($(ls ${REPO}/Backups/*/*.txt))
+        fi
+    fi
+
+    if [[ "${#gBakFileNames[@]}" -gt 0 ]];
+      then
+        gBakFileMD5=($(cat ${gBakFileNames[@]} | grep 'Patched Recovery HD MD5:' | sed -e 's/.*: //' -e 's/ //'))
+        for checksum in "${gBakFileMD5[@]}"
+        do
+          if [[ $checksum == $gLastOpenedFileMD5 ]];
+            then
+              _PRINT_MSG "OK: Backup found. No more patch operations need"
+              exit -0
+          fi
+        done
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function _recoveryhd_fix()
 {
     #
@@ -986,14 +1051,14 @@ function _recoveryhd_fix()
     #
     # Mount Recovery HD.
     #
-    local gRecoveryHD=""
     local gMountPoint="/tmp/RecoveryHD"
     local gBaseSystem_RW="/tmp/BaseSystem_RW.dmg"
-    local gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
     local gBaseSystem_PATCH="/tmp/BaseSystem_PATCHED.dmg"
-    diskutil list
-    printf "Enter ${RED}Recovery HD's ${OFF}IDENTIFIER, e.g. ${BOLD}disk0s3${OFF}"
-    read -p ": " gRecoveryHD
+
+    #
+    # Locate Recovery HD
+    #
+    gRecoveryHD=$(_locate_rhd ${targetEFI})
     _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
     _touch "${gMountPoint}"
 
@@ -1004,12 +1069,13 @@ function _recoveryhd_fix()
     local gTarget_FS=$(echo 'UDRW')
 
     #
-    # Backup origin BaseSystem.dmg to ${REPO}/Backups/.
+    # Backup origin BaseSystem.dmg to ${REPO}/Backups
     #
+    _bakBaseSystem
     _touch "${gBak_Dir}"
-    cp "${gRecoveryHD_DMG}" "${gBak_Dir}/"
-    local gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
-    _tidy_exec "chflags nohidden "${gBak_BaseSystem}"" "Show the dmg"
+    cp "${gRecoveryHD_DMG}" "${gBak_Dir}"
+    gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
+    chflags nohidden "${gBak_BaseSystem}"
 
     #
     # Start to override.
@@ -1081,7 +1147,6 @@ function main()
     diskutil list
     printf "Enter ${RED}EFI's${OFF} IDENTIFIER, e.g. ${BOLD}disk0s1${OFF}"
     read -p ": " targetEFI
-    locate_esp ${targetEFI}
     _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
     #
