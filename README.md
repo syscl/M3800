@@ -60,6 +60,13 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-7-17
+
+- Added Backup checksum detection to prevent too many backup files
+being created.
+- Added pixel unlock for Sierra support.
+- Optimised code.
+
 2016-7-15
 
 - Added SMC Version (system) and smc-huronriver for FakeSMC.kext.
