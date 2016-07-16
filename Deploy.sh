@@ -68,7 +68,7 @@ t_clover_tools="/Volumes/EFI/EFI/CLOVER/tools"
 #
 gArgv=""
 gDebug=1
-gProductVersion=""
+gProductVer=""
 target_website=""
 target_website_status=""
 RETURN_VAL=""
@@ -102,7 +102,9 @@ replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
 gTriggerLE=1
-gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
+gProductVer="$(sw_vers -productVersion)"
+gOSVer=${gProductVer:0:5}
+gMINOR_VER=${gProductVer:3:2}
 gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
 gBak_Dir="${REPO}/Backups/${gBak_Time}"
 gRecoveryHD=""
@@ -333,10 +335,16 @@ function _getEDID()
         #
         # Get horizontal resolution. Arrays start from 0.
         #
+        # Examples:
+        #
+        # 00ffffffffffff004c2d240137314a4d0d1001036c221b782aaaa5a654549926145054bfef808180714f010101010101010101010101302a009851002a4030701300520e1100001e000000fd00384b1e510e000a202020202020000000fc0053796e634d61737465720a20
+        #                                                                                                                     ^
+        #                                                                                                                 ^^
+        #                                                                                                                           ^
+        #                                                                                                                       ^^
         gHorizontalRez_pr=${gEDID:116:1}
         gHorizontalRez_st=${gEDID:112:2}
         gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
-
         #
         # Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the
         # progress clear.
@@ -680,19 +688,14 @@ function _find_acpi()
 
 function _update_clover()
 {
-    #
-    # Gain OS generation.
-    #
-    gProductVersion="$(sw_vers -productVersion)"
-    OS_Version=$(echo ${gProductVersion:0:5})
-    KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
+    KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${gOSVer}
 
     #
     # Updating kexts. NOTE: This progress will remove any previous kexts.
     #
     _PRINT_MSG "--->: ${BLUE}Updating kexts...${OFF}"
     _tidy_exec "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
-    _tidy_exec "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
+    _tidy_exec "cp -R ./CLOVER/kexts/${gOSVer} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${gOSVer}"
     _tidy_exec "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
 
     #
@@ -905,15 +908,7 @@ function _del()
 {
     local target_file=$1
 
-    if [ -d ${target_file} ];
-      then
-        _tidy_exec "sudo rm -R ${target_file}" "Remove ${target_file}"
-      else
-        if [ -f ${target_file} ];
-          then
-            _tidy_exec "sudo rm ${target_file}" "Remove ${target_file}"
-        fi
-    fi
+    _tidy_exec "sudo rm -R ${target_file}" "Remove ${target_file}"
 }
 
 #
@@ -967,6 +962,12 @@ function _fix_usb_ejected_improperly()
 
 function _printBackupLOG()
 {
+    #
+    # Examples:
+    #
+    # 2016-07-17-h01_43_14
+    # ^^^^ ^^ ^^
+    #             ^^ ^^ ^^
     local gDAY="${gBak_Time:5:2}/${gBak_Time:8:2}/${gBak_Time:0:4}"
     local gTIME="${gBak_Time:12:2}:${gBak_Time:15:2}:${gBak_Time:18:2}"
     local gBackupLOG=$(echo "${gBak_Dir}/BackupLOG.txt")
