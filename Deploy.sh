@@ -30,6 +30,13 @@ BLUE="\033[1;34m"
 OFF="\033[m"
 
 #
+# Define two status: 0 - Success, Turn on,
+#                    1 - Failure, Turn off
+#
+kBASHReturnSuccess=0
+kBASHReturnFailure=1
+
+#
 # Located repository.
 #
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -67,7 +74,7 @@ t_clover_tools="/Volumes/EFI/EFI/CLOVER/tools"
 # Gvariables stands for getting datas from OS X.
 #
 gArgv=""
-gDebug=1
+gDebug=${kBASHReturnFailure}
 gProductVer=""
 target_website=""
 target_website_status=""
@@ -82,7 +89,7 @@ gVerticalRez=""
 gSystemRez=""
 gSystemHorizontalRez=""
 gSystemVerticalRez=""
-gPatchIOKit=0
+gPatchIOKit=${kBASHReturnSuccess}
 gClover_ig_platform_id=""
 target_ig_platform_id=""
 find_lid_byte_ENCODE=""
@@ -101,14 +108,17 @@ find_handoff_bytes=""
 replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
-gTriggerLE=1
+gTriggerLE=${kBASHReturnFailure}
 gProductVer="$(sw_vers -productVersion)"
 gOSVer=${gProductVer:0:5}
 gMINOR_VER=${gProductVer:3:2}
 gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
 gBak_Dir="${REPO}/Backups/${gBak_Time}"
+gStop_Bak=${kBASHReturnFailure}
 gRecoveryHD=""
 gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
+gTarget_rhd_Framework=""
+gTarget_Framework_Repo=""
 
 #
 # Set delimitation OS ver
@@ -238,9 +248,9 @@ function _tidy_exec()
         #
         # Make the output clear.
         #
-        $1 >/tmp/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
+        $1 >/tmp/report 2>&1 && RETURN_VAL=${kBASHReturnSuccess} || RETURN_VAL=${kBASHReturnFailure}
 
-        if [ "${RETURN_VAL}" == 0 ];
+        if [ "${RETURN_VAL}" == ${kBASHReturnSuccess} ];
           then
             _PRINT_MSG "OK: $2"
           else
@@ -376,12 +386,12 @@ function _getEDID()
         #
         # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all models being powered up.
         #
-        gPatchIOKit=0
+        gPatchIOKit=${kBASHReturnSuccess}
       else
         #
         # No, patch IOKit is not required, we won't touch IOKit(for a more intergration/clean system since less is more).
         #
-        gPatchIOKit=1
+        gPatchIOKit=${kBASHReturnFailure}
     fi
 
     #
@@ -401,15 +411,16 @@ function _unlock_pixel_clock()
         #
         # 10.12+
         #
-        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' $gMountPoint/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay
-        _tidy_exec "sudo codesign -f -s - $gMountPoint/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay" "Sign CoreDisplay for Recovery HD"
+        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
       else
         #
         # 10.12-
         #
-        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-        _tidy_exec "sudo codesign -f -s - $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit for Recovery HD"
+        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
     fi
+
+    sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_rhd_Framework}
+    _tidy_exec "sudo codesign -f -s - ${gTarget_rhd_Framework}" "Patch and sign framework for Recovery HD"
 }
 
 #
@@ -1034,10 +1045,10 @@ function _bakBaseSystem()
         gBakFileMD5=($(cat ${gBakFileNames[@]} | grep 'Patched Recovery HD MD5:' | sed -e 's/.*: //' -e 's/ //'))
         for checksum in "${gBakFileMD5[@]}"
         do
-          if [[ $checksum == $gLastOpenedFileMD5 ]];
+          if [[ $checksum == $gLastOpenedFileMD5 && gStop_Bak != ${kBASHReturnSuccess} ]];
             then
               _PRINT_MSG "OK: Backup found. No more patch operations need"
-              exit -0
+              gStop_Bak=${kBASHReturnSuccess}
           fi
         done
     fi
@@ -1359,15 +1370,15 @@ function main()
             #
             # 10.12+
             #
-            sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay
-            _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay" "Sign CoreDisplay"
+            gTarget_Framework_Repo="/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
           else
             #
             # 10.12-
             #
-            sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-            _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit"
+            gTarget_Framework_Repo="/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
         fi
+            sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_Framework_Repo}
+            _tidy_exec "sudo codesign -f -s - ${gTarget_Framework_Repo}" "Patch and sign framework"
     fi
 
     #
