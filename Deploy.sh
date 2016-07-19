@@ -406,7 +406,7 @@ function _getEDID()
 
 function _unlock_pixel_clock()
 {
-    if [ $gOSVer -ge $gDelimitation_OSVer ];
+    if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
       then
         #
         # 10.12+
@@ -1365,7 +1365,7 @@ function main()
         # Patch IOKit.
         #
         _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
-        if [ $gOSVer -ge $gDelimitation_OSVer ];
+        if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
           then
             #
             # 10.12+
