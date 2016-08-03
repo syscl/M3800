@@ -30,6 +30,13 @@ BLUE="\033[1;34m"
 OFF="\033[m"
 
 #
+# Define two status: 0 - Success, Turn on,
+#                    1 - Failure, Turn off
+#
+kBASHReturnSuccess=0
+kBASHReturnFailure=1
+
+#
 # Located repository.
 #
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -67,8 +74,8 @@ t_clover_tools="/Volumes/EFI/EFI/CLOVER/tools"
 # Gvariables stands for getting datas from OS X.
 #
 gArgv=""
-gDebug=1
-gProductVersion=""
+gDebug=${kBASHReturnFailure}
+gProductVer=""
 target_website=""
 target_website_status=""
 RETURN_VAL=""
@@ -82,7 +89,7 @@ gVerticalRez=""
 gSystemRez=""
 gSystemHorizontalRez=""
 gSystemVerticalRez=""
-gPatchIOKit=0
+gPatchIOKit=${kBASHReturnSuccess}
 gClover_ig_platform_id=""
 target_ig_platform_id=""
 find_lid_byte_ENCODE=""
@@ -101,10 +108,22 @@ find_handoff_bytes=""
 replace_handoff_bytes=""
 find_handoff_bytes_ENCODE=""
 replace_handoff_bytes_ENCODE=""
-gTriggerLE=1
-gMINOR_VER=$([[ "$(sw_vers -productVersion)" =~ [0-9]+\.([0-9]+) ]] && echo ${BASH_REMATCH[1]})
+gTriggerLE=${kBASHReturnFailure}
+gProductVer="$(sw_vers -productVersion)"
+gOSVer=${gProductVer:0:5}
+gMINOR_VER=${gProductVer:3:2}
 gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
 gBak_Dir="${REPO}/Backups/${gBak_Time}"
+gStop_Bak=${kBASHReturnFailure}
+gRecoveryHD=""
+gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
+gTarget_rhd_Framework=""
+gTarget_Framework_Repo=""
+
+#
+# Set delimitation OS ver
+#
+let gDelimitation_OSVer=12
 
 #
 # Define target website
@@ -169,10 +188,19 @@ function _update()
 #--------------------------------------------------------------------------------
 #
 
-function locate_esp()
+function _locate_rhd()
 {
-    diskutil info $1 | grep -i "Partition UUID" >${EFI_INFO}
-    targetUUID=$(grep -i "Disk / Partition UUID" ${EFI_INFO} | awk -F':' '{print $2}')
+    #
+    # Passing gRecoveryHD from ${targetEFI}
+    #
+    local gDisk_INF="$1"
+
+    #
+    # Example:
+    #
+    # disk0s3
+    # ^^^^^
+    diskutil list | grep -i "${gDisk_INF:0:5}" | grep "Recovery HD" |sed 's/.*MB   //'
 }
 
 #
@@ -220,9 +248,9 @@ function _tidy_exec()
         #
         # Make the output clear.
         #
-        $1 >/tmp/report 2>&1 && RETURN_VAL=0 || RETURN_VAL=1
+        $1 >/tmp/report 2>&1 && RETURN_VAL=${kBASHReturnSuccess} || RETURN_VAL=${kBASHReturnFailure}
 
-        if [ "${RETURN_VAL}" == 0 ];
+        if [ "${RETURN_VAL}" == ${kBASHReturnSuccess} ];
           then
             _PRINT_MSG "OK: $2"
           else
@@ -322,10 +350,16 @@ function _getEDID()
         #
         # Get horizontal resolution. Arrays start from 0.
         #
+        # Examples:
+        #
+        # 00ffffffffffff004c2d240137314a4d0d1001036c221b782aaaa5a654549926145054bfef808180714f010101010101010101010101302a009851002a4030701300520e1100001e000000fd00384b1e510e000a202020202020000000fc0053796e634d61737465720a20
+        #                                                                                                                     ^
+        #                                                                                                                 ^^
+        #                                                                                                                           ^
+        #                                                                                                                       ^^
         gHorizontalRez_pr=${gEDID:116:1}
         gHorizontalRez_st=${gEDID:112:2}
         gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
-
         #
         # Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the
         # progress clear.
@@ -352,18 +386,41 @@ function _getEDID()
         #
         # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all models being powered up.
         #
-        gPatchIOKit=0
+        gPatchIOKit=${kBASHReturnSuccess}
       else
         #
         # No, patch IOKit is not required, we won't touch IOKit(for a more intergration/clean system since less is more).
         #
-        gPatchIOKit=1
+        gPatchIOKit=${kBASHReturnFailure}
     fi
 
     #
     # Passing gPatchIOKit to gPatchRecoveryHD.
     #
     gPatchRecoveryHD=${gPatchIOKit}
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _unlock_pixel_clock()
+{
+    if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
+      then
+        #
+        # 10.12+
+        #
+        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
+      else
+        #
+        # 10.12-
+        #
+        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+    fi
+
+    sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_rhd_Framework}
+    _tidy_exec "sudo codesign -f -s - ${gTarget_rhd_Framework}" "Patch and sign framework for Recovery HD"
 }
 
 #
@@ -421,8 +478,20 @@ function _check_and_fix_config()
             sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
         fi
     fi
-
-
+    #
+    # Check SSDT-m-M3800.aml
+    #
+    local dCheck_SSDT="SSDT-m-M3800.aml"
+    local gSortedOrder=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
+    local gSortedNumber=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g' | wc -l)
+    if [[ $gSortedOrder != *"$dCheck_SSDT" ]];
+      then
+        #
+        # $dCheck_SSDT no found. Insert it.
+        #
+        /usr/libexec/plistbuddy -c "Add ':ACPI:SortedOrder:' string" ${config_plist}
+        /usr/libexec/plistbuddy -c "Set ':ACPI:SortedOrder:$gSortedNumber' $dCheck_SSDT" ${config_plist}
+    fi
 
     #
     # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
@@ -657,19 +726,14 @@ function _find_acpi()
 
 function _update_clover()
 {
-    #
-    # Gain OS generation.
-    #
-    gProductVersion="$(sw_vers -productVersion)"
-    OS_Version=$(echo ${gProductVersion:0:5})
-    KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${OS_Version}
+    KEXT_DIR=/Volumes/EFI/EFI/CLOVER/kexts/${gOSVer}
 
     #
     # Updating kexts. NOTE: This progress will remove any previous kexts.
     #
     _PRINT_MSG "--->: ${BLUE}Updating kexts...${OFF}"
     _tidy_exec "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
-    _tidy_exec "cp -R ./CLOVER/kexts/${OS_Version} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${OS_Version}"
+    _tidy_exec "cp -R ./CLOVER/kexts/${gOSVer} /Volumes/EFI/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${gOSVer}"
     _tidy_exec "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
 
     #
@@ -942,6 +1006,66 @@ function _fix_usb_ejected_improperly()
 #--------------------------------------------------------------------------------
 #
 
+function _printBackupLOG()
+{
+    #
+    # Examples:
+    #
+    # 2016-07-17-h01_43_14
+    # ^^^^ ^^ ^^
+    #             ^^ ^^ ^^
+    local gDAY="${gBak_Time:5:2}/${gBak_Time:8:2}/${gBak_Time:0:4}"
+    local gTIME="${gBak_Time:12:2}:${gBak_Time:15:2}:${gBak_Time:18:2}"
+    local gBackupLOG=$(echo "${gBak_Dir}/BackupLOG.txt")
+
+    #
+    # Print Header.
+    #
+    echo "  Backup Recovery HD(BaseSystem.dmg)"                                                   > "${gBackupLOG}"
+    echo ''                                                                                       >>"${gBackupLOG}"
+    echo "  DATE:                     $gDAY"                                                      >>"${gBackupLOG}"
+    echo "  TIME:                     $gTIME"                                                     >>"${gBackupLOG}"
+    local gRecentFileMD5=$(md5 -q "${gBak_BaseSystem}")
+    echo "  Origin Recovery HD MD5:   ${gRecentFileMD5}"                                          >>"${gBackupLOG}"
+    local gPatchedFileMD5=$(md5 -q "${gBaseSystem_PATCH}")
+    echo "  Patched Recovery HD MD5:  ${gPatchedFileMD5}"                                         >>"${gBackupLOG}"
+    echo ''                                                                                       >>"${gBackupLOG}"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _bakBaseSystem()
+{
+    gLastOpenedFileMD5=$(md5 -q "${gRecoveryHD_DMG}")
+
+    if [ -d "${REPO}/Backups" ];
+      then
+        if [[ `ls ${REPO}/Backups/*` == *'.txt'* ]];
+          then
+            gBakFileNames=($(ls ${REPO}/Backups/*/*.txt))
+        fi
+    fi
+
+    if [[ "${#gBakFileNames[@]}" -gt 0 ]];
+      then
+        gBakFileMD5=($(cat ${gBakFileNames[@]} | grep 'Patched Recovery HD MD5:' | sed -e 's/.*: //' -e 's/ //'))
+        for checksum in "${gBakFileMD5[@]}"
+        do
+          if [[ $checksum == $gLastOpenedFileMD5 && gStop_Bak != ${kBASHReturnSuccess} ]];
+            then
+              _PRINT_MSG "OK: Backup found. No more patch operations need"
+              gStop_Bak=${kBASHReturnSuccess}
+          fi
+        done
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
 function _recoveryhd_fix()
 {
     #
@@ -974,14 +1098,14 @@ function _recoveryhd_fix()
     #
     # Mount Recovery HD.
     #
-    local gRecoveryHD=""
     local gMountPoint="/tmp/RecoveryHD"
     local gBaseSystem_RW="/tmp/BaseSystem_RW.dmg"
-    local gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
     local gBaseSystem_PATCH="/tmp/BaseSystem_PATCHED.dmg"
-    diskutil list
-    printf "Enter ${RED}Recovery HD's ${OFF}IDENTIFIER, e.g. ${BOLD}disk0s3${OFF}"
-    read -p ": " gRecoveryHD
+
+    #
+    # Locate Recovery HD
+    #
+    gRecoveryHD=$(_locate_rhd ${targetEFI})
     _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
     _touch "${gMountPoint}"
 
@@ -992,12 +1116,13 @@ function _recoveryhd_fix()
     local gTarget_FS=$(echo 'UDRW')
 
     #
-    # Backup origin BaseSystem.dmg to ${REPO}/Backups/.
+    # Backup origin BaseSystem.dmg to ${REPO}/Backups
     #
+    _bakBaseSystem
     _touch "${gBak_Dir}"
-    cp "${gRecoveryHD_DMG}" "${gBak_Dir}/"
-    local gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
-    _tidy_exec "chflags nohidden "${gBak_BaseSystem}"" "Show the dmg"
+    cp "${gRecoveryHD_DMG}" "${gBak_Dir}"
+    gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
+    chflags nohidden "${gBak_BaseSystem}"
 
     #
     # Start to override.
@@ -1005,8 +1130,7 @@ function _recoveryhd_fix()
     _PRINT_MSG "--->: Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w) ..."
     _tidy_exec "hdiutil convert "${gBak_BaseSystem}" -format ${gTarget_FS} -o ${gBaseSystem_RW} -quiet" "Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w)"
     _tidy_exec "hdiutil attach "${gBaseSystem_RW}" -nobrowse -quiet -readwrite -noverify -mountpoint ${gMountPoint}" "Attach Recovery HD"
-    sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-    _tidy_exec "sudo codesign -f -s - $gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit for Recovery HD"
+    _unlock_pixel_clock
     _tidy_exec "hdiutil detach $gMountPoint" "Detach mountpoint"
     #
     # Convert to origin format.
@@ -1069,7 +1193,6 @@ function main()
     diskutil list
     printf "Enter ${RED}EFI's${OFF} IDENTIFIER, e.g. ${BOLD}disk0s1${OFF}"
     read -p ": " targetEFI
-    locate_esp ${targetEFI}
     _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
 
     #
@@ -1201,6 +1324,11 @@ function main()
         _tidy_exec "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
     fi
 
+    if [[ `sysctl machdep.cpu.brand_string` == *"i5-4200H"* ]]
+      then
+        _tidy_exec "cp "${prepare}"/CpuPm-4200H.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i5-4200H${OFF}"
+    fi
+
     #
     # Install SSDT-m for ALS0.
     #
@@ -1245,8 +1373,20 @@ function main()
         # Patch IOKit.
         #
         _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
-        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit
-        _tidy_exec "sudo codesign -f -s - /System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit" "Sign IOKit"
+        if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
+          then
+            #
+            # 10.12+
+            #
+            gTarget_Framework_Repo="/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
+          else
+            #
+            # 10.12-
+            #
+            gTarget_Framework_Repo="/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+        fi
+            sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_Framework_Repo}
+            _tidy_exec "sudo codesign -f -s - ${gTarget_Framework_Repo}" "Patch and sign framework"
     fi
 
     #
@@ -1276,11 +1416,6 @@ function main()
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
     _tidy_exec "rebuild_kernel_cache" "Rebuild kernel extensions cache"
-
-    #
-    # Clean up.
-    #
-    _tidy_exec "rm ${EFI_INFO}" "Clean up"
 
     _PRINT_MSG "NOTE: Congratulations! All operation has been completed"
     _PRINT_MSG "NOTE: Reboot now. Then enjoy your OS X! -${BOLD}syscl/lighting/Yating Zhou @PCBeta${OFF}"
