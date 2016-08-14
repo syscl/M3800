@@ -329,12 +329,6 @@ function install_audio()
         # 10.12+
         #
         _install_AppleHDA_Injector
-
-      else
-        #
-        # 10.12-
-        #
-        _alc_method
     fi
 }
 
@@ -386,17 +380,6 @@ function _install_AppleHDA_Injector()
     # Trigger /L*/E* to rebuild
     #
     gTriggerLE=0
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _alc_method()
-{
-    #
-    # Install AppleALC.kext to Clover
-    #
 }
 
 #
