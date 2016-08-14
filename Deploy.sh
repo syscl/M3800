@@ -119,6 +119,15 @@ gRecoveryHD=""
 gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
 gTarget_rhd_Framework=""
 gTarget_Framework_Repo=""
+gBluetooth_Brand_String=""
+#
+# Audio variables
+#
+gResources_xml_zlib=("layout1" "Platforms")
+gExtensions_Repo=("/System/Library/Extensions" "/Library/Extensions")
+gInjector_Repo="/tmp/AppleHDA_ALC668.kext"
+gAppleHDA_Config="${gInjector_Repo}/Contents/Info.plist"
+doCommands=("${REPO}/tools/iasl" "/usr/libexec/plistbuddy -c" "perl -p -e 's/(\d*\.\d*)/9\1/'")
 
 #
 # Set delimitation OS ver
@@ -313,6 +322,81 @@ function install_audio()
     #
     _del /System/Library/Extensions/AppleHDA_ALC668.kext
     _del /System/Library/Extensions/CodecCommander.kext
+
+    if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
+      then
+        #
+        # 10.12+
+        #
+        _install_AppleHDA_Injector
+
+      else
+        #
+        # 10.12-
+        #
+        _alc_method
+    fi
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _install_AppleHDA_Injector()
+{
+    _del "${gInjector_Repo}"
+    _del "${KEXT_DIR}/AppleALC.kext"
+    #
+    # Generate audio from current system.
+    #
+    _PRINT_MSG "--->: Generating AppleHDA injector..."
+    cp -RX "${gExtensions_Repo[0]}/AppleHDA.kext" ${gInjector_Repo}
+    _del ${gInjector_Repo}/Contents/Resources/*
+    _del ${gInjector_Repo}/Contents/PlugIns
+    _del ${gInjector_Repo}/Contents/_CodeSignature
+    _del ${gInjector_Repo}/Contents/MacOS/AppleHDA
+    _del ${gInjector_Repo}/Contents/version.plist
+    ln -s ${gExtensions_Repo[0]}/AppleHDA.kext/Contents/MacOS/AppleHDA ${gInjector_Repo}/Contents/MacOS/AppleHDA
+
+    for zlib in "${gResources_xml_zlib[@]}"
+    do
+      _tidy_exec "cp "${REPO}/Kexts/audio/Resources/layout/${zlib}.xml.zlib" "${gInjector_Repo}/Contents/Resources/"" "Copy ${zlib}"
+    done
+
+    replace=`${doCommands[1]} "Print :NSHumanReadableCopyright" ${gAppleHDA_Config} | ${doCommands[2]}`
+    ${doCommands[1]} "Set :NSHumanReadableCopyright '$replace'" ${gAppleHDA_Config}
+    replace=`${doCommands[1]} "Print :CFBundleGetInfoString" ${gAppleHDA_Config} | ${doCommands[2]}`
+    ${doCommands[1]} "Set :CFBundleGetInfoString '$replace'" ${gAppleHDA_Config}
+    replace=`${doCommands[1]} "Print :CFBundleVersion" ${gAppleHDA_Config} | ${doCommands[2]}`
+    ${doCommands[1]} "Set :CFBundleVersion '$replace'" ${gAppleHDA_Config}
+    replace=`${doCommands[1]} "Print :CFBundleShortVersionString" ${gAppleHDA_Config} | ${doCommands[2]}`
+    ${doCommands[1]} "Set :CFBundleShortVersionString '$replace'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Add ':HardwareConfigDriver_Temp' dict" ${gAppleHDA_Config}
+    ${doCommands[1]} "Merge ${gExtensions_Repo[0]}/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Delete ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" ${gAppleHDA_Config}
+    ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
+    ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
+    ${doCommands[1]} "Merge ${REPO}/Kexts/audio/Resources/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
+    _tidy_exec "sudo cp -RX "${gInjector_Repo}" "${gExtensions_Repo[1]}"" "Install AppleHDA_ALC668"
+
+    #
+    # Trigger /L*/E* to rebuild
+    #
+    gTriggerLE=0
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _alc_method()
+{
+    #
+    # Install AppleALC.kext to Clover
+    #
 }
 
 #
@@ -321,9 +405,9 @@ function install_audio()
 
 function _initIntel()
 {
-    if [[ `/usr/libexec/plistbuddy -c "Print"  "${config_plist}"` == *"Intel = false"* ]];
+    if [[ `${doCommands[1]} "Print"  "${config_plist}"` == *"Intel = false"* ]];
       then
-        /usr/libexec/plistbuddy -c "Set ':Graphics:Inject:Intel' true" "${config_plist}"
+        ${doCommands[1]} "Set ':Graphics:Inject:Intel' true" "${config_plist}"
     fi
 }
 
@@ -464,8 +548,8 @@ function _check_and_fix_config()
     #
     if [ -z $gClover_ig_platform_id ];
       then
-        /usr/libexec/plistbuddy -c "Add ':Graphics:ig-platform-id' string" ${config_plist}
-        /usr/libexec/plistbuddy -c "Set ':Graphics:ig-platform-id' $target_ig_platform_id" ${config_plist}
+        ${doCommands[1]} "Add ':Graphics:ig-platform-id' string" ${config_plist}
+        ${doCommands[1]} "Set ':Graphics:ig-platform-id' $target_ig_platform_id" ${config_plist}
       else
         #
         # ig-platform-id existed, check ig-platform-id.
@@ -489,8 +573,8 @@ function _check_and_fix_config()
         #
         # $dCheck_SSDT no found. Insert it.
         #
-        /usr/libexec/plistbuddy -c "Add ':ACPI:SortedOrder:' string" ${config_plist}
-        /usr/libexec/plistbuddy -c "Set ':ACPI:SortedOrder:$gSortedNumber' $dCheck_SSDT" ${config_plist}
+        ${doCommands[1]} "Add ':ACPI:SortedOrder:' string" ${config_plist}
+        ${doCommands[1]} "Set ':ACPI:SortedOrder:$gSortedNumber' $dCheck_SSDT" ${config_plist}
     fi
 
     #
@@ -600,12 +684,12 @@ function _check_and_fix_config()
         #
         # Add argv to prevent/remove "Welcome to Clover... Scan Entries" at early startup.
         #
-        /usr/libexec/plistbuddy -c "Add ':Boot:NoEarlyProgress' bool" "${config_plist}"
-        /usr/libexec/plistbuddy -c "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
+        ${doCommands[1]} "Add ':Boot:NoEarlyProgress' bool" "${config_plist}"
+        ${doCommands[1]} "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
       else
         if [[ $gBootArgv == *"false"* ]];
           then
-            /usr/libexec/plistbuddy -c "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
+            ${doCommands[1]} "Set ':Boot:NoEarlyProgress' true" "${config_plist}"
         fi
     fi
 }
@@ -625,34 +709,34 @@ function _add_kexts_to_patch_infoplist()
     #
     # Inject comment.
     #
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index' dict" ${config_plist}
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Comment' string" ${config_plist}
-    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Comment' $comment" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index' dict" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Comment' string" ${config_plist}
+    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Comment' $comment" ${config_plist}
 
     #
     # Disabled = Nope.
     #
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Disabled' bool" ${config_plist}
-    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Disabled' false" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Disabled' bool" ${config_plist}
+    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Disabled' false" ${config_plist}
 
     #
     # Inject find binary.
     #
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Find' data" ${config_plist}
-    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Find' syscl" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Find' data" ${config_plist}
+    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Find' syscl" ${config_plist}
     sed -ig "s|c3lzY2w=|$find_binary_ENCODE|g" ${config_plist}
 
     #
     # Inject name.
     #
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Name' string" ${config_plist}
-    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Name' $binary_name" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Name' string" ${config_plist}
+    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Name' $binary_name" ${config_plist}
 
     #
     # Inject replace binary.
     #
-    /usr/libexec/plistbuddy -c "Add ':KernelAndKextPatches:KextsToPatch:$index:Replace' data" ${config_plist}
-    /usr/libexec/plistbuddy -c "Set ':KernelAndKextPatches:KextsToPatch:$index:Replace' syscl" ${config_plist}
+    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Replace' data" ${config_plist}
+    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Replace' syscl" ${config_plist}
     sed -ig "s|c3lzY2w=|$replace_binary_ENCODE|g" ${config_plist}
 }
 
@@ -738,6 +822,11 @@ function _update_clover()
 
     #
     # Decide which BT kext to use.
+    #
+    gBluetooth_Brand_String=$(ioreg | grep -i 'BCM' | grep -i 'Apple' | sed -e 's/.*-o //' -e 's/@.*//')
+
+    #
+    # Try to build injector instead of using BrcmPatchRAM.kext
     #
     if [[ `ioreg` == *"BCM20702A3"* ]];
       then
@@ -868,6 +957,9 @@ function _createUSB_Sleep_Script()
     echo ''                                                                                                                                                 >> "$gUSBSleepScript"
     echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil eject {}'                                         >> "$gUSBSleepScript"
     echo ''                                                                                                                                                 >> "$gUSBSleepScript"
+    #
+    # Add detection for RTLWlan USB
+    #
     echo '#'                                                                                                                                                >> "$gUSBSleepScript"
     echo '# Fix RTLWlanUSB sleep problem credit B1anker & syscl/lighting/Yating Zhou. @PCBeta.'                                                             >> "$gUSBSleepScript"
     echo '#'                                                                                                                                                >> "$gUSBSleepScript"
@@ -899,6 +991,9 @@ function _RTLWlanU()
     _del ${gUSBWakeScript}
     _del "/etc/syscl.usbfix.wake"
 
+    #
+    # Add detection for RTLWlan USB
+    #
     echo '#!/bin/sh'                                                                                                                                         > "$gUSBWakeScript"
     echo '#'                                                                                                                                                >> "$gUSBWakeScript"
     echo '# Fix RTLWlanUSB sleep problem credit B1anker & syscl/lighting/Yating Zhou. @PCBeta.'                                                             >> "$gUSBWakeScript"
@@ -1080,8 +1175,8 @@ function _recoveryhd_fix()
     #
     if [ -z $gClover_BooterConfig ];
       then
-        /usr/libexec/plistbuddy -c "Add ':RtVariables:BooterConfig' string" ${config_plist}
-        /usr/libexec/plistbuddy -c "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
+        ${doCommands[1]} "Add ':RtVariables:BooterConfig' string" ${config_plist}
+        ${doCommands[1]} "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
       else
         #
         # Check if BooterConfig = 0x2A.
@@ -1091,7 +1186,7 @@ function _recoveryhd_fix()
             #
             # Yes, we have to touch/modify the config.plist.
             #
-            /usr/libexec/plistbuddy -c "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
+            ${doCommands[1]} "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
         fi
     fi
 
@@ -1363,7 +1458,7 @@ function main()
     _tidy_exec "install_audio" "Install audio"
 
     #
-    # Patch IOKit.
+    # Patch IOKit/CoreDisplay.
     #
     _PRINT_MSG "NOTE: Set ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
 
