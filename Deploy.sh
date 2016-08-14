@@ -314,14 +314,11 @@ function install_audio()
     #
     # Remove previous AppleHDA_ALC668.kext & CodecCommander.kext.
     #
-    _del /Library/Extensions/AppleHDA_ALC668.kext
-    _del /Library/Extensions/CodecCommander.kext
-
-    #
-    # Added detection to prevent failure of remove.
-    #
-    _del /System/Library/Extensions/AppleHDA_ALC668.kext
-    _del /System/Library/Extensions/CodecCommander.kext
+    for extensions in ${gExtensions_Repo[@]}
+    do
+      _del $extensions/AppleHDA_ALC668.kext
+      _del $extensions/CodecCommander.kext
+    done
 
     if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
       then
@@ -1183,7 +1180,6 @@ function _recoveryhd_fix()
     #
     # Locate Recovery HD
     #
-    gRecoveryHD=$(_locate_rhd ${targetEFI})
     _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
     _touch "${gMountPoint}"
 
@@ -1481,12 +1477,19 @@ function main()
     #
     # Fixed Recovery HD entering issues (c) syscl.
     #
-    if [ $gPatchRecoveryHD -eq 0 ];
+    gRecoveryHD=$(_locate_rhd ${targetEFI})
+    if [ ! -z ${gRecoveryHD} ];
       then
         #
-        # Yes, patch Recovery HD.
+        # Recovery HD found, patch it or not?
         #
-        _recoveryhd_fix
+        if [ $gPatchRecoveryHD -eq 0 ];
+          then
+            #
+            # Yes, patch Recovery HD.
+            #
+            _recoveryhd_fix
+        fi
     fi
 
     #
