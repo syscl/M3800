@@ -548,7 +548,7 @@ function _check_and_fix_config()
     local dCheck_SSDT="SSDT-m-M3800.aml"
     local gSortedOrder=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
     local gSortedNumber=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g' | wc -l)
-    if [[ $gSortedOrder != *"$dCheck_SSDT" ]];
+    if [[ $gSortedOrder != *"$dCheck_SSDT"* ]];
       then
         #
         # $dCheck_SSDT no found. Insert it.
