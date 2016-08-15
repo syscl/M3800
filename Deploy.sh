@@ -92,8 +92,8 @@ gSystemVerticalRez=""
 gPatchIOKit=${kBASHReturnSuccess}
 gClover_ig_platform_id=""
 target_ig_platform_id=""
-find_lid_byte_ENCODE=""
-replace_lid_byte_ENCODE=""
+fLidWake_ENCODE=""
+rLidWake_ENCODE=""
 replace_framebuffer_data_byte=""
 replace_framebuffer_data_byte_ENCODE=""
 find_hdmi_bytes=""
@@ -120,6 +120,13 @@ gRecoveryHD_DMG="/Volumes/Recovery HD/com.apple.recovery.boot/BaseSystem.dmg"
 gTarget_rhd_Framework=""
 gTarget_Framework_Repo=""
 gBluetooth_Brand_String=""
+#
+# Add: Comment(string), Disabled(bool), Find(data), Name(string), Replace(data)
+# Set: $comment       , false         , syscl     , $binary_name, syscl
+#
+gProperties_Name=(Comment Disabled Find Name Replace)
+gProperties_Type=(string bool data string data)
+
 #
 # Audio variables
 #
@@ -493,16 +500,28 @@ function _unlock_pixel_clock()
 
 function _upd_EFI()
 {
+    local gUPD=${kBASHReturnSuccess}
     #
     # Update EFI drivers/Clover.
     #
-    local gMD_st=$(md5 -q "$1")
+    if [ -f "$1" ];
+      then
+        local gMD_nd=$(md5 -q "$1")
+      else
+        local gUPD=${kBASHReturnFailure}
+    fi
+
     #
     # Target EFI/Clover files.
     #
-    local gMD_nd=$(md5 -q "$2")
+    if [ -f "$2" ];
+      then
+        local gMD_nd=$(md5 -q "$2")
+      else
+        local gUPD=${kBASHReturnFailure}
+    fi
 
-    if [[ $gMD_st != $gMD_nd ]];
+    if [[ $gMD_st != $gMD_nd && $gUPD == ${kBASHReturnSuccess} ]];
       then
         #
         # Yes, ne, update Clover.
@@ -558,101 +577,73 @@ function _check_and_fix_config()
     fi
 
     #
-    # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
-    #
-    # Check if the binary patch for AppleIntelFramebufferAzul is in the right place.
+    # Gain all binary patches from config.
     #
     gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
-    find_lid_byte="40000000 1e000000 05050901"
-    replace_lid_byte="40000000 0f000000 05050901"
 
     #
-    # Convert to base64.
+    # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
     #
-    find_lid_byte_ENCODE=$(echo $find_lid_byte | xxd -r -p | base64)
-    replace_lid_byte_ENCODE=$(echo $replace_lid_byte | xxd -r -p | base64)
-
-    if [[ $gClover_kexts_to_patch_data != *"$find_lid_byte_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_lid_byte_ENCODE"* ]];
-      then
-        #
-        # No patch existed in config.plist, add patch for it:
-        #
-        _add_kexts_to_patch_infoplist "Enable lid wake after sleep for 0x0a2e0008 (c) syscl/lighting/Yating Zhou" "$find_lid_byte_ENCODE" "$replace_lid_byte_ENCODE" "AppleIntelFramebufferAzul"
-    fi
-
+    cLidWake="Enable lid wake after sleep for 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
+    fLidWake="40000000 1e000000 05050901"
+    rLidWake="40000000 0f000000 05050901"
+    nLidWake="AppleIntelFramebufferAzul"
     #
-    # Check if "Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" is in config.plist.
+    # Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008.
     #
-    find_Azul_data="08002e0a 01030303 00000004 00002002 00005001"
-    replace_Azul_data="08002e0a 01030303 00000008 00000003 00000003"
-
-    #
-    # Convert to base64.
-    #
-    find_Azul_data_ENCODE=$(echo $find_Azul_data | xxd -r -p | base64)
-    replace_Azul_data_ENCODE=$(echo $replace_Azul_data | xxd -r -p | base64)
-
-    if [[ $gClover_kexts_to_patch_data != *"$find_Azul_data_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_Azul_data_ENCODE"* ]];
-      then
-        #
-        # No patch existed in config.plist, add patch for it:
-        #
-        _add_kexts_to_patch_infoplist "Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008" "$find_Azul_data_ENCODE" "$replace_Azul_data_ENCODE" "AppleIntelFramebufferAzul"
-    fi
-
+    cAzulFrameBuffer="Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0x0a2e0008"
+    fAzulFrameBuffer="08002e0a 01030303 00000004 00002002 00005001"
+    rAzulFrameBuffer="08002e0a 01030303 00000008 00000003 00000003"
+    nAzulFrameBuffer="AppleIntelFramebufferAzul"
     #
     # Check if "Enable HD4600 HDMI Audio" is located in config.plist.
     #
-    find_hdmi_bytes="3D0C0A00 00"
-    replace_hdmi_bytes="3D0C0C00 00"
-
-    #
-    # Convert to base64.
-    #
-    find_hdmi_bytes_ENCODE=$(echo $find_hdmi_bytes | xxd -r -p | base64)
-    replace_hdmi_bytes_ENCODE=$(echo $replace_hdmi_bytes | xxd -r -p | base64)
-
-    if [[ $gClover_kexts_to_patch_data != *"$find_hdmi_bytes_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_hdmi_bytes_ENCODE"* ]];
-      then
-        #
-        # No patch existed in config.plist, add patch for it:
-        #
-        _add_kexts_to_patch_infoplist "Enable HD4600 HDMI Audio" "$find_hdmi_bytes_ENCODE" "$replace_hdmi_bytes_ENCODE" "AppleHDAController"
-    fi
-
+    cHDMI="Enable HD4600 HDMI Audio"
+    fHDMI="3D0C0A00 00"
+    rHDMI="3D0C0C00 00"
+    nHDMI="AppleHDAController"
     #
     # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
     #
-    # The first step is to check the minor version of OS X(e.g. 10.10 vs. 10.11).
+    cHandoff="Enable BT4LE-Handoff-Hotspot"
+    #
+    # Check the minor version of OS X(e.g. 10.10 vs. 10.11) and then we can choose the patch accordingly to the system.
     #
     if [[ $gMINOR_VER -ge 11 ]];
       then
         #
         # OS X is 10.11+.
         #
-        find_handoff_bytes="4885ff74 47488b07"
-        replace_handoff_bytes="41be0f00 0000eb44"
+        fHandoff="4885ff74 47488b07"
+        rHandoff="41be0f00 0000eb44"
       else
         #
         # OS X is 10.10-.
         #
-        find_handoff_bytes="4885c074 5c0fb748"
-        replace_handoff_bytes="41be0f00 0000eb59"
+        fHandoff="4885c074 5c0fb748"
+        rHandoff="41be0f00 0000eb59"
     fi
+    nHandoff="IOBluetoothFamily"
 
     #
-    # Convert to base64.
+    # Now let's inject it.
     #
-    find_handoff_bytes_ENCODE=$(echo $find_handoff_bytes | xxd -r -p | base64)
-    replace_handoff_bytes_ENCODE=$(echo $replace_handoff_bytes | xxd -r -p | base64)
-
-    if [[ $gClover_kexts_to_patch_data != *"$find_handoff_bytes_ENCODE"* || $gClover_kexts_to_patch_data != *"$replace_handoff_bytes_ENCODE"* ]];
-      then
-        #
-        # No patch existed in config.plist, add patch for it:
-        #
-        _add_kexts_to_patch_infoplist "Enable BT4LE-Handoff-Hotspot" "$find_handoff_bytes_ENCODE" "$replace_handoff_bytes_ENCODE" "IOBluetoothFamily"
-    fi
+    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
+    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
+    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
+    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
+    for ((j=0; j<${#nBinData[@]}; ++j))
+    do
+      local gCmp_fString=$(_bin2base64 "$fBinData")
+      local gCmp_rString=$(_bin2base64 "$rBinData")
+      if [[ $gClover_kexts_to_patch_data != *"$gCmp_fString"* || $gClover_kexts_to_patch_data != *"$gCmp_rString"* ]];
+        then
+          #
+          # No patch existed in config.plist, add patch for it:
+          #
+          _kext2patch "${cBinData[j]}" "${fBinData[j]}" "${rBinData[j]}" "${nBinData[j]}"
+      fi
+    done
 
     #
     # Gain boot argv.
@@ -678,46 +669,42 @@ function _check_and_fix_config()
 #--------------------------------------------------------------------------------
 #
 
-function _add_kexts_to_patch_infoplist()
+function _kext2patch()
 {
     local comment=$1
-    local find_binary_ENCODE=$2
-    local replace_binary_ENCODE=$3
+    local fBinaryEncode=$(_bin2base64 "$2")
+    local rBinaryEncode=$(_bin2base64 "$3")
     local binary_name=$4
+
+    local gProperties_Data=("$comment" "false" "syscl" "$binary_name" "syscl")
     index=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist} | grep -i "Name" | wc -l)
 
     #
-    # Inject comment.
+    # Inject dict with patch now.
     #
     ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index' dict" ${config_plist}
-    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Comment' string" ${config_plist}
-    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Comment' $comment" ${config_plist}
 
-    #
-    # Disabled = Nope.
-    #
-    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Disabled' bool" ${config_plist}
-    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Disabled' false" ${config_plist}
+    for ((i=0; i<${#gProperties_Name[@]}; ++i))
+    do
+      ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:${gProperties_Name[i]}' ${gProperties_Type[i]}" ${config_plist}
+      ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:${gProperties_Name[i]}' ${gProperties_Data[i]}" ${config_plist}
 
-    #
-    # Inject find binary.
-    #
-    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Find' data" ${config_plist}
-    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Find' syscl" ${config_plist}
-    sed -ig "s|c3lzY2w=|$find_binary_ENCODE|g" ${config_plist}
+      case "${gProperties_Name[i]}" in
+        Find   ) sed -ig "s|c3lzY2w=|$fBinaryEncode|g" ${config_plist}
+                 ;;
+        Replace) sed -ig "s|c3lzY2w=|$rBinaryEncode|g" ${config_plist}
+                 ;;
+      esac
+    done
+}
 
-    #
-    # Inject name.
-    #
-    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Name' string" ${config_plist}
-    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Name' $binary_name" ${config_plist}
+#
+#--------------------------------------------------------------------------------
+#
 
-    #
-    # Inject replace binary.
-    #
-    ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:Replace' data" ${config_plist}
-    ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:Replace' syscl" ${config_plist}
-    sed -ig "s|c3lzY2w=|$replace_binary_ENCODE|g" ${config_plist}
+function _bin2base64()
+{
+    echo $1 | xxd -r -p | base64
 }
 
 #
@@ -829,12 +816,12 @@ function _update_clover()
         #
         # OS X is 10.11+.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver: BrcmPatchRAM.kext"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver::BrcmPatchRAM.kext"
       else
         #
         # OS X is 10.10-.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver: BrcmPatchRAM2.kext"
+        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver::BrcmPatchRAM2.kext"
     fi
 
     #
@@ -875,7 +862,7 @@ function _update_thm()
             #
             # Yes we need to update themes.
             #
-            rm -R /Volumes/EFI/EFI/CLOVER/themes/bootcamp
+            _del /Volumes/EFI/EFI/CLOVER/themes/bootcamp
             cp -R ${REPO}/CLOVER/themes/BootCamp /Volumes/EFI/EFI/CLOVER/themes
         fi
     fi
@@ -1498,6 +1485,11 @@ function main()
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
     _tidy_exec "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+
+    #
+    # Clean up backup
+    #
+    _del /Volumes/EFI/EFI/CLOVER/config.plistg
 
     _PRINT_MSG "NOTE: Congratulations! All operation has been completed"
     _PRINT_MSG "NOTE: Reboot now. Then enjoy your OS X! -${BOLD}syscl/lighting/Yating Zhou @PCBeta${OFF}"
