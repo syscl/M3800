@@ -92,22 +92,6 @@ gSystemVerticalRez=""
 gPatchIOKit=${kBASHReturnSuccess}
 gClover_ig_platform_id=""
 target_ig_platform_id=""
-fLidWake_ENCODE=""
-rLidWake_ENCODE=""
-replace_framebuffer_data_byte=""
-replace_framebuffer_data_byte_ENCODE=""
-find_hdmi_bytes=""
-replace_hdmi_bytes=""
-find_hdmi_bytes_ENCODE=""
-replace_hdmi_bytes_ENCODE=""
-find_Azul_data=""
-replace_Azul_data=""
-find_Azul_data_ENCODE=""
-replace_Azul_data_ENCODE=""
-find_handoff_bytes=""
-replace_handoff_bytes=""
-find_handoff_bytes_ENCODE=""
-replace_handoff_bytes_ENCODE=""
 gTriggerLE=${kBASHReturnFailure}
 gProductVer="$(sw_vers -productVersion)"
 gOSVer=${gProductVer:0:5}
@@ -126,7 +110,25 @@ gBluetooth_Brand_String=""
 #
 gProperties_Name=(Comment Disabled Find Name Replace)
 gProperties_Type=(string bool data string data)
-
+#
+# Kexts to patch
+#
+cLidWake=""
+fLidWake=""
+rLidWake=""
+nLidWake=""
+cAzulFrameBuffer=""
+fAzulFrameBuffer=""
+rAzulFrameBuffer=""
+nAzulFrameBuffer=""
+cHDMI=""
+fHDMI=""
+rHDMI=""
+nHDMI=""
+cHandoff=""
+fHandoff=""
+rHandoff=""
+nHandoff=""
 #
 # Audio variables
 #
