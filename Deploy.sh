@@ -416,7 +416,7 @@ function _install_AppleHDA_Injector()
     #
     cALC668_Stage4="Enable Realtek ALC668 stage 4 of 5"
     fALC668_Stage4="8419d411"
-    rALC668_Stage4="00000000"
+    rALC668_Stage4="6806EC10"
     nALC668_Stage4="AppleHDA"
     #
     # Stage 5 of 5
