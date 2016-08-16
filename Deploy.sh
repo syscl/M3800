@@ -382,6 +382,83 @@ function _install_AppleHDA_Injector()
     ${doCommands[1]} "Merge ${REPO}/Kexts/audio/Resources/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
     _tidy_exec "sudo cp -RX "${gInjector_Repo}" "${gExtensions_Repo[1]}"" "Install AppleHDA_ALC668"
 
+
+    #
+    # Gain all binary patches from config.
+    #
+    gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
+
+    #
+    # Added Clover patch for ALC668 in Sierra
+    #
+    # Stage 1 of 5
+    #
+    cALC668_Stage1="Enable Realtek ALC668 stage 1 of 5"
+    fALC668_Stage1="8408ec10"
+    rALC668_Stage1="00000000"
+    nALC668_Stage1="AppleHDA"
+    #
+    # Stage 2 of 5
+    #
+    cALC668_Stage2="Enable Realtek ALC668 stage 2 of 5"
+    fALC668_Stage2="8508ec10"
+    rALC668_Stage2="00000000"
+    nALC668_Stage2="AppleHDA"
+    #
+    # Stage 3 of 5
+    #
+    cALC668_Stage3="Enable Realtek ALC668 stage 3 of 5"
+    fALC668_Stage3="8B19D411"
+    rALC668_Stage3="00000000"
+    nALC668_Stage3="AppleHDA"
+    #
+    # Stage 4 of 5
+    #
+    cALC668_Stage4="Enable Realtek ALC668 stage 4 of 5"
+    fALC668_Stage4="8419d411"
+    rALC668_Stage4="00000000"
+    nALC668_Stage4="AppleHDA"
+    #
+    # Stage 5 of 5
+    #
+    cALC668_Stage5="Enable Realtek ALC668 stage 5 of 5"
+    fALC668_Stage5="8A19D411"
+    rALC668_Stage5="00000000"
+    nALC668_Stage5="AppleHDA"
+    #
+    # Chrome audio issues patch stage 1 of 2
+    #
+    cALC668_Stage6="Sleep loose sound issue patch 1 of 2"
+    fALC668_Stage6="41C60600 488BBB68"
+    rALC668_Stage6="41C60601 488BBB68"
+    nALC668_Stage6="AppleHDA"
+    #
+    # Chrome audio issues patch stage 2 of 2
+    #
+    cALC668_Stage7="Sleep loose sound issue patch 2 of 2"
+    fALC668_Stage7="41C68643 01000000"
+    rALC668_Stage7="41C68643 01000001"
+    nALC668_Stage7="AppleHDA"
+    #
+    # Now let's inject it.
+    #
+    cALC668Data=("$cALC668_Stage1" "$cALC668_Stage2" "$cALC668_Stage3" "$cALC668_Stage4" "$cALC668_Stage5" "$cALC668_Stage6" "$cALC668_Stage7")
+    fALC668Data=("$fALC668_Stage1" "$fALC668_Stage2" "$fALC668_Stage3" "$fALC668_Stage4" "$fALC668_Stage5" "$fALC668_Stage6" "$fALC668_Stage7")
+    rALC668Data=("$rALC668_Stage1" "$rALC668_Stage2" "$rALC668_Stage3" "$rALC668_Stage4" "$rALC668_Stage5" "$rALC668_Stage6" "$rALC668_Stage7")
+    nALC668Data=("$nALC668_Stage1" "$nALC668_Stage2" "$nALC668_Stage3" "$nALC668_Stage4" "$nALC668_Stage5" "$nALC668_Stage6" "$nALC668_Stage7")
+    for ((k=0; k<${#nALC668Data[@]}; ++k))
+    do
+      local gCmp_fString=$(_bin2base64 "$fALC668Data")
+      local gCmp_rString=$(_bin2base64 "$rALC668Data")
+      if [[ $gClover_kexts_to_patch_data != *"$gCmp_fString"* || $gClover_kexts_to_patch_data != *"$gCmp_rString"* ]];
+        then
+          #
+          # No patch existed in config.plist, add patch for it:
+          #
+          _kext2patch "${cALC668Data[k]}" "${fALC668Data[k]}" "${rALC668Data[k]}" "${nALC668Data[k]}"
+      fi
+    done
+
     #
     # Trigger /L*/E* to rebuild
     #
@@ -581,7 +658,14 @@ function _check_and_fix_config()
     #
     # Gain all binary patches from config.
     #
-    gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
+    if [ $gMINOR_VER -lt $gDelimitation_OSVer ];
+      then
+      #
+      # 10.12-, note: this detection will later remove due to optimization.
+      #
+      gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
+    fi
+
 
     #
     # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
