@@ -31,6 +31,11 @@ BLUE="\033[1;34m"
 OFF="\033[m"
 
 #
+# Get user id
+#
+let gID=$(id -u)
+
+#
 # Located repository.
 #
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -43,35 +48,26 @@ function _PRINT_MSG()
 {
     local message=$1
 
-    if [[ $message =~ 'OK' ]];
-      then
-        local message=$(echo $message | sed -e 's/.*OK://')
-        echo "[  ${GREEN}OK${OFF}  ] ${message}."
-      else
-        if [[ $message =~ 'FAILED' ]];
-          then
-            local message=$(echo $message | sed -e 's/.*FAILED://')
-            echo "[${RED}FAILED${OFF}] ${message}."
-          else
-            if [[ $message =~ '--->' ]];
-              then
-                local message=$(echo $message | sed -e 's/.*--->://')
-                echo "[ ${GREEN}--->${OFF} ] ${message}"
-              else
-                if [[ $message =~ 'NOTE' ]];
-                  then
-                    local message=$(echo $message | sed -e 's/.*NOTE://')
-                    echo "[ ${RED}NOTE${OFF} ] ${message}."
-                  else
-                    if [[ $message =~ 'DEBUG' ]];
-                      then
-                        local message=$(echo $message | sed -e 's/.*DEBUG://')
-                        echo "[${BLUE}DEBLOG${OFF}] ${message}."
-                    fi
-                fi
-            fi
-        fi
-    fi
+    case "$message" in
+      OK*    ) local message=$(echo $message | sed -e 's/.*OK://')
+               echo "[  ${GREEN}OK${OFF}  ] ${message}."
+               ;;
+
+      FAILED*) local message=$(echo $message | sed -e 's/.*://')
+               echo "[${RED}FAILED${OFF}] ${message}."
+               ;;
+
+      ---*   ) local message=$(echo $message | sed -e 's/.*--->://')
+               echo "[ ${GREEN}--->${OFF} ] ${message}"
+               ;;
+
+      NOTE*  ) local message=$(echo $message | sed -e 's/.*NOTE://')
+               echo "[ ${RED}Note${OFF} ] ${message}."
+               ;;
+
+      *      ) echo "$message"
+               ;;
+    esac
 }
 
 #
@@ -147,7 +143,20 @@ function main()
 
 #==================================== START =====================================
 
-main "$@"
+if [[ $gID -ne 0 ]];
+  then
+    _PRINT_MSG "NOTE:This script ${RED}MUST${OFF} be run as ${BOLD}root${OFF}"
+    printf "[ ${RED}Note${OFF} ] Type in "
+    #
+    # Re-run script with arguments.
+    #
+    sudo "$0" "$@"
+else
+    #
+    # We are root. Call main with arguments.
+    #
+    main "$@"
+fi
 
 #================================================================================
 
