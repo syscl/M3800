@@ -145,8 +145,8 @@ function main()
 
 if [[ $gID -ne 0 ]];
   then
-    _PRINT_MSG "NOTE:This script ${RED}MUST${OFF} be run as ${BOLD}root${OFF}"
-    printf "[ ${RED}Note${OFF} ] Type in "
+    _PRINT_MSG "NOTE: This script ${RED}MUST${OFF} be run as ${BOLD}root${OFF}"
+    printf "[ ${RED}Note${OFF} ]  Type in "
     #
     # Re-run script with arguments.
     #
