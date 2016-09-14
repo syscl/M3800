@@ -1049,6 +1049,12 @@ function _RTLWlanU()
     #
     echo '#!/bin/sh'                                                                                                                                         > "$gUSBWakeScript"
     echo '#'                                                                                                                                                >> "$gUSBWakeScript"
+    echo '# Added mount Disk for "OS X" (c) syscl/lighting/Yating Zhou.'                                                                                    >> "$gUSBWakeScript"
+    echo '#'                                                                                                                                                >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo 'diskutil list | grep -i "External" | sed -e "s| (external, physical):||" | xargs -I {} diskutil mountDisk {}'                                     >> "$gUSBWakeScript"
+    echo ''                                                                                                                                                 >> "$gUSBWakeScript"
+    echo '#'                                                                                                                                                >> "$gUSBWakeScript"
     echo '# Fix RTLWlanUSB sleep problem credit B1anker & syscl/lighting/Yating Zhou. @PCBeta.'                                                             >> "$gUSBWakeScript"
     echo '#'                                                                                                                                                >> "$gUSBWakeScript"
     echo ''                                                                                                                                                 >> "$gUSBWakeScript"
