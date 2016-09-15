@@ -60,6 +60,15 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-9-15
+
+- Mount points at wake to fix external hard disk mounting issue.
+- Updated AppleALC to 1.0.16 with bug fix:
+- Fixed a rare kernel panic on initialisation failure
+- Fixed a rare lock acquisition issue on 10.12
+- Fixed an undefined behaviour when failing to perform an i/o operation
+- Guaranteed null termination for readFileToBuffer buffers
+
 2016-7-17
 
 - Added Backup checksum detection to prevent too many backup files
