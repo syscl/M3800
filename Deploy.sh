@@ -1032,7 +1032,7 @@ function _createUSB_Sleep_Script()
     echo "    osascript -e 'quit app \"Wireless Network Utility\"'"                                                                                         >> "$gUSBSleepScript"
     echo '    echo "1" > "$gRT_Config"'                                                                                                                     >> "$gUSBSleepScript"
     echo '    open "/Applications/Wireless Network Utility.app"'                                                                                            >> "$gUSBSleepScript"
-    echo 'fi'  
+    echo 'fi'                                                                                                                                               >> "$gUSBSleepScript"
 }
 
 #
