@@ -1,9 +1,9 @@
 #!/bin/sh
 
-#  mnt
+#  umnt
 #  
 #
-#  Created by lighting on 16/2/5.
+#  Created by lighting on 16/9/19.
 #
 BOLD="\033[1m"
 RED="\033[1;31m"
@@ -17,8 +17,8 @@ OFF="\033[m"
 REPO=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 diskutil list
-printf "Enter EFI's IDENTIFIER, e.g. ${RED}disk0s1${OFF}"
+printf "Enter EFI's IDENTIFIER to unmount, e.g. ${RED}disk0s1${OFF}"
 read -p ": " targetEFI
-diskutil mount ${targetEFI}
+diskutil umount ${targetEFI}
 
 exit 0
