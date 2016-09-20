@@ -237,6 +237,8 @@
 				<false/>
 				<key>Find</key>
 				<data>AQAAdRc=</data>
+				<key>MatchOS</key>
+				<string>10.11.x</string>
 				<key>Name</key>
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
@@ -301,6 +303,18 @@
 				<string>AirPortBrcm4360</string>
 				<key>Replace</key>
 				<data>ZscGVVPrKw==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Boot graphics glitch, 10.12.dp1 (credit denskop)</string>
+				<key>Find</key>
+				<data>AQAAdSU=</data>
+				<key>MatchOS</key>
+				<string>10.12.x</string>
+				<key>Name</key>
+				<string>IOGraphicsFamily</string>
+				<key>Replace</key>
+				<data>AQAA6yU=</data>
 			</dict>
 		</array>
 	</dict>
