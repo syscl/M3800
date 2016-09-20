@@ -351,7 +351,7 @@ function _install_AppleHDA_Injector()
     #
     _PRINT_MSG "--->: Generating AppleHDA injector..."
     cp -RX "${gExtensions_Repo[0]}/AppleHDA.kext" ${gInjector_Repo}
-    _del ${gInjector_Repo}/Contents/Resources/*
+    rm -rf ${gInjector_Repo}/Contents/Resources/*
     _del ${gInjector_Repo}/Contents/PlugIns
     _del ${gInjector_Repo}/Contents/_CodeSignature
     _del ${gInjector_Repo}/Contents/MacOS/AppleHDA
@@ -391,37 +391,30 @@ function _install_AppleHDA_Injector()
     #
     # Added Clover patch for ALC668 in Sierra
     #
-    # Stage 1 of 5
+    # Stage 1 of 4
     #
-    cALC668_Stage1="Enable Realtek ALC668 stage 1 of 5"
+    cALC668_Stage1="Enable Realtek ALC668 stage 1 of 4"
     fALC668_Stage1="8408ec10"
     rALC668_Stage1="00000000"
     nALC668_Stage1="AppleHDA"
     #
-    # Stage 2 of 5
+    # Stage 2 of 4
     #
-    cALC668_Stage2="Enable Realtek ALC668 stage 2 of 5"
+    cALC668_Stage2="Enable Realtek ALC668 stage 2 of 4"
     fALC668_Stage2="8508ec10"
     rALC668_Stage2="00000000"
     nALC668_Stage2="AppleHDA"
     #
-    # Stage 3 of 5
+    # Stage 3 of 4
     #
-    cALC668_Stage3="Enable Realtek ALC668 stage 3 of 5"
+    cALC668_Stage3="Enable Realtek ALC668 stage 3 of 4"
     fALC668_Stage3="8B19D411"
-    rALC668_Stage3="00000000"
+    rALC668_Stage3="6806ec10"
     nALC668_Stage3="AppleHDA"
     #
-    # Stage 4 of 5
+    # Stage 4 of 4
     #
-    cALC668_Stage4="Enable Realtek ALC668 stage 4 of 5"
-    fALC668_Stage4="8419d411"
-    rALC668_Stage4="6806EC10"
-    nALC668_Stage4="AppleHDA"
-    #
-    # Stage 5 of 5
-    #
-    cALC668_Stage5="Enable Realtek ALC668 stage 5 of 5"
+    cALC668_Stage5="Enable Realtek ALC668 stage 4 of 4"
     fALC668_Stage5="8A19D411"
     rALC668_Stage5="00000000"
     nALC668_Stage5="AppleHDA"
