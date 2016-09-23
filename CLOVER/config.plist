@@ -238,7 +238,7 @@
 				<key>Find</key>
 				<data>AQAAdRc=</data>
 				<key>MatchOS</key>
-				<string>10.11.x</string>
+				<string>10.10.x,10.11.x</string>
 				<key>Name</key>
 				<string>IOGraphicsFamily</string>
 				<key>Replace</key>
