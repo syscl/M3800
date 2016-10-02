@@ -106,7 +106,7 @@ being created.
 2016-5-25
 
 - Huge update for the support of Recovery HD for DELL M3800/XPS9530 (c) syscl/lighting/Yating Zhou.
-- Reverted back to Clover injection for ig-platform-id(easier to turn off "Inject Intel under Graphics for update".
+- Reverted back to Clover injection for ig-platform-id(easier to turn off "Inject Intel" under Graphics for update).
 
 2016-5-15
 
@@ -159,7 +159,7 @@ being created.
 
 2016-4-18
 
-- Moved ig-platform-id=0x0a2e0008 to ACPI tables. (Fast and reliable injection)
+- Moved ig-platform-id=0x0a2e0008 to ACPI tables(Fast and reliable injection).
 - Cleaned up clover patches.
 - Updated FakePCI_ID.kext to 2016-4-14.
 
@@ -198,7 +198,7 @@ or
 2016-4-3
 
 - Using a totally new way(insert pre-linked-kext at the startup stage to power up the audio which means the only unsigned kernel extension we have to install under /L\*/E\* is CodecCommander.kext to prevent noise from headphone! (Now, we don't have to worry full SIP eanble!!) credit vit9696's great project "dynamic AppleHDA patching" and syscl to modify the configuration for both M3800 and XPS15(9530).
-- Fixed an issue that light indicator of front facing camera will not turn off after accessing it. (c) syscl/lighting/Yating Zhou
+- Fixed an issue that light indicator of front facing camera will not turn off after accessing it (c) syscl/lighting/Yating Zhou.
 
 2016-3-30
 
@@ -245,7 +245,7 @@ or
 - 4 finger swipe right = Go.
 - 4 finger pinch = Open Mission Control.
 - 5 finger pinch = Open Dashboard.
-- My next step is going to find more details of touchpad of M3800/XPS9530 under Linux to make the ApplePS2SmartTouchPad.kext more comfortable to use than ever. (Coming soon!)
+- My next step is going to find more details of touchpad of M3800/XPS9530 under Linux to make the ApplePS2SmartTouchPad.kext more comfortable to use than ever(Coming soon!).
 - Another problem is that after a full sleep, I can't reproduce the fix I made to fix the HP lose sound problem after a cold boot, really boring since I usually plug in HP all the time. I'm finding new way to fix this annoying problem. (After extensive explore, I believe this bug is produced by AppleHDA, since there's no such problem under Windows and Linux. Actually, Linux has this bug, but it can be fixed through a re-plugged-in HP.)
 
 
@@ -287,7 +287,7 @@ or
 
 2015-12-10
 
-- Added support for 1920*1080p model. (Don't worry about the progress, detection will be automatical.)
+- Added support for 1920*1080p model(Don't worry about the progress, detection will be automatical).
 - Refined scripts (Runing more smooth).
 - Easier to read.
 - Removed ACPIBacklight.kext in ~/M3800/CLOVER/Kexts/10.11
@@ -314,7 +314,7 @@ or
 
 2015-11-17 
 
-- Added A10 bios file and flash tools (AFU).
+- Added A10 bios file and flash tools(AFU).
 - Bumped version of Clover to v3320.
 - Removed "Scan Entiries ..." to boost the progress of booting operation system.
 - Updated Config.plist
