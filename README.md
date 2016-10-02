@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-10-1
+
+- Added UHD patched BIOS for XPS9530 credit @ssmith353 see [here] (https://github.com/syscl/M3800/issues/22).
+
 2016-9-15
 
 - Mount points at wake to fix external hard disk mounting issue.
