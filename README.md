@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-10-4
+
+- Updated AppleHDA patches on 10.12.x credit @PMHeart (aka) Vanilla
+
 2016-10-1
 
 - Added UHD patched BIOS for XPS9530 credit @ssmith353 see [here] (https://github.com/syscl/M3800/issues/22).
