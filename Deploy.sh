@@ -377,9 +377,16 @@ function _install_AppleHDA_Injector()
     ${doCommands[1]} "Delete ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
     ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" ${gAppleHDA_Config}
     ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
-    ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
+    #
+    # PMheart - not necessary to add IOProbeScore = 2000.
+    #
+    # ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
+    # ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
     ${doCommands[1]} "Merge ${REPO}/Kexts/audio/Resources/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
+    #
+    # PMheart - Set CFBundleIdentifier under 'HDA Hardware Config Resource' to com.apple.driver.AppleHDA .
+    #
+    ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:CFBundleIdentifier' com.apple.driver.AppleHDA" ${gAppleHDA_Config}
     _tidy_exec "sudo cp -RX "${gInjector_Repo}" "${gExtensions_Repo[1]}"" "Install AppleHDA_ALC668"
 
 
@@ -390,55 +397,74 @@ function _install_AppleHDA_Injector()
 
     #
     # Added Clover patch for ALC668 in Sierra
+
     #
-    # Stage 1 of 4
+    # PMheart - Some redundant patches should be removed.
     #
-    cALC668_Stage1="Enable Realtek ALC668 stage 1 of 4"
-    fALC668_Stage1="8408ec10"
-    rALC668_Stage1="00000000"
-    nALC668_Stage1="AppleHDA"
+
     #
-    # Stage 2 of 4
+    # Stage 1 of 4 // Zero 0x10ec0884 is not necessary.
+    #
+    # cALC668_Stage1="Enable Realtek ALC668 stage 1 of 4"
+    # fALC668_Stage1="8408ec10"
+    # rALC668_Stage1="00000000"
+    # nALC668_Stage1="AppleHDA"
+
+    #
+    # Stage 2 of 4 // This is necessary.
     #
     cALC668_Stage2="Enable Realtek ALC668 stage 2 of 4"
     fALC668_Stage2="8508ec10"
     rALC668_Stage2="00000000"
     nALC668_Stage2="AppleHDA"
+
     #
-    # Stage 3 of 4
+    # Stage 3 of 4 // Yes and we can only patch 0x11d4198b with 0x10ec0668.
     #
     cALC668_Stage3="Enable Realtek ALC668 stage 3 of 4"
     fALC668_Stage3="8B19D411"
     rALC668_Stage3="6806ec10"
     nALC668_Stage3="AppleHDA"
+
     #
-    # Stage 4 of 4
+    # Stage 4 of 4 // When modifying 0x11d4198b, this should be zeroed.
     #
     cALC668_Stage5="Enable Realtek ALC668 stage 4 of 4"
     fALC668_Stage5="8A19D411"
     rALC668_Stage5="00000000"
     nALC668_Stage5="AppleHDA"
+
     #
-    # Chrome audio issues patch stage 1 of 2
+    # Chrome audio issues patch stage 1 of 2 // Maybe this is not necessary.
+    #                                        // We should use CodecCommander instead of this.
+    #                                        // Anyway if there is any issue without this, try re-use this.
     #
-    cALC668_Stage6="Sleep loose sound issue patch 1 of 2"
-    fALC668_Stage6="41C60600 488BBB68"
-    rALC668_Stage6="41C60601 488BBB68"
-    nALC668_Stage6="AppleHDA"
+    # cALC668_Stage6="Sleep loose sound issue patch 1 of 2"
+    # fALC668_Stage6="41C60600 488BBB68"
+    # rALC668_Stage6="41C60601 488BBB68"
+    # nALC668_Stage6="AppleHDA"
+
     #
-    # Chrome audio issues patch stage 2 of 2
+    # Chrome audio issues patch stage 2 of 2 // The same as above.
     #
-    cALC668_Stage7="Sleep loose sound issue patch 2 of 2"
-    fALC668_Stage7="41C68643 01000000"
-    rALC668_Stage7="41C68643 01000001"
-    nALC668_Stage7="AppleHDA"
+    # cALC668_Stage7="Sleep loose sound issue patch 2 of 2"
+    # fALC668_Stage7="41C68643 01000000"
+    # rALC668_Stage7="41C68643 01000001"
+    # nALC668_Stage7="AppleHDA"
+
     #
     # Now let's inject it.
     #
-    cALC668Data=("$cALC668_Stage1" "$cALC668_Stage2" "$cALC668_Stage3" "$cALC668_Stage4" "$cALC668_Stage5" "$cALC668_Stage6" "$cALC668_Stage7")
-    fALC668Data=("$fALC668_Stage1" "$fALC668_Stage2" "$fALC668_Stage3" "$fALC668_Stage4" "$fALC668_Stage5" "$fALC668_Stage6" "$fALC668_Stage7")
-    rALC668Data=("$rALC668_Stage1" "$rALC668_Stage2" "$rALC668_Stage3" "$rALC668_Stage4" "$rALC668_Stage5" "$rALC668_Stage6" "$rALC668_Stage7")
-    nALC668Data=("$nALC668_Stage1" "$nALC668_Stage2" "$nALC668_Stage3" "$nALC668_Stage4" "$nALC668_Stage5" "$nALC668_Stage6" "$nALC668_Stage7")
+    # cALC668Data=("$cALC668_Stage1" "$cALC668_Stage2" "$cALC668_Stage3" "$cALC668_Stage4" "$cALC668_Stage5" "$cALC668_Stage6" "$cALC668_Stage7")
+    # fALC668Data=("$fALC668_Stage1" "$fALC668_Stage2" "$fALC668_Stage3" "$fALC668_Stage4" "$fALC668_Stage5" "$fALC668_Stage6" "$fALC668_Stage7")
+    # rALC668Data=("$rALC668_Stage1" "$rALC668_Stage2" "$rALC668_Stage3" "$rALC668_Stage4" "$rALC668_Stage5" "$rALC668_Stage6" "$rALC668_Stage7")
+    # nALC668Data=("$nALC668_Stage1" "$nALC668_Stage2" "$nALC668_Stage3" "$nALC668_Stage4" "$nALC668_Stage5" "$nALC668_Stage6" "$nALC668_Stage7")
+
+    cALC668Data=("$cALC668_Stage2" "$cALC668_Stage3" "$cALC668_Stage5")
+    fALC668Data=("$fALC668_Stage2" "$fALC668_Stage3" "$fALC668_Stage5")
+    rALC668Data=("$rALC668_Stage2" "$rALC668_Stage3" "$rALC668_Stage5")
+    nALC668Data=("$nALC668_Stage2" "$nALC668_Stage3" "$nALC668_Stage5")
+
     for ((k=0; k<${#nALC668Data[@]}; ++k))
     do
       local gCmp_fString=$(_bin2base64 "$fALC668Data")
@@ -768,10 +794,14 @@ function _kext2patch()
       ${doCommands[1]} "Add ':KernelAndKextPatches:KextsToPatch:$index:${gProperties_Name[i]}' ${gProperties_Type[i]}" ${config_plist}
       ${doCommands[1]} "Set ':KernelAndKextPatches:KextsToPatch:$index:${gProperties_Name[i]}' ${gProperties_Data[i]}" ${config_plist}
 
+      #
+      # PMheart - use `perl` is a better way.
+      # Note: c3lzY2w= is the base64 form of 'syscl'.
+      #
       case "${gProperties_Name[i]}" in
-        Find   ) sed -ig "s|c3lzY2w=|$fBinaryEncode|g" ${config_plist}
+        Find   ) perl -pi -e "s|c3lzY2w=|$fBinaryEncode|g" ${config_plist}
                  ;;
-        Replace) sed -ig "s|c3lzY2w=|$rBinaryEncode|g" ${config_plist}
+        Replace) perl -pi -e "s|c3lzY2w=|$rBinaryEncode|g" ${config_plist}
                  ;;
       esac
     done
@@ -1300,6 +1330,17 @@ function _recoveryhd_fix()
 
 function main()
 {
+    #
+    # PMheart - We should make a detection for Command Line Tools. If no CLT available, we should install it.
+    #
+
+    if [ ! -x /usr/bin/make ];
+      then
+        _PRINT_MSG "NOTE: ${RED}Xcode Command Line Tools from Apple not found!${OFF}"
+        _PRINT_MSG "NOTE: ${BLUE}Run '`xcode-select --install`' to install it."
+        exit 1
+    fi
+
     #
     # Get argument.
     #
