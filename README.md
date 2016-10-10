@@ -60,6 +60,12 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-10-10
+
+- Updated Clover to r3793:
+- Introduce SMCHelper efi driver
+- Fix zero pointer dereferencing
+
 2016-10-4
 
 - Updated AppleHDA patches on 10.12.x credit @PMHeart (aka) Vanilla
