@@ -663,7 +663,7 @@
 				<key>FingersPress</key>
 				<dict>
 					<key>2FingersPressAction</key>
-					<integer>17</integer>
+					<integer>32</integer>
 					<key>3FingersPressAction</key>
 					<integer>32</integer>
 					<key>4FingersPressAction</key>
@@ -671,7 +671,7 @@
 					<key>5FingersPressAction</key>
 					<integer>13</integer>
 					<key>FingersPressTimeOut</key>
-					<integer>450</integer>
+					<integer>700</integer>
 				</dict>
 				<key>Keyboard</key>
 				<dict>
@@ -704,9 +704,9 @@
 				<key>Others</key>
 				<dict>
 					<key>4FingersPinchAction</key>
-					<integer>9</integer>
+					<integer>4</integer>
 					<key>5FingersPinchAction</key>
-					<integer>20</integer>
+					<integer>3</integer>
 					<key>CircularRotate</key>
 					<true/>
 					<key>DisableTPadOnLIDClose</key>
@@ -790,7 +790,7 @@
 					<key>PinchZoomDelta</key>
 					<integer>300</integer>
 					<key>Rotation</key>
-					<false/>
+					<true/>
 					<key>RotationDelta</key>
 					<integer>350</integer>
 					<key>RotationMaxCFingDelta</key>
@@ -959,7 +959,7 @@
 						<key>EdgeScrollAccelMode</key>
 						<integer>0</integer>
 						<key>EdgeScrolling</key>
-						<false/>
+						<true/>
 						<key>EdgeVScrollAdaptArea</key>
 						<integer>4</integer>
 						<key>EdgeVScrollArea</key>
@@ -1018,7 +1018,7 @@
 					<key>3FingerSwipeRightAction</key>
 					<integer>12</integer>
 					<key>3FingerSwipeUpAction</key>
-					<integer>13</integer>
+					<integer>8</integer>
 					<key>3FingerSwipes</key>
 					<true/>
 					<key>4FingerSwipeDownAction</key>
@@ -1028,7 +1028,7 @@
 					<key>4FingerSwipeRightAction</key>
 					<integer>6</integer>
 					<key>4FingerSwipeUpAction</key>
-					<integer>4</integer>
+					<integer>13</integer>
 					<key>4FingerSwipes</key>
 					<true/>
 					<key>EdgeSwipeBottom</key>
@@ -1050,9 +1050,9 @@
 					<key>EdgeSwipeTop</key>
 					<integer>10</integer>
 					<key>EdgeSwipes</key>
-					<false/>
+					<true/>
 					<key>EdgeSwipes2Ways</key>
-					<false/>
+					<true/>
 					<key>EdgeSwipesResetPointer</key>
 					<true/>
 					<key>MultiFingerSwipesDeltaX</key>
@@ -1090,7 +1090,7 @@
 					<key>3FingersTapAction</key>
 					<integer>21</integer>
 					<key>4FingersTapAction</key>
-					<integer>0</integer>
+					<integer>4</integer>
 					<key>5FingersTapAction</key>
 					<integer>5</integer>
 					<key>CornerTapAreaHeight</key>
@@ -1104,7 +1104,7 @@
 					<key>Enable</key>
 					<true/>
 					<key>MulFingDoubleTaps</key>
-					<true/>
+					<false/>
 					<key>MulFingTapMaxDelta</key>
 					<integer>55</integer>
 					<key>MulFingTapTimeOut</key>
