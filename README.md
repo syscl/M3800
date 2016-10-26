@@ -60,6 +60,15 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-10-26
+
+- macOS 10.12.1 fixed all keyboard function keys(brightness up/down, volume up/down), please update to the latest version 
+- macOS 10.12 fixed the System Preference-->Sound-->Output cause headphone noise issue
+- Updated SmartTouchPad config with 3D Touch function by syscl
+- Removed useless boot glitches patch on 10.12.x to prevent 3 stage logo change. Actually, Apple seems to fix almost the boot glitch issue for us. Cheers!
+- Updated Clover to r3859
+- Ready for IOPowerManagement to be released, please wait this week:)
+
 2016-10-10
 
 - Updated Clover to r3793:
