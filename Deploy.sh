@@ -704,13 +704,33 @@ function _check_and_fix_config()
     fi
     nHandoff="IOBluetoothFamily"
 
+    if [[ $gMINOR_VER -ge 12 ]];
+      then
+        #
+        # OS X is 10.12+.
+        #
+        cHaswellLive="Fix Intel HD4600 Safari Video Crash credit vit9696"
+        fHaswellLive="48898ba8 000000"
+        rHaswellLive="90909090 909090"
+        nHaswellLive="AppleIntelFramebufferAzul"
+    fi
+
     #
     # Now let's inject it.
     #
-    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
-    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
-    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
-    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
+    if [[ $gMINOR_VER -ge 12 ]];
+      then
+        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff" "$cHaswellLive")
+        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff" "$fHaswellLive")
+        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff" "$rHaswellLive")
+        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff" "$nHaswellLive")
+      else
+        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
+        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
+        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
+        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
+    fi
+
     for ((j=0; j<${#nBinData[@]}; ++j))
     do
       local gCmp_fString=$(_bin2base64 "$fBinData")
@@ -1323,7 +1343,10 @@ function main()
     #
     # Check if github is available
     #
-    _update
+    if [[ "$gArgv" != *"-NO-UPDATE"* ]];
+      then
+        _update
+    fi
 
     #
     # Generate dir.
