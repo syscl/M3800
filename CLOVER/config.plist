@@ -306,15 +306,15 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Boot graphics glitch, 10.12.dp1 (credit denskop)</string>
+				<string>Fix Intel HD4600 Safari Video Crash credit vit9696</string>
 				<key>Find</key>
-				<data>AQAAdSU=</data>
+				<data>SImLqAAAAA==</data>
 				<key>MatchOS</key>
-				<string>10.12.x</string>
+				<string>10.11.6, 10.12.x</string>
 				<key>Name</key>
-				<string>disable::IOGraphicsFamily</string>
+				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>AQAA6yU=</data>
+				<data>kJCQkJCQkA==</data>
 			</dict>
 		</array>
 	</dict>
