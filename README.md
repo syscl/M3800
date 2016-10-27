@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-10-27
+
+- Fix Intel Haswell HD Video for Safari on Sierra credit vit9696
+
 2016-10-26
 
 - macOS 10.12.1 fixed all keyboard function keys(brightness up/down, volume up/down), please update to the latest version 
