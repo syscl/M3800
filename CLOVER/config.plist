@@ -312,7 +312,7 @@
 				<key>MatchOS</key>
 				<string>10.11.6, 10.12.x</string>
 				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
+				<string>disable::AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
 				<data>kJCQkJCQkA==</data>
 			</dict>
