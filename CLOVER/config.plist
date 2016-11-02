@@ -306,15 +306,75 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Fix Intel HD4600 Safari Video Crash credit vit9696</string>
+				<string>Enable Realtek ALC668 stage 1 of 5</string>
+				<key>Disabled</key>
+				<false/>
 				<key>Find</key>
-				<data>SImLqAAAAA==</data>
-				<key>MatchOS</key>
-				<string>10.11.6, 10.12.x</string>
+				<data>hAjsEA==</data>
 				<key>Name</key>
-				<string>disable::AppleIntelFramebufferAzul</string>
+				<string>AppleHDA</string>
 				<key>Replace</key>
-				<data>kJCQkJCQkA==</data>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 stage 2 of 5</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>hQjsEA==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 stage 3 of 5</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>ixnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>aAbsEA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 stage 4 of 5</string>
+				<key>Disabled</key>
+				<true/>
+				<key>Find</key>
+				<data>hBnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>aAbsEA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 stage 5 of 5</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>ihnUEQ==</data>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>Enable Realtek ALC668 stage for 10.11</string>
+				<key>Find</key>
+				<data>gxnUEQ==</data>
+				<key>MatchOS</key>
+				<string>10.11.x</string>
+				<key>Name</key>
+				<string>AppleHDA</string>
+				<key>Replace</key>
+				<data>AAAAAA==</data>
 			</dict>
 		</array>
 	</dict>
