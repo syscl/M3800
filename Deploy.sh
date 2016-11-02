@@ -720,10 +720,14 @@ function _check_and_fix_config()
     #
     if [[ $gMINOR_VER -ge 12 ]];
       then
-        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff" "$cHaswellLive")
-        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff" "$fHaswellLive")
-        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff" "$rHaswellLive")
-        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff" "$nHaswellLive")
+#        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff" "$cHaswellLive")
+#        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff" "$fHaswellLive")
+#        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff" "$rHaswellLive")
+#        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff" "$nHaswellLive")
+        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
+        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
+        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
+        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
       else
         cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
         fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
