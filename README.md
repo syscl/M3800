@@ -60,6 +60,13 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-11-20
+
+- Insert Device (PPMC) will not display on IOReg as real MacBook credit syscl
+- Insert Device (PMCR) credit syscl
+- Insert Device (SLPB) credit syscl
+- Correct internal display connector type from LVDS <02 00 00 00> to eDP <00 04 00 00> credit syscl
+
 2016-10-27
 
 - Fix Intel Haswell HD Video for Safari on Sierra credit vit9696
