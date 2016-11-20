@@ -1431,7 +1431,7 @@ function main()
     #
     _tidy_exec "patch_acpi DSDT syscl "syscl_SLPB"" "Insert SLPB"
     _tidy_exec "patch_acpi DSDT syscl "syscl_PMCR"" "Insert PMCR"
-
+    _tidy_exec "patch_acpi DSDT syscl "syscl_PPMC"" "Insert PPMC"
 
     #
     # DptfTa Patches.

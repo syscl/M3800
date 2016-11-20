@@ -1,0 +1,25 @@
+#Maintained by: syscl/lighting/Yating Zhou for: PCBeta
+#Insert Device (PPMC) for macOS
+
+# add missing PPMC device
+into definitionblock code_regex . insert
+begin
+Scope (_SB.PCI0)\n
+{\n
+	Device (PPMC)\n
+	{\n
+		Name (_ADR, 0x001F0002)  // _ADR: Address\n
+		OperationRegion (PMCB, PCI_Config, Zero, 0x0100)\n
+		Field (PMCB, AnyAcc, NoLock, Preserve)\n
+		{\n
+			VDID,   32, \n
+			Offset (0x40), \n
+			Offset (0x41), \n
+			ACBA,   8, \n
+			Offset (0x48), \n
+				,   12, \n
+			PWBA,   20\n
+		}\n
+	}\n
+}\n
+end;
