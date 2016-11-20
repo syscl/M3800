@@ -10,7 +10,7 @@ into scope label _SB insert
 begin
 Device (SLPB) // inject SLPB with status by syscl\n
 {\n
-Name (_HID, EisaId ("PNP0C0E"))  // _HID: Hardware ID\n
-Name (_STA, 0x0B)  // _STA: Status\n
+    Name (_HID, EisaId ("PNP0C0E"))  // _HID: Hardware ID\n
+    Name (_STA, 0x0B)  // _STA: Status\n
 }\n
 end;
