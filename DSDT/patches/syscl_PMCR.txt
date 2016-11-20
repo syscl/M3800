@@ -1,0 +1,11 @@
+#Maintained by: syscl/lighting/Yating Zhou for: PCBeta
+#Insert Device (PMCR) for macOS
+
+# add missing PMCR device
+into device label PCI0 insert
+begin
+Device (PMCR) // insert PMCR by syscl\n
+{\n
+    Name (_ADR, 0x001F0002)  // _ADR: Address\n
+}\n
+end;

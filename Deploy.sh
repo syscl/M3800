@@ -1430,6 +1430,7 @@ function main()
     # Modificate ACPI for macOS to load devices correctly
     #
     _tidy_exec "patch_acpi DSDT syscl "syscl_SLPB"" "Insert SLPB"
+    _tidy_exec "patch_acpi DSDT syscl "syscl_PMCR"" "Insert PMCR"
 
 
     #
