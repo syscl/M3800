@@ -306,6 +306,30 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
+				<string>HDMI-audio, 1/2</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>CwwAAA==</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
+				<key>Replace</key>
+				<data>DAwAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
+				<string>HDMI-audio, 2/2</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>DAoAAA==</data>
+				<key>Name</key>
+				<string>AppleHDAController</string>
+				<key>Replace</key>
+				<data>DAwAAA==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>AirPortBrcm4360 5ghz</string>
 				<key>Disabled</key>
 				<false/>
