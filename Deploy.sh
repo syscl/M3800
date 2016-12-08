@@ -675,12 +675,12 @@ function _check_and_fix_config()
     rAzulFrameBuffer="08002e0a 01030303 00000008 00000003 00000003"
     nAzulFrameBuffer="AppleIntelFramebufferAzul"
     #
-    # Check if "Enable HD4600 HDMI Audio" is located in config.plist.
+    # Check if "HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl" is located in config.plist.
     #
-    cHDMI="Enable HD4600 HDMI Audio"
-    fHDMI="3D0C0A00 00"
-    rHDMI="3D0C0C00 00"
-    nHDMI="disable::AppleHDAController"
+    cHDMI="HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl"
+    fHDMI="02040a00 00040000 07010000 ff000000 01000000 40000000"
+    rHDMI="02040a00 00080000 07010000 03060800 00080000 07010000"
+    nHDMI="AppleIntelFramebufferAzul"
     #
     # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
     #
