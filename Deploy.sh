@@ -682,6 +682,21 @@ function _check_and_fix_config()
     rHDMI="02040a00 00080000 07010000 03060800 00080000 07010000"
     nHDMI="AppleIntelFramebufferAzul"
     #
+    # HDMI-audio 1/2
+    #
+    cHDMI_1="HDMI-audio, 1/2"
+    fHDMI_1="0b0c0000"
+    rHDMI_1="0c0c0000"
+    nHDMI_1="AppleHDAController"
+    #
+    # HDMI-audio 2/2
+    #
+    cHDMI_2="HDMI-audio, 2/2"
+    fHDMI_2="0c0a0000"
+    rHDMI_2="0c0c0000"
+    nHDMI_2="AppleHDAController"
+
+    #
     # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
     #
     cHandoff="Enable BT4LE-Handoff-Hotspot"
@@ -704,36 +719,14 @@ function _check_and_fix_config()
     fi
     nHandoff="IOBluetoothFamily"
 
-    if [[ $gMINOR_VER -ge 12 ]];
-      then
-        #
-        # OS X is 10.12+.
-        #
-        cHaswellLive="Fix Intel HD4600 Safari Video Crash credit vit9696"
-        fHaswellLive="48898ba8 000000"
-        rHaswellLive="90909090 909090"
-        nHaswellLive="AppleIntelFramebufferAzul"
-    fi
 
     #
     # Now let's inject it.
     #
-    if [[ $gMINOR_VER -ge 12 ]];
-      then
-#        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff" "$cHaswellLive")
-#        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff" "$fHaswellLive")
-#        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff" "$rHaswellLive")
-#        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff" "$nHaswellLive")
-        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
-        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
-        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
-        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
-      else
-        cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHandoff")
-        fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHandoff")
-        rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHandoff")
-        nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHandoff")
-    fi
+    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHDMI_1" "$cHDMI_2" "$cHandoff")
+    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHDMI_1" "$fHDMI_2" "$fHandoff")
+    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHDMI_1" "$rHDMI_2" "$rHandoff")
+    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHDMI_1" "$nHDMI_2" "$nHandoff")
 
     for ((j=0; j<${#nBinData[@]}; ++j))
     do
