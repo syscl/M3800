@@ -294,15 +294,15 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable HD4600 HDMI Audio </string>
+				<string>HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>PQwKAAA=</data>
+				<data>AgQKAAAEAAAHAQAA/wAAAAEAAABAAAAA</data>
 				<key>Name</key>
-				<string>AppleHDAController</string>
+				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>PQwMAAA=</data>
+				<data>AgQKAAAIAAAHAQAAAwYIAAAIAAAHAQAA</data>
 			</dict>
 			<dict>
 				<key>Comment</key>

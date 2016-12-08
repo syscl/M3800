@@ -1,0 +1,17 @@
+#syscl_Haswell_DPnHDMI
+# syscl: there are copious amount of ways to power up the HDMI and DP audio but I just
+# enjoy the elegant way to power up it, no AppleHDA touch, no more kexts being involved
+
+into method label _DSM parent_label HDAU remove_entry;
+into device label HDAU insert
+begin
+Method (_DSM, 4, NotSerialized)\n
+{\n
+    If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }\n
+    Return (Package()\n
+    {\n
+        "hda-gfx", Buffer() { "onboard-1" },\n
+        "device-id", Buffer() { 0x0c, 0x0c, 0x0, 0x0 } // credit syscl, now there's no more kext and AppleHDA patches require\n
+    })\n
+}\n
+end;

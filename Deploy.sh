@@ -680,7 +680,7 @@ function _check_and_fix_config()
     cHDMI="Enable HD4600 HDMI Audio"
     fHDMI="3D0C0A00 00"
     rHDMI="3D0C0C00 00"
-    nHDMI="AppleHDAController"
+    nHDMI="disable::AppleHDAController"
     #
     # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
     #
@@ -1448,7 +1448,7 @@ function main()
     _tidy_exec "patch_acpi ${SaSsdt} syscl "syscl_Iris_Pro"" "Rename HD4600 to Iris Pro"
     _tidy_exec "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
     _tidy_exec "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
-    _tidy_exec "patch_acpi ${SaSsdt} syscl "audio_Intel_HD4600"" "Insert HDAU device"
+    _tidy_exec "patch_acpi ${SaSsdt} syscl "syscl_Haswell_DPnHDMI"" "Insert HDAU device (c) syscl"
 
     #
     # SgRef Patches.
