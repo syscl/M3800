@@ -282,7 +282,7 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor for Azul framebuffer 0xa2e0008</string>
+				<string>Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  4ports(port: 0000, 0105, 0204, 0306), 0x0a2e0008</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
@@ -290,7 +290,7 @@
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>CAAuCgEDAwMAAAAIAAAAAwAAAAM=</data>
+				<data>CAAuCgEDBAMAAAAIAAAAAwAAAAM=</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
