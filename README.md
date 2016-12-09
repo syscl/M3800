@@ -60,6 +60,12 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2016-12-8
+
+- Updated HDMI audio setting
+- Enable 4ports(0000, 0105, 0204, 0306)
+- Sync fixUSB to version 2016-9-17
+
 2016-11-20
 
 - Insert Device (PPMC) will not display on IOReg as real MacBook credit syscl
