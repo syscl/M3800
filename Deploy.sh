@@ -675,11 +675,11 @@ function _check_and_fix_config()
     rAzulFrameBuffer="08002e0a 01030403 00000008 00000003 00000003"
     nAzulFrameBuffer="AppleIntelFramebufferAzul"
     #
-    # Check if "HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl" is located in config.plist.
+    # Check if "HDMI-audio, port 0105, port 0306, 0x0a2e0008 credit syscl" is located in config.plist.
     #
     cHDMI="HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl"
-    fHDMI="02040a00 00040000 07010000 ff000000 01000000 40000000"
-    rHDMI="02040a00 00080000 07010000 03060800 00080000 07010000"
+    fHDMI="01050900 00040000 07010000 02040a00 00040000 07010000 ff000000 01000000 40000000"
+    rHDMI="01050900 00080000 07010000 02040a00 00040000 07010000 03060800 00080000 07010000"
     nHDMI="AppleIntelFramebufferAzul"
     #
     # HDMI-audio 1/2

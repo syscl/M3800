@@ -294,15 +294,15 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl</string>
+				<string>HDMI-audio, port 0105, port 0306, 0x0a2e0008 credit syscl</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>AgQKAAAEAAAHAQAA/wAAAAEAAABAAAAA</data>
+				<data>AQUJAAAEAAAHAQAAAgQKAAAEAAAHAQAA/wAAAAEAAABAAAAA</data>
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>AgQKAAAIAAAHAQAAAwYIAAAIAAAHAQAA</data>
+				<data>AQUJAAAIAAAHAQAAAgQKAAAEAAAHAQAAAwYIAAAIAAAHAQAA</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
