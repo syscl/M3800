@@ -570,42 +570,6 @@ function _unlock_pixel_clock()
 #--------------------------------------------------------------------------------
 #
 
-function _upd_EFI()
-{
-    local gUPD=${kBASHReturnSuccess}
-    #
-    # Update EFI drivers/Clover.
-    #
-    if [ -f "$1" ];
-      then
-        local gMD_nd=$(md5 -q "$1")
-      else
-        local gUPD=${kBASHReturnFailure}
-    fi
-
-    #
-    # Target EFI/Clover files.
-    #
-    if [ -f "$2" ];
-      then
-        local gMD_nd=$(md5 -q "$2")
-      else
-        local gUPD=${kBASHReturnFailure}
-    fi
-
-    if [[ $gMD_st != $gMD_nd && $gUPD == ${kBASHReturnSuccess} ]];
-      then
-        #
-        # Yes, ne, update Clover.
-        #
-        _tidy_exec "cp "$1" "$2"" "Update $2"
-    fi
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
 function _check_and_fix_config()
 {
     #
@@ -931,18 +895,45 @@ function _update_clover()
     #
     for filename in "${drvEFI[@]}"
     do
-      _upd_EFI "${drivers64UEFI}/${filename}" "${t_drivers64UEFI}/${filename}"
+      _updfl "${t_drivers64UEFI}/${filename}" "${drivers64UEFI}/${filename}"
     done
 
     for filename in "${efiTOOL[@]}"
     do
-      _upd_EFI "${clover_tools}/${filename}" "${t_clover_tools}/${filename}"
+      _updfl "${t_clover_tools}/${filename}" "${clover_tools}/${filename}"
     done
 
     #
     # Update CLOVERX64.efi
     #
-    _upd_EFI "${REPO}/CLOVER/CLOVERX64.efi" "/Volumes/EFI/EFI/CLOVER/CLOVERX64.efi"
+    _updfl "/Volumes/EFI/EFI/CLOVER/CLOVERX64.efi" "${REPO}/CLOVER/CLOVERX64.efi"
+}
+
+#
+#--------------------------------------------------------------------------------
+#
+
+function _updfl()
+{
+    local gTargetf=$1
+    local gSourcef=$2
+    local gTargetHash=""
+    local gSourceHash=""
+
+    if [ -f ${gTargetf} ]; then
+        gTargetHash=$(md5 -q $gTargetf)
+    fi
+
+    if [ -f ${gSourcef} ]; then
+        gSourceHash=$(md5 -q $gSourcef)
+    fi
+
+    if [[ "${gTargetHash}" != "${gSourceHash}" ]]; then
+        #
+        # Update target file
+        #
+        _tidy_exec "cp ${gSourcef} ${gTargetf}" "Update ${gTargetf}"
+    fi
 }
 
 #
