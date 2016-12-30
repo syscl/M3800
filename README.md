@@ -254,7 +254,6 @@ or
 
 2016-3-13
 
-- Added magic number "01470c02" as PMheart/neycwcy10's suggestion to try to fix the issue #10.
 - Refined configdata from dump codec from linux.
 - Enable BT4LE-Handoff-Hotspot by kextstopatch.
 
