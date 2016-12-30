@@ -623,7 +623,6 @@ function _check_and_fix_config()
       gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
     fi
 
-
     #
     # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
     #

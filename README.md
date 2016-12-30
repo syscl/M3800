@@ -94,7 +94,7 @@ Change Log
 
 2016-10-4
 
-- Updated AppleHDA patches on 10.12.x credit @PMHeart (aka) Vanilla
+- Updated AppleHDA patches on 10.12.x credit @vbourachot's resource and syscl's configdat
 
 2016-10-1
 
