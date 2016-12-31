@@ -286,7 +286,8 @@ function _tidy_exec()
 
 function compile_table()
 {
-    "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
+#    "${REPO}"/tools/iasl -vr -w1 -ve -p "${compile}"$1.aml "${precompile}"$1.dsl
+    "${REPO}"/tools/iasl -vr -p "${compile}"$1.aml "${precompile}"$1.dsl
 }
 
 #
@@ -1450,20 +1451,25 @@ function main()
     _tidy_exec "patch_acpi ${SaSsdt} graphics "graphics_PNLF_haswell"" "Brightness fix (Haswell)"
     _tidy_exec "patch_acpi ${SaSsdt} syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
     _tidy_exec "patch_acpi ${SaSsdt} syscl "syscl_Haswell_DPnHDMI"" "Insert HDAU device (c) syscl"
-
     #
+    # Note this condition else-if use to fix issue #54 by edfungus
+    #
+    # Usually SgRef and OptRef are for integrate card and discrete card, but edfungus' device lack them
     # SgRef Patches.
     #
-    _PRINT_MSG "--->: ${BLUE}Patching ${SgRef}.dsl${OFF}"
-    _tidy_exec "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-
+    if [ -f "${REPO}/DSDT/raw/${SgRef}.dsl" ]; then
+        _PRINT_MSG "--->: ${BLUE}Patching ${SgRef}.dsl${OFF}"
+        _tidy_exec "patch_acpi ${SgRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+    fi
     #
     # OptRef Patches.
     #
-    _PRINT_MSG "--->: ${BLUE}Patching ${OptRef}.dsl${OFF}"
-    _tidy_exec "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
-    _tidy_exec "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
-    _tidy_exec "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
+    if [ -f "${REPO}/DSDT/raw/${OptRef}.dsl" ]; then
+        _PRINT_MSG "--->: ${BLUE}Patching ${OptRef}.dsl${OFF}"
+        _tidy_exec "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
+        _tidy_exec "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
+        _tidy_exec "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
+    fi
 
     #
     # Copy all tables to precompile.
@@ -1484,8 +1490,19 @@ function main()
     _tidy_exec "compile_table "DSDT"" "Compiling DSDT"
     _tidy_exec "compile_table "${DptfTa}"" "Compile DptfTa"
     _tidy_exec "compile_table "${SaSsdt}"" "Compile SaSsdt"
-    _tidy_exec "compile_table "${SgRef}"" "Compile SgRef"
-    _tidy_exec "compile_table "${OptRef}"" "Compile OptRef"
+    #
+    # Note this condition else-if use to fix issue #54 by edfungus
+    #
+    # Usually SgRef and OptRef are for integrate card and discrete card, but edfungus' device lack them
+    # SgRef Patches.
+    #
+    if [ -f "${REPO}/DSDT/raw/${SgRef}.dsl" ]; then
+        _tidy_exec "compile_table "${SgRef}"" "Compile SgRef"
+    fi
+
+    if [ -f "${REPO}/DSDT/raw/${OptRef}.dsl" ]; then
+        _tidy_exec "compile_table "${OptRef}"" "Compile OptRef"
+    fi
 
     #
     # Copy SSDT-rmne.aml.
