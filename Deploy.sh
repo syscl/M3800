@@ -364,13 +364,13 @@ function _install_AppleHDA_Injector()
       _tidy_exec "cp "${REPO}/Kexts/audio/Resources/layout/${zlib}.xml.zlib" "${gInjector_Repo}/Contents/Resources/"" "Copy ${zlib}"
     done
 
-    replace=`${doCommands[1]} "Print :NSHumanReadableCopyright" ${gAppleHDA_Config} | ${doCommands[2]}`
+    replace=`${doCommands[1]} "Print :NSHumanReadableCopyright" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
     ${doCommands[1]} "Set :NSHumanReadableCopyright '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleGetInfoString" ${gAppleHDA_Config} | ${doCommands[2]}`
+    replace=`${doCommands[1]} "Print :CFBundleGetInfoString" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
     ${doCommands[1]} "Set :CFBundleGetInfoString '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleVersion" ${gAppleHDA_Config} | ${doCommands[2]}`
+    replace=`${doCommands[1]} "Print :CFBundleVersion" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
     ${doCommands[1]} "Set :CFBundleVersion '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleShortVersionString" ${gAppleHDA_Config} | ${doCommands[2]}`
+    replace=`${doCommands[1]} "Print :CFBundleShortVersionString" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
     ${doCommands[1]} "Set :CFBundleShortVersionString '$replace'" ${gAppleHDA_Config}
     ${doCommands[1]} "Add ':HardwareConfigDriver_Temp' dict" ${gAppleHDA_Config}
     ${doCommands[1]} "Merge ${gExtensions_Repo[0]}/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
@@ -378,8 +378,11 @@ function _install_AppleHDA_Injector()
     ${doCommands[1]} "Delete ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
     ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" ${gAppleHDA_Config}
     ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
-    ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
+    #
+    # Cause high CPU percentage occupation, don't use IOProbeScore
+    #
+#   ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
+#   ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
     ${doCommands[1]} "Merge ${REPO}/Kexts/audio/Resources/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
     _tidy_exec "sudo cp -RX "${gInjector_Repo}" "${gExtensions_Repo[1]}"" "Install AppleHDA_ALC668"
 
