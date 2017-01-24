@@ -1409,7 +1409,8 @@ function main()
     #
     if [ -f "${gESPMountPoint}/EFI/CLOVER/ACPI/origin/DSDT.aml" ];
       then
-        _tidy_exec "cp ${gESPMountPoint}/EFI/CLOVER/ACPI/origin/DSDT.aml ${gESPMountPoint}/EFI/CLOVER/ACPI/origin/SSDT-*.aml "${decompile}"" "Copy untouch ACPI tables"
+        local gOrgAcpiRepo="${gESPMountPoint}/EFI/CLOVER/ACPI/origin"
+        _tidy_exec "cp "${gOrgAcpiRepo}/DSDT.aml" "${gOrgAcpiRepo}/SSDT-*.aml" "${decompile}"" "Copy untouch ACPI tables"
       else
         _PRINT_MSG "NOTE: Warning!! DSDT and SSDTs doesn't exist! Press Fn+F4 under Clover to dump ACPI tables"
         # ERROR.
