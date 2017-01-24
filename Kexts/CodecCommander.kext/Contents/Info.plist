@@ -95,7 +95,7 @@
 					<key>Perform Reset</key>
 					<false/>
 					<key>Perform Reset on EAPD Fail</key>
-					<true/>
+					<false/>
 					<key>Perform Reset on External Wake</key>
 					<false/>
 				</dict>

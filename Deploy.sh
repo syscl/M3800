@@ -886,12 +886,12 @@ function _update_clover()
         #
         # BCM20702A3 found.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmFirmwareRepo.kext" "BCM20702A3 found"
+        _tidy_exec "rm -rf ${KEXT_DIR}/BrcmFirmwareRepo.kext" "BCM20702A3 found"
       else
         #
         # BCM2045A0 found. We remove BrcmFirmwareData.kext to prevent this driver crashes the whole system during boot.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmFirmwareData.kext" "BCM2045A0 found"
+        _tidy_exec "rm -rf ${KEXT_DIR}/BrcmFirmwareData.kext" "BCM2045A0 found"
     fi
 
     #
@@ -902,12 +902,12 @@ function _update_clover()
         #
         # OS X is 10.11+.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver::BrcmPatchRAM.kext"
+        _tidy_exec "rm -rf ${KEXT_DIR}/BrcmPatchRAM.kext" "Remove redundant BT driver::BrcmPatchRAM.kext"
       else
         #
         # OS X is 10.10-.
         #
-        _tidy_exec "rm -R ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver::BrcmPatchRAM2.kext"
+        _tidy_exec "rm -rf ${KEXT_DIR}/BrcmPatchRAM2.kext" "Remove redundant BT driver::BrcmPatchRAM2.kext"
     fi
 
     #
