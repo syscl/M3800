@@ -1463,6 +1463,8 @@ function main()
     _tidy_exec "patch_acpi DSDT syscl "syscl_SLPB"" "Insert SLPB"
     _tidy_exec "patch_acpi DSDT syscl "syscl_PMCR"" "Insert PMCR"
     _tidy_exec "patch_acpi DSDT syscl "syscl_PPMC"" "Insert PPMC"
+    # Inject reg-ltrovr for IOPCIFamily::setLatencyTolerance setting ltrOffset for PCI devices successfully (c) syscl
+    _tidy_exec "patch_acpi DSDT syscl "syscl_ltrovr"" "Inject reg-ltrovr for IOPCIFamily::setLatencyTolerance setting ltrOffset for PCI devices successfully (c) syscl"
 
     #
     # DptfTa Patches.
