@@ -40,14 +40,14 @@ This will download the whole installation directory to your current directory(./
 
 
 ```sh
-chmod +x ./M3800/deploy.sh
+cd M3800
+chmod +x ./deploy.sh
 ```
 
 
 Run the script in a terminal windows by(Note: You should dump the ACPI tables by pressing F4/Fn+F4 under Clover first and then execute the following command lines):
 
 ```sh
-cd M3800
 ./deploy.sh
 ```
 
@@ -60,6 +60,10 @@ Note: For two finger scrolling you need to change the speed of the Scrolling onc
 
 Change Log
 ----------------
+2017-01-26
+
+- 
+
 2016-12-8
 
 - Updated HDMI audio setting
