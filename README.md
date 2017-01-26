@@ -62,7 +62,7 @@ Change Log
 ----------------
 2017-01-26
 
-- 
+- Enable IOPCIFamily to set tolerance latency for PCI devices (c) syscl
 
 2016-12-8
 
