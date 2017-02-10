@@ -1451,7 +1451,7 @@ function main()
     _tidy_exec "patch_acpi DSDT system "system_IMEI"" "Add IMEI"
     _tidy_exec "patch_acpi DSDT system "system_Mutex"" "Fix Non-zero Mutex"
     _tidy_exec "patch_acpi DSDT syscl "system_OSYS"" "OS Check Fix"
-    _tidy_exec "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Add audio Layout 1"
+    _tidy_exec "patch_acpi DSDT syscl "audio_HDEF-layout1"" "Inject Audio Info"
     _tidy_exec "patch_acpi DSDT syscl "audio_B0D3_HDAU"" "Rename B0D3 to HDAU"
     _tidy_exec "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
     _tidy_exec "patch_acpi DSDT syscl "syscl_iGPU_MEM2"" "iGPU TPMX to MEM2"
