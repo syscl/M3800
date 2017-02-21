@@ -56,10 +56,17 @@ Reboot your OS X to see the change. If you have any problem about the script, tr
 ./deploy.sh -d
 ```
 
-Note: For two finger scrolling you need to change the speed of the Scrolling once to get it work and also have to enable them in Trackpad preferences.
+Note:
+- VoodooPS2Controller is recommended on macOS Sierra(10.12.x+)
+- AppleSmartTouchPad users: for two finger scrolling you need to change the speed of the Scrolling once to get it work and also have to enable them in Trackpad preferences. 
 
 Change Log
 ----------------
+2017-02-21
+
+- Prepare for @icedman 's VoodooPS2Controller(tuned by syscl)
+- Updated sleep: add deep sleep & deep idle properties as per Pike R. Alpha
+
 2017-01-26
 
 - Enable IOPCIFamily to set tolerance latency for PCI devices (c) syscl
