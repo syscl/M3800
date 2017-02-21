@@ -872,6 +872,18 @@ function _update_clover()
     _tidy_exec "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
     _tidy_exec "cp -R ./CLOVER/kexts/${gOSVer} ${gESPMountPoint}/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${gOSVer}"
     _tidy_exec "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
+    if [[ ${gSelect_TouchPad_Drv} == 1 ]];
+      then
+        #
+        # Use ApplePS2SmartTouchPad, remove VoodooPS2
+        #
+        _tidy_exec "rm -rf ${KEXT_DIR}/VoodooPS2Controller.kext" "Install ApplePS2SmartTouchPad"
+      else
+        #
+        # Use VoodooPS2Controller, remove ApplePS2SmartTouchPad
+        #
+        _tidy_exec "rm -rf ${KEXT_DIR}/ApplePS2SmartTouchPad.kext" "Install VoodooPS2Controller"
+    fi
 
     #
     # Decide which BT kext to use.
@@ -1422,7 +1434,39 @@ function main()
     fi
 
     #
-    # Decompile dsdt.
+    # Choose touchpad kext you prefer
+    #
+    printf "Available touchpad kext:\n"
+    printf "[   ${BLUE}1${OFF}  ] ApplePS2SmartTouchPad\n"
+    printf "[   ${BLUE}2${OFF}  ] VoodooPS2Controller\n"
+    printf "Please choose the desired touchpad kext (${RED}1${OFF} or ${RED}2${OFF})"
+    read -p ": " gSelect_TouchPad_Drv
+    case "${gSelect_TouchPad_Drv}" in
+      1     ) _PRINT_MSG "NOTE: Use ${BLUE}ApplePS2SmartTouchPad${OFF}"
+              ;;
+
+      2     ) _PRINT_MSG "NOTE: Use ${BLUE}VoodooPS2Controller${OFF}"
+              ;;
+
+      *     ) _PRINT_MSG "NOTE: Invalid number, use default setting"
+              local gApplePS2SmartTouchPadIsPresent=$(kextstat |grep -i "ApplePS2SmartTouchPad")
+              if [[ ${gApplePS2SmartTouchPadIsPresent} != "" ]];
+                then
+                  #
+                  # Use ApplePS2SmartTouchPad
+                  #
+                  gSelect_TouchPad_Drv=1
+                else
+                  #
+                  # Use VoodooPS2Controller
+                  #
+                  gSelect_TouchPad_Drv=2
+              fi
+              ;;
+    esac
+
+    #
+    # Decompile acpi tables
     #
     cd "${REPO}"
     _PRINT_MSG "--->: ${BLUE}Disassembling tables...${OFF}"
