@@ -64,8 +64,9 @@ Change Log
 ----------------
 2017-02-21
 
-- Prepare for @icedman 's VoodooPS2Controller(tuned by syscl)
-- Updated sleep: add deep sleep & deep idle properties as per Pike R. Alpha
+- Add port injector for ```MacBookPro11,4(M3800/XPS9530)``` credit syscl 
+- Prepare for @icedman 's ```VoodooPS2Controller```(tuned by ```syscl```)
+- Update sleep: add deep sleep & deep idle properties as per Pike R. Alpha
 
 2017-01-26
 
