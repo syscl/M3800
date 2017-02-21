@@ -1509,6 +1509,10 @@ function main()
     _tidy_exec "patch_acpi DSDT syscl "syscl_PPMC"" "Insert PPMC"
     # Inject reg-ltrovr for IOPCIFamily::setLatencyTolerance setting ltrOffset for PCI devices successfully (c) syscl
     #_tidy_exec "patch_acpi DSDT syscl "syscl_ltrovr"" "Inject reg-ltrovr for IOPCIFamily::setLatencyTolerance setting ltrOffset for PCI devices successfully (c) syscl"
+    #
+    # Added deep sleep & deep idle as per Pike R. Alpha
+    #
+    _tidy_exec "patch_acpi DSDT syscl "system_deep_idle"" "Added deep sleep and deep idle properties"
 
     #
     # DptfTa Patches.
