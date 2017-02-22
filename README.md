@@ -62,6 +62,10 @@ Note:
 
 Change Log
 ----------------
+2017-02-22
+
+- Prevent patching RecoveryHD dmg per call (c) syscl
+
 2017-02-21
 
 - Add port injector for ```MacBookPro11,4(M3800/XPS9530)``` credit syscl 
