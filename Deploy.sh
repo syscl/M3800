@@ -926,7 +926,7 @@ function _update_clover()
     # gEFI.
     #
     drvEFI=("FSInject-64.efi" "HFSPlus.efi" "OsxAptioFix2Drv-64.efi" "OsxFatBinaryDrv-64.efi" "DataHubDxe-64.efi")
-    efiTOOL=("Shell.inf" "Shell32.efi" "Shell64.efi" "Shell64U.efi" "bdmesg-32.efi" "bdmesg.efi")
+    efiTOOL=("Shell.inf" "Shell32.efi" "Shell64.efi" "Shell64U.efi" "bdmesg.efi")
 
     #
     # Check if necessary to update Clover.
@@ -968,7 +968,7 @@ function _updfl()
 
     if [[ "${gTargetHash}" != "${gSourceHash}" ]]; then
         #
-        # Update target file
+        # Both target and source file exist, update target file
         #
         _tidy_exec "cp ${gSourcef} ${gTargetf}" "Update ${gTargetf}"
     fi
@@ -1247,7 +1247,7 @@ function _printBackupLOG()
 #--------------------------------------------------------------------------------
 #
 
-function _bakBaseSystem()
+function _bakRecHDIsRequire()
 {
     gLastOpenedFileMD5=$(md5 -q "${gRecoveryHD_DMG}")
 
@@ -1264,7 +1264,7 @@ function _bakBaseSystem()
         gBakFileMD5=($(cat ${gBakFileNames[@]} | grep 'Patched Recovery HD MD5:' | sed -e 's/.*: //' -e 's/ //'))
         for checksum in "${gBakFileMD5[@]}"
         do
-          if [[ $checksum == $gLastOpenedFileMD5 && gStop_Bak != ${kBASHReturnSuccess} ]];
+          if [[ $checksum == $gLastOpenedFileMD5 && ${gStop_Bak} != ${kBASHReturnSuccess} ]];
             then
               _PRINT_MSG "OK: Backup found. No more patch operations need"
               gStop_Bak=${kBASHReturnSuccess}
@@ -1317,8 +1317,23 @@ function _recoveryhd_fix()
     # Locate Recovery HD
     #
     _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
-    _touch "${gMountPoint}"
 
+
+    #
+    # Check if backup RecoveryHD is required
+    #
+    _bakRecHDIsRequire
+    if [[ ${gStop_Bak} == ${kBASHReturnSuccess} ]]; then
+        #
+        # Already patched Recovery HD, return
+        #
+        return;
+    fi
+
+    #
+    # let's get started to backup and patch RecoveryHD
+    #
+    _touch "${gMountPoint}"
     #
     # Gain origin file format(e.g. UDZO...).
     #
@@ -1328,7 +1343,6 @@ function _recoveryhd_fix()
     #
     # Backup origin BaseSystem.dmg to ${REPO}/Backups
     #
-    _bakBaseSystem
     _touch "${gBak_Dir}"
     cp "${gRecoveryHD_DMG}" "${gBak_Dir}"
     gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
@@ -1350,6 +1364,11 @@ function _recoveryhd_fix()
     _PRINT_MSG "--->: Updating Recovery HD for DELL M3800/XPS9530..."
     cp ${gBaseSystem_PATCH} "${gRecoveryHD_DMG}"
     chflags hidden "${gRecoveryHD_DMG}"
+
+    #
+    # Backup and patch finish, print out RecoveryHD dmg info
+    #
+    _printBackupLOG
 
     #
     # Clean redundant dmg files.
