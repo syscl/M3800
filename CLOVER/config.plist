@@ -208,6 +208,20 @@
 		<array>
 			<dict>
 				<key>Comment</key>
+				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor, HDMI @ 0105 for Azul framebuffer 0x0d26000f</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>DwAmDQEDAQEAAAAGAAAgAgAAUAEAAABgoQcAAKEHAAAAAAAAAAAAAAAACAACAAAAMAAAAP8AAAABAAAAQAAAAP8AAAABAAAAQAAAAP8AAAABAAAAQAAAAB4AAAAFBQkCAAAAADIAAAAOAAAAAAAAAP////8=</data>
+				<key>MatchOS</key>
+				<string>10.12</string>
+				<key>Name</key>
+				<string>AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>DwAmDQEDAwMAAAAKAAAAAwAAAAMAAABg2QoAANkKAAAAAAAAAAAAAAAACAACAAAAMAAAAAEFEgAACAAAhwAAAAIECQAABAAAhwAAAP8AAAABAAAAQAAAAA8AAAABAQAABAAAAAAAAAAOAAAAAAAAAP////8=</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>Enable TRIM support for non-Apple SSD</string>
 				<key>Disabled</key>
 				<false/>
