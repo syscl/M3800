@@ -62,6 +62,10 @@ Note:
 
 Change Log
 ----------------
+2017-03-03
+
+- Fixed up freeze issue (c) vit9696, lvs1974
+
 2017-02-22
 
 - Prevent patching RecoveryHD dmg per call (c) syscl
