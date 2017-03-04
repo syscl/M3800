@@ -658,19 +658,19 @@ function _check_and_fix_config()
     rLidWake="40000000 0f000000 05050901"
     nLidWake="AppleIntelFramebufferAzul"
     #
-    # Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  4ports(port: 0000, 0105, 0204, 0306), 0x0a2e0008
+    # Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl
     #
-    cAzulFrameBuffer="Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  4ports(port: 0000, 0105, 0204, 0306), 0x0a2e0008"
-    fAzulFrameBuffer="08002e0a 01030303 00000004 00002002 00005001"
-    rAzulFrameBuffer="08002e0a 01030403 00000008 00000003 00000003"
+    cAzulFrameBuffer="Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl"
+    fAzulFrameBuffer="08002e0a 01030303 00000004 00002002 00005001 00000060 6c050000 6c050000 00000000 00000000 00000800 02000000 30000000 01050900 00040000 07010000 02040a00 00040000 07010000"
+    rAzulFrameBuffer="08002e0a 01030303 0000000a 00000003 00000003 00000060 6c050000 6c050000 00000000 00000000 00000800 00040000 30000000 01051200 00080000 07010000 02040900 00040000 07010000"
     nAzulFrameBuffer="AppleIntelFramebufferAzul"
     #
     # Check if "HDMI-audio, port 0105, port 0306, 0x0a2e0008 credit syscl" is located in config.plist.
     #
-    cHDMI="HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl"
-    fHDMI="01050900 00040000 07010000 02040a00 00040000 07010000 ff000000 01000000 40000000"
-    rHDMI="01050900 00080000 07010000 02040a00 00040000 07010000 03060800 00080000 07010000"
-    nHDMI="AppleIntelFramebufferAzul"
+#    cHDMI="HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl"
+#    fHDMI="01050900 00040000 07010000 02040a00 00040000 07010000 ff000000 01000000 40000000"
+#    rHDMI="01050900 00080000 07010000 02040a00 00040000 07010000 03060800 00080000 07010000"
+#    nHDMI="AppleIntelFramebufferAzul"
     #
     # HDMI-audio 1/2
     #
@@ -713,10 +713,10 @@ function _check_and_fix_config()
     #
     # Now let's inject it.
     #
-    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI" "$cHDMI_1" "$cHDMI_2" "$cHandoff")
-    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI" "$fHDMI_1" "$fHDMI_2" "$fHandoff")
-    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI" "$rHDMI_1" "$rHDMI_2" "$rHandoff")
-    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI" "$nHDMI_1" "$nHDMI_2" "$nHandoff")
+    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI_1" "$cHDMI_2" "$cHandoff")
+    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI_1" "$fHDMI_2" "$fHandoff")
+    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI_1" "$rHDMI_2" "$rHandoff")
+    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI_1" "$nHDMI_2" "$nHandoff")
 
     for ((j=0; j<${#nBinData[@]}; ++j))
     do
