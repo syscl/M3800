@@ -64,6 +64,8 @@ Change Log
 ----------------
 2017-03-03
 
+- Fixed a quirk that cause lid wake malfunction (c) syscl
+- Change country code to #a for 867Mbps 5Ghz Wi-Fi
 - Fixed up freeze issue (c) vit9696, lvs1974
 
 2017-02-22
