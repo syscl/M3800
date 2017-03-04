@@ -208,20 +208,6 @@
 		<array>
 			<dict>
 				<key>Comment</key>
-				<string>Enable 160MB BIOS, 48MB Framebuffer, 48MB Cursor, HDMI @ 0105 for Azul framebuffer 0x0d26000f</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>DwAmDQEDAQEAAAAGAAAgAgAAUAEAAABgoQcAAKEHAAAAAAAAAAAAAAAACAACAAAAMAAAAP8AAAABAAAAQAAAAP8AAAABAAAAQAAAAP8AAAABAAAAQAAAAB4AAAAFBQkCAAAAADIAAAAOAAAAAAAAAP////8=</data>
-				<key>MatchOS</key>
-				<string>10.12</string>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>DwAmDQEDAwMAAAAKAAAAAwAAAAMAAABg2QoAANkKAAAAAAAAAAAAAAAACAACAAAAMAAAAAEFEgAACAAAhwAAAAIECQAABAAAhwAAAP8AAAABAAAAQAAAAA8AAAABAQAABAAAAAAAAAAOAAAAAAAAAP////8=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
 				<string>Enable TRIM support for non-Apple SSD</string>
 				<key>Disabled</key>
 				<false/>
@@ -284,39 +270,15 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>eDP, port 0000, 0x0a260005 0x0a260006 0x0a2e0008 0x0a1600c0 credit syscl</string>
+				<string>Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>AAAIAAIAAAAwAAAAAQUJAAAEAAA=</data>
+				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAEAAABgbAUAAGwFAAAAAAAAAAAAAAAACAACAAAAMAAAAAEFCQAABAAABwEAAAIECgAABAAABwEAAA==</data>
 				<key>Name</key>
 				<string>AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>AAAIAAAEAAAwAAAAAQUJAAAEAAA=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  4ports(port: 0000, 0105, 0204, 0306), 0x0a2e0008</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAE=</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>CAAuCgEDBAMAAAAIAAAAAwAAAAM=</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>HDMI-audio, port 0105, port 0306, 0x0a2e0008 credit syscl</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>AQUJAAAEAAAHAQAAAgQKAAAEAAAHAQAA/wAAAAEAAABAAAAA</data>
-				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
-				<key>Replace</key>
-				<data>AQUJAAAIAAAHAQAAAgQKAAAEAAAHAQAAAwYIAAAIAAAHAQAA</data>
+				<data>CAAuCgEDAwMAAAAKAAAAAwAAAAMAAABgbAUAAGwFAAAAAAAAAAAAAAAACAAABAAAMAAAAAEFEgAACAAABwEAAAIECQAABAAABwEAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
@@ -341,18 +303,6 @@
 				<string>AppleHDAController</string>
 				<key>Replace</key>
 				<data>DAwAAA==</data>
-			</dict>
-			<dict>
-				<key>Comment</key>
-				<string>AirPortBrcm4360 5ghz</string>
-				<key>Disabled</key>
-				<false/>
-				<key>Find</key>
-				<data>QYP8/3QsSA==</data>
-				<key>Name</key>
-				<string>AirPortBrcm4360</string>
-				<key>Replace</key>
-				<data>ZscGVVPrKw==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
