@@ -1531,7 +1531,7 @@ function main()
     #
     # Added deep sleep & deep idle as per Pike R. Alpha
     #
-    _tidy_exec "patch_acpi DSDT syscl "system_deep_idle"" "Added deep sleep and deep idle properties"
+    #_tidy_exec "patch_acpi DSDT syscl "system_deep_idle"" "Added deep sleep and deep idle properties"
 
     #
     # DptfTa Patches.
