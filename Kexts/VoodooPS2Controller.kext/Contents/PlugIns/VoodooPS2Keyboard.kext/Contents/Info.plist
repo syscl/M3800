@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>BuildMachineOSBuild</key>
-	<string>16D32</string>
+	<string>16F73</string>
 	<key>CFBundleExecutable</key>
 	<string>VoodooPS2Keyboard</string>
 	<key>CFBundleGetInfoString</key>
@@ -29,17 +29,17 @@
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>8C1002</string>
+	<string>8E3004b</string>
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
-	<string>16C58</string>
+	<string>16E185</string>
 	<key>DTSDKName</key>
 	<string>macosx10.12</string>
 	<key>DTXcode</key>
-	<string>0821</string>
+	<string>0833</string>
 	<key>DTXcodeBuild</key>
-	<string>8C1002</string>
+	<string>8E3004b</string>
 	<key>IOKitPersonalities</key>
 	<dict>
 		<key>ApplePS2Keyboard</key>
@@ -276,17 +276,9 @@
 				<key>Default</key>
 				<dict>
 					<key>Action2FingersTap</key>
-					<string>3b d, 37 d, 1a d, 1a u, 37 u, 3b u</string>
-					<key>Action3FingersPinch</key>
-					<string>3b d, 37 d, 1a d, 1a u, 37 u, 3b u</string>
-					<key>Action3FingersSpread</key>
 					<string>3b d, 37 d, 1c d, 1c u, 37 u, 3b u</string>
 					<key>Action3FingersTap</key>
 					<string>3b d, 37 d, 2 d, 2 u, 37 u, 3b u</string>
-					<key>Action4FingersPinch</key>
-					<string>3b d, 37 d, 1a d, 1a u, 37 u, 3b u</string>
-					<key>Action4FingersSpread</key>
-					<string>3b d, 37 d, 1c d, 1c u, 37 u, 3b u</string>
 					<key>Action4FingersTap</key>
 					<string>3b d, 37 d, 2 d, 2 u, 37 u, 3b u</string>
 					<key>ActionSwipe4FingersDown</key>
@@ -309,10 +301,6 @@
 					<string>3b d, 37 d, 19 d, 19 u, 37 u, 3b u</string>
 					<key>ActionSwipeUp</key>
 					<string>3b d, 7e d, 7e u, 3b u</string>
-					<key>ActionZoomIn</key>
-					<string></string>
-					<key>ActionZoomOut</key>
-					<string></string>
 					<key>Breakless PS2</key>
 					<array>
 						<string>;Items must be strings in the form of breaklessscan (in hex)</string>
