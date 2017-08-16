@@ -6,6 +6,17 @@
 	<dict>
 		<key>DSDT</key>
 		<dict>
+			<key>Patches</key>
+			<array>
+				<dict>
+					<key>Comment</key>
+					<string>change EC0 to EC</string>
+					<key>Find</key>
+					<data>RUMwXw==</data>
+					<key>Replace</key>
+					<data>RUNfXw==</data>
+				</dict>
+			</array>
 			<key>DropOEM_DSM</key>
 			<true/>
 			<key>DropTables</key>
