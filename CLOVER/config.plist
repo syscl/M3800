@@ -15,8 +15,6 @@
 					<string>DMAR</string>
 				</dict>
 			</array>
-			<key>Name</key>
-			<string>DSDT.aml</string>
 		</dict>
 		<key>SSDT</key>
 		<dict>
