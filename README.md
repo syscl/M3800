@@ -69,6 +69,7 @@ Change Log
 - Resolved Headphone noise after updating to 10.12.4+
 - Updated Clover to r4173
 - Optimized configuration
+- EC0->EC such that AppleBusPowerControllerUSB loaded correctly
 
 2017-06-14
 
