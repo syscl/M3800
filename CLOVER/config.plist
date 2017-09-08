@@ -65,14 +65,6 @@
 		<key>Timeout</key>
 		<integer>5</integer>
 	</dict>
-	<key>Devices</key>
-	<dict>
-		<key>FakeID</key>
-		<dict>
-			<key>IntelGFX</key>
-			<string>0x04128086</string>
-		</dict>
-	</dict>
 	<key>GUI</key>
 	<dict>
 		<key>Custom</key>
