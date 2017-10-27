@@ -62,6 +62,11 @@ Note:
 
 Change Log
 ----------------
+2017-10-27
+
+- Added apfs.efi so that users can update from ```HFS+``` to ```APFS``` flawslessly
+- Updated Clover to r4259
+
 2017-08-16
 
 - Japanese PS2 support
