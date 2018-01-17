@@ -65,6 +65,7 @@ Change Log
 2018-01-16
 
 - Updated lid wake patch for ```0x0a2e0008``` on ```10.13+```
+- Updated VoodooPS2 to fix Trackpad blank issue
 
 2017-10-27
 
