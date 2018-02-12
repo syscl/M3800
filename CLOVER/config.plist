@@ -70,7 +70,7 @@
 		<key>EFILoginHiDPI</key>
 		<integer>0</integer>
 		<key>UIScale</key>
-		<integer>2</integer>
+		<integer>1</integer>
 	</dict>
 	<key>GUI</key>
 	<dict>
