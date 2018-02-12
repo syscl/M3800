@@ -65,6 +65,13 @@
 		<key>Timeout</key>
 		<integer>5</integer>
 	</dict>
+	<key>BootGraphics</key>
+	<dict>
+		<key>EFILoginHiDPI</key>
+		<integer>0</integer>
+		<key>UIScale</key>
+		<integer>2</integer>
+	</dict>
 	<key>GUI</key>
 	<dict>
 		<key>Custom</key>
