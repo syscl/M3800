@@ -651,7 +651,7 @@ function _check_and_fix_config()
     fi
 
     #
-    # Repair the lid wake problem for 0x0a2e0008 by syscl/lighting/Yating Zhou.
+    # Repair the lid wake problem for 0x0a2e0008 by syscl
     #
     cLidWake="Enable lid wake after sleep for 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
     fLidWake="40000000 1e000000 05050901"
@@ -685,38 +685,13 @@ function _check_and_fix_config()
     fHDMI_2="0c0a0000"
     rHDMI_2="0c0c0000"
     nHDMI_2="AppleHDAController"
-
-    #
-    # Check if "BT4LE-Handoff-Hotspot" is in place of kextstopatch.
-    #
-    cHandoff="Enable BT4LE-Handoff-Hotspot"
-    #
-    # Check the minor version of OS X(e.g. 10.10 vs. 10.11) and then we can choose the patch accordingly to the system.
-    #
-    if [[ $gMINOR_VER -ge 11 ]];
-      then
-        #
-        # OS X is 10.11+.
-        #
-        fHandoff="4885ff74 47488b07"
-        rHandoff="41be0f00 0000eb44"
-      else
-        #
-        # OS X is 10.10-.
-        #
-        fHandoff="4885c074 5c0fb748"
-        rHandoff="41be0f00 0000eb59"
-    fi
-    nHandoff="IOBluetoothFamily"
-
-
     #
     # Now let's inject it.
     #
-    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI_1" "$cHDMI_2" "$cHandoff")
-    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI_1" "$fHDMI_2" "$fHandoff")
-    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI_1" "$rHDMI_2" "$rHandoff")
-    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI_1" "$nHDMI_2" "$nHandoff")
+    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI_1" "$cHDMI_2")
+    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI_1" "$fHDMI_2")
+    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI_1" "$rHDMI_2")
+    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI_1" "$nHDMI_2")
 
     for ((j=0; j<${#nBinData[@]}; ++j))
     do
