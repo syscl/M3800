@@ -62,6 +62,11 @@ Note:
 
 Change Log
 ----------------
+2018-03-22
+
+- Updated to the latest CPU microcode to address CVE-2017-5715 and associated Intel Reboot issue
+- Major kexts clean up; reduce project size
+
 2018-02-17
 
 - Updated ```apfs.efi``` to 10.13.2 with log suppressed
