@@ -97,6 +97,8 @@ gTriggerLE=${kBASHReturnFailure}
 gProductVer="$(sw_vers -productVersion)"
 gOSVer=${gProductVer:0:5}
 gMINOR_VER=${gProductVer:3:2}
+# get increment version e.g. 10.x.y => y
+gINCR_VER=$(printf ${gProductVer} | awk -F. '{print $NF}')
 gBak_Time=$(date +%Y-%m-%d-h%H_%M_%S)
 gBak_Dir="${REPO}/Backups/${gBak_Time}"
 gStop_Bak=${kBASHReturnFailure}
@@ -576,21 +578,36 @@ function _getEDID()
 
 function _unlock_pixel_clock()
 {
-    if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
-      then
+    #
+    # $1 for the mount point
+    #
+    # Patch IOKit.
+    #
+    _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
+    if [ $gMINOR_VER -ge $gDelimitation_OSVer ]; then
         #
         # 10.12+
         #
-        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
-      else
+        gTarget_Framework_Repo="$1/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
+    else
         #
         # 10.12-
         #
-        gTarget_rhd_Framework="$gMountPoint/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
+        gTarget_Framework_Repo="$1/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
     fi
 
-    sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_rhd_Framework}
-    _tidy_exec "sudo codesign -f -s - ${gTarget_rhd_Framework}" "Patch and sign framework for Recovery HD"
+    if [[ $gMINOR_VER -ge 13 && $gINCR_VER -ge 4 ]]; then
+        # 10.13.4+
+        sudo perl -i.bak -pe 's|\xBB\xE6\x02\x00\xE0\x85\xC0|\xBB\xE6\x02\x00\xE0\x31\xC0|sg' ${gTarget_Framework_Repo}
+        sudo perl -i.bak -pe 's|\x85\xC0\xBB\xE6\x02\x00\xE0|\x31\xC0\xBB\xE6\x02\x00\xE0|sg' ${gTarget_Framework_Repo}
+    else
+        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_Framework_Repo}
+    fi
+    _tidy_exec "sudo codesign -f -s - ${gTarget_Framework_Repo}" "Patch and sign CoreDisplay/IOKit framework"
+    #
+    # rebuild dyld_shared_cache to resolve display framework issues
+    #
+    _tidy_exec "sudo update_dyld_shared_cache -force" "Update dyld shared cache"
 }
 
 #
@@ -1329,7 +1346,7 @@ function _recoveryhd_fix()
     _PRINT_MSG "--->: Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w) ..."
     _tidy_exec "hdiutil convert "${gBak_BaseSystem}" -format ${gTarget_FS} -o ${gBaseSystem_RW} -quiet" "Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w)"
     _tidy_exec "hdiutil attach "${gBaseSystem_RW}" -nobrowse -quiet -readwrite -noverify -mountpoint ${gMountPoint}" "Attach Recovery HD"
-    _unlock_pixel_clock
+    _unlock_pixel_clock "${gMountPoint}"
     _tidy_exec "hdiutil detach $gMountPoint" "Detach mountpoint"
     #
     # Convert to origin format.
@@ -1652,26 +1669,11 @@ function main()
     #
     _PRINT_MSG "NOTE: Set ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
 
-    if [ $gPatchIOKit -eq 0 ];
-      then
+    if [ $gPatchIOKit -eq 0 ]; then
         #
-        # Patch IOKit.
+        # Patch CoreDisplay/IOKit Framework
         #
-        _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
-        if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
-          then
-            #
-            # 10.12+
-            #
-            gTarget_Framework_Repo="/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
-          else
-            #
-            # 10.12-
-            #
-            gTarget_Framework_Repo="/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-        fi
-            sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_Framework_Repo}
-            _tidy_exec "sudo codesign -f -s - ${gTarget_Framework_Repo}" "Patch and sign framework"
+        _unlock_pixel_clock
     fi
 
     #
