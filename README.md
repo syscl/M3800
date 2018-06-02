@@ -62,6 +62,14 @@ Note:
 
 Change Log
 ----------------
+2018-06-02
+
+- Update support for 10.13.5 and 10.13.4
+- Update Clover EFI to r4509
+- Update apfs.efi to 10.13.4
+- Update kext to latest
+- Clean up deploy
+
 2018-03-22
 
 - Updated to the latest CPU microcode to address CVE-2017-5715 and associated Intel Reboot issue
