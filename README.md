@@ -62,6 +62,10 @@ Note:
 
 Change Log
 ----------------
+2018-06-10
+
+- Enable lid wake by using [EnableLidwake](https://github.com/syscl/EnableLidWake))
+
 2018-06-02
 
 - Update support for 10.13.5 and 10.13.4
