@@ -62,9 +62,13 @@ Note:
 
 Change Log
 ----------------
+2018-07-30
+
+- Updated IntelGraphicsFixup to WhateverGreen
+
 2018-06-10
 
-- Enable lid wake by using [EnableLidwake](https://github.com/syscl/EnableLidWake))
+- Enable lid wake by using [EnableLidwake](https://github.com/syscl/EnableLidWake)
 
 2018-06-02
 
