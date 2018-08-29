@@ -794,57 +794,57 @@ function _find_acpi()
     #
     # Search specification tables by syscl/Yating Zhou.
     #
-    number=$(ls "${REPO}"/DSDT/raw/SSDT*.dsl | wc -l)
+    dslfiles=($(find ${REPO}/DSDT/raw/ -type f -name \*.dsl -exec sh -c 'basename {} .dsl' \; ))
 
     #
     # Search DptfTa.
     #
-    for ((index = 1; index <= ${number}; index++))
+    for dslfile in ${dslfiles[@]}
     do
-      grep -i "DptfTa" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+      grep -i "DptfTa" "${REPO}"/DSDT/raw/${dslfile}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 
       if [ "${RETURN_VAL}" == 0 ];
         then
-          DptfTa=SSDT-${index}
+          DptfTa=${dslfile}
       fi
     done
 
     #
     # Search SaSsdt.
     #
-    for ((index = 1; index <= ${number}; index++))
+    for dslfile in ${dslfiles[@]}
     do
-      grep -i "SaSsdt" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+      grep -i "SaSsdt" "${REPO}"/DSDT/raw/${dslfile}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 
       if [ "${RETURN_VAL}" == 0 ];
         then
-          SaSsdt=SSDT-${index}
+          SaSsdt=${dslfile}
       fi
     done
 
     #
     # Search SgRef.
     #
-    for ((index = 1; index <= ${number}; index++))
+    for dslfile in ${dslfiles[@]}
     do
-      grep -i "SgRef" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+      grep -i "SgRef" "${REPO}"/DSDT/raw/${dslfile}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 
       if [ "${RETURN_VAL}" == 0 ];
         then
-          SgRef=SSDT-${index}
+          SgRef=${dslfile}
       fi
     done
 
     #
     # Search OptRef.
     #
-    for ((index = 1; index <= ${number}; index++))
+    for dslfile in ${dslfiles[@]}
     do
-      grep -i "OptRef" "${REPO}"/DSDT/raw/SSDT-${index}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
+      grep -i "OptRef" "${REPO}"/DSDT/raw/${dslfile}.dsl &> /dev/null && RETURN_VAL=0 || RETURN_VAL=1
 
       if [ "${RETURN_VAL}" == 0 ];
         then
-          OptRef=SSDT-${index}
+          OptRef=${dslfile}
       fi
     done
 }
@@ -861,7 +861,7 @@ function _update_clover()
     # Updating kexts. NOTE: This progress will remove any previous kexts.
     #
     _PRINT_MSG "--->: ${BLUE}Updating kexts...${OFF}"
-    _tidy_exec "rm -rf ${KEXT_DIR}" "Remove pervious kexts in ${KEXT_DIR}"
+    _tidy_exec "rm -rf ${KEXT_DIR}" "Remove previous kexts in ${KEXT_DIR}"
     _tidy_exec "cp -R ./CLOVER/kexts/${gOSVer} ${gESPMountPoint}/EFI/CLOVER/kexts/" "Update kexts from ./CLOVER/kexts/${gOSVer}"
     _tidy_exec "cp -R ./Kexts/*.kext ${KEXT_DIR}/" "Update kexts from ./Kexts"
     if [[ ${gSelect_TouchPad_Drv} == 1 ]];
@@ -1627,7 +1627,7 @@ function main()
     #
     # Clean up dynamic SSDTs.
     #
-    _tidy_exec "rm "${compile}"SSDT-*x.aml" "Clean dynamic SSDTs"
+    _tidy_exec "rm "${compile}"SSDT-x*.aml" "Clean dynamic SSDTs"
 
     #
     # Copy AML to destination place.
