@@ -154,15 +154,15 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
-				<string>Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl</string>
+				<string>Enable 160MB DVMT (48MB Framebuffer, 48MB Cursor),  HDMI/DP @ 0105, 0204 (c) syscl</string>
 				<key>Disabled</key>
 				<false/>
 				<key>Find</key>
-				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAEAAABgbAUAAGwFAAAAAAAAAAAAAAAACAACAAAAMAAAAAEFCQAABAAABwEAAAIECgAABAAABwEAAA==</data>
+				<data>CAAuCgEDAwMAAAAEAAAgAgAAUAEAAABgbAUAAGwFAAAAAAAAAAAAAAAACAACAAAAMAAAAA==</data>
 				<key>Name</key>
-				<string>AppleIntelFramebufferAzul</string>
+				<string>com.apple.driver.AppleIntelFramebufferAzul</string>
 				<key>Replace</key>
-				<data>CAAuCgEDAwMAAAAKAAAAAwAAAAMAAABgbAUAAGwFAAAAAAAAAAAAAAAACAAABAAAMAAAAAEFEgAACAAABwEAAAIECQAABAAABwEAAA==</data>
+				<data>CAAuCgEDAwMAAAAKAAAAAwAAAAMAAABgbAUAAGwFAAAAAAAAAAAAAAAACAACAAAAMAAAAA==</data>
 			</dict>
 			<dict>
 				<key>Comment</key>
