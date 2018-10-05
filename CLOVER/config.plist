@@ -96,8 +96,7 @@
 		</dict>
 		<key>Hide</key>
 		<array>
-			<string>\EFI\BOOT\BOOTX64.EFI</string>
-			<string>Windows</string>
+			<string>Preboot</string>
 		</array>
 		<key>Mouse</key>
 		<dict>
