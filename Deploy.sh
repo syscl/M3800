@@ -344,270 +344,16 @@ function rebuild_kernel_cache()
 #--------------------------------------------------------------------------------
 #
 
-function install_audio()
+function remove_patched_hda_kext()
 {
     #
     # Remove previous AppleHDA_ALC668.kext & CodecCommander.kext.
     #
     for extensions in ${gExtensions_Repo[@]}
     do
-      _del $extensions/AppleHDA_ALC668.kext
-      _del $extensions/CodecCommander.kext
+        _del $extensions/AppleHDA_ALC668.kext
+        _del $extensions/CodecCommander.kext
     done
-
-    if [ $gMINOR_VER -ge $gDelimitation_OSVer ];
-      then
-        #
-        # 10.12+
-        #
-        _install_AppleHDA_Injector
-    fi
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _install_AppleHDA_Injector()
-{
-    _del "${gInjector_Repo}"
-    _del "${KEXT_DIR}/AppleALC.kext"
-    #
-    # Generate audio from current system.
-    #
-    _PRINT_MSG "--->: Generating AppleHDA injector..."
-    cp -RX "${gExtensions_Repo[0]}/AppleHDA.kext" ${gInjector_Repo}
-    rm -rf ${gInjector_Repo}/Contents/Resources/*
-    _del ${gInjector_Repo}/Contents/PlugIns
-    _del ${gInjector_Repo}/Contents/_CodeSignature
-    _del ${gInjector_Repo}/Contents/MacOS/AppleHDA
-    _del ${gInjector_Repo}/Contents/version.plist
-    ln -s ${gExtensions_Repo[0]}/AppleHDA.kext/Contents/MacOS/AppleHDA ${gInjector_Repo}/Contents/MacOS/AppleHDA
-
-    for zlib in "${gResources_xml_zlib[@]}"
-    do
-      _tidy_exec "cp "${REPO}/Kexts/audio/Resources/layout/${zlib}.xml.zlib" "${gInjector_Repo}/Contents/Resources/"" "Copy ${zlib}"
-    done
-
-    replace=`${doCommands[1]} "Print :NSHumanReadableCopyright" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    ${doCommands[1]} "Set :NSHumanReadableCopyright '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleGetInfoString" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    ${doCommands[1]} "Set :CFBundleGetInfoString '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleVersion" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    ${doCommands[1]} "Set :CFBundleVersion '$replace'" ${gAppleHDA_Config}
-    replace=`${doCommands[1]} "Print :CFBundleShortVersionString" ${gAppleHDA_Config} | perl -Xpi -e 's/(\d*\.\d*)/9\1/'`
-    ${doCommands[1]} "Set :CFBundleShortVersionString '$replace'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Add ':HardwareConfigDriver_Temp' dict" ${gAppleHDA_Config}
-    ${doCommands[1]} "Merge ${gExtensions_Repo[0]}/AppleHDA.kext/Contents/PlugIns/AppleHDAHardwareConfigDriver.kext/Contents/Info.plist ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Copy ':HardwareConfigDriver_Temp:IOKitPersonalities:HDA Hardware Config Resource' ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Delete ':HardwareConfigDriver_Temp'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:HDAConfigDefault'" ${gAppleHDA_Config}
-    ${doCommands[1]} "Delete ':IOKitPersonalities:HDA Hardware Config Resource:PostConstructionInitialization'" ${gAppleHDA_Config}
-    #
-    # Cause high CPU percentage occupation, don't use IOProbeScore
-    #
-#   ${doCommands[1]} "Add ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' integer" ${gAppleHDA_Config}
-#   ${doCommands[1]} "Set ':IOKitPersonalities:HDA Hardware Config Resource:IOProbeScore' 2000" ${gAppleHDA_Config}
-    ${doCommands[1]} "Merge ${REPO}/Kexts/audio/Resources/ahhcd.plist ':IOKitPersonalities:HDA Hardware Config Resource'" ${gAppleHDA_Config}
-    _tidy_exec "sudo cp -RX "${gInjector_Repo}" "${gExtensions_Repo[1]}"" "Install AppleHDA_ALC668"
-
-
-    #
-    # Gain all binary patches from config.
-    #
-    gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
-
-    #
-    # Added Clover patch for ALC668 in Sierra
-    #
-    # Stage 1 of 4
-    #
-    cALC668_Stage1="Enable Realtek ALC668 stage 1 of 4"
-    fALC668_Stage1="8408ec10"
-    rALC668_Stage1="00000000"
-    nALC668_Stage1="AppleHDA"
-    #
-    # Stage 2 of 4
-    #
-    cALC668_Stage2="Enable Realtek ALC668 stage 2 of 4"
-    fALC668_Stage2="8508ec10"
-    rALC668_Stage2="00000000"
-    nALC668_Stage2="AppleHDA"
-    #
-    # Stage 3 of 4
-    #
-    cALC668_Stage3="Enable Realtek ALC668 stage 3 of 4"
-    fALC668_Stage3="8B19D411"
-    rALC668_Stage3="6806ec10"
-    nALC668_Stage3="AppleHDA"
-    #
-    # Stage 4 of 4
-    #
-    cALC668_Stage5="Enable Realtek ALC668 stage 4 of 4"
-    fALC668_Stage5="8A19D411"
-    rALC668_Stage5="00000000"
-    nALC668_Stage5="AppleHDA"
-    #
-    # Chrome audio issues patch stage 1 of 2
-    #
-    cALC668_Stage6="Sleep loose sound issue patch 1 of 2"
-    fALC668_Stage6="41C60600 488BBB68"
-    rALC668_Stage6="41C60601 488BBB68"
-    nALC668_Stage6="AppleHDA"
-    #
-    # Chrome audio issues patch stage 2 of 2
-    #
-    cALC668_Stage7="Sleep loose sound issue patch 2 of 2"
-    fALC668_Stage7="41C68643 01000000"
-    rALC668_Stage7="41C68643 01000001"
-    nALC668_Stage7="AppleHDA"
-    #
-    # Now let's inject it.
-    #
-    cALC668Data=("$cALC668_Stage1" "$cALC668_Stage2" "$cALC668_Stage3" "$cALC668_Stage4" "$cALC668_Stage5" "$cALC668_Stage6" "$cALC668_Stage7")
-    fALC668Data=("$fALC668_Stage1" "$fALC668_Stage2" "$fALC668_Stage3" "$fALC668_Stage4" "$fALC668_Stage5" "$fALC668_Stage6" "$fALC668_Stage7")
-    rALC668Data=("$rALC668_Stage1" "$rALC668_Stage2" "$rALC668_Stage3" "$rALC668_Stage4" "$rALC668_Stage5" "$rALC668_Stage6" "$rALC668_Stage7")
-    nALC668Data=("$nALC668_Stage1" "$nALC668_Stage2" "$nALC668_Stage3" "$nALC668_Stage4" "$nALC668_Stage5" "$nALC668_Stage6" "$nALC668_Stage7")
-    for ((k=0; k<${#nALC668Data[@]}; ++k))
-    do
-      local gCmp_fString=$(_bin2base64 "$fALC668Data")
-      local gCmp_rString=$(_bin2base64 "$rALC668Data")
-      if [[ $gClover_kexts_to_patch_data != *"$gCmp_fString"* || $gClover_kexts_to_patch_data != *"$gCmp_rString"* ]];
-        then
-          #
-          # No patch existed in config.plist, add patch for it:
-          #
-          _kext2patch "${cALC668Data[k]}" "${fALC668Data[k]}" "${rALC668Data[k]}" "${nALC668Data[k]}"
-      fi
-    done
-
-    #
-    # Trigger /L*/E* to rebuild
-    #
-    gTriggerLE=0
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _initIntel()
-{
-    if [[ `${doCommands[1]} "Print"  "${config_plist}"` == *"Intel = false"* ]];
-      then
-        ${doCommands[1]} "Set ':Graphics:Inject:Intel' true" "${config_plist}"
-    fi
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _getEDID()
-{
-    #
-    # Whether the Intel Graphics kernel extensions are loaded in cache?
-    #
-    if [[ `kextstat` == *"Azul"* && `kextstat` == *"HD5000"* ]];
-      then
-        #
-        # Yes. Then we can directly assess EDID from ioreg.
-        #
-        # Get raw EDID.
-        #
-        gEDID=$(ioreg -lw0 | grep -i "IODisplayEDID" | sed -e 's/.*<//' -e 's/>//')
-
-        #
-        # Get native resolution(Rez) from $gEDID.
-        #
-        # Get horizontal resolution. Arrays start from 0.
-        #
-        # Examples:
-        #
-        # 00ffffffffffff004c2d240137314a4d0d1001036c221b782aaaa5a654549926145054bfef808180714f010101010101010101010101302a009851002a4030701300520e1100001e000000fd00384b1e510e000a202020202020000000fc0053796e634d61737465720a20
-        #                                                                                                                     ^
-        #                                                                                                                 ^^
-        #                                                                                                                           ^
-        #                                                                                                                       ^^
-        gHorizontalRez_pr=${gEDID:116:1}
-        gHorizontalRez_st=${gEDID:112:2}
-        gHorizontalRez=$((0x$gHorizontalRez_pr$gHorizontalRez_st))
-        #
-        # Get vertical resolution. Actually, Vertical rez is no more needed in this scenario, but we just use this to make the
-        # progress clear.
-        #
-        gVerticalRez_pr=${gEDID:122:1}
-        gVerticalRez_st=${gEDID:118:2}
-        gVerticalRez=$((0x$gVerticalRez_pr$gVerticalRez_st))
-      else
-        #
-        # No, we cannot assess EDID from ioreg. But now the resolution of current display has been forced to the highest resolution as vendor designed.
-        #
-        gSystemRez=$(system_profiler SPDisplaysDataType | grep -i "Resolution" | sed -e 's/.*://')
-        gSystemHorizontalRez=$(echo $gSystemRez | sed -e 's/x.*//')
-        gSystemVerticalRez=$(echo $gSystemRez | sed -e 's/.*x//')
-    fi
-
-    #
-    # Patch IOKit?
-    #
-    if [[ $gHorizontalRez -gt 1920 || $gSystemHorizontalRez -gt 1920 ]];
-      then
-        #
-        # Yes, We indeed require a patch to unlock the limitation of flash rate of IOKit to power up the QHD+/4K display.
-        #
-        # Note: the argument of gPatchIOKit is set to 0 as default if the examination of resolution fail, this argument can ensure all models being powered up.
-        #
-        gPatchIOKit=${kBASHReturnSuccess}
-      else
-        #
-        # No, patch IOKit is not required, we won't touch IOKit(for a more intergration/clean system since less is more).
-        #
-        gPatchIOKit=${kBASHReturnFailure}
-    fi
-
-    #
-    # Passing gPatchIOKit to gPatchRecoveryHD.
-    #
-    gPatchRecoveryHD=${gPatchIOKit}
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _unlock_pixel_clock()
-{
-    #
-    # $1 for the mount point
-    #
-    # Patch IOKit.
-    #
-    _PRINT_MSG "--->: ${BLUE}Unlocking maximum pixel clock...${OFF}"
-    if [ $gMINOR_VER -ge $gDelimitation_OSVer ]; then
-        #
-        # 10.12+
-        #
-        gTarget_Framework_Repo="$1/System/Library/Frameworks/CoreDisplay.framework/Versions/Current/CoreDisplay"
-    else
-        #
-        # 10.12-
-        #
-        gTarget_Framework_Repo="$1/System/Library/Frameworks/IOKit.framework/Versions/Current/IOKit"
-    fi
-
-    if [[ $gMINOR_VER -ge 13 && $gINCR_VER -ge 4 ]]; then
-        # 10.13.4+
-        sudo perl -i.bak -pe 's|\xBB\xE6\x02\x00\xE0\x85\xC0|\xBB\xE6\x02\x00\xE0\x31\xC0|sg' ${gTarget_Framework_Repo}
-        sudo perl -i.bak -pe 's|\x85\xC0\xBB\xE6\x02\x00\xE0|\x31\xC0\xBB\xE6\x02\x00\xE0|sg' ${gTarget_Framework_Repo}
-    else
-        sudo perl -i.bak -pe 's|\xB8\x01\x00\x00\x00\xF6\xC1\x01\x0F\x85|\x33\xC0\x90\x90\x90\x90\x90\x90\x90\xE9|sg' ${gTarget_Framework_Repo}
-    fi
-    _tidy_exec "sudo codesign -f -s - ${gTarget_Framework_Repo}" "Patch and sign CoreDisplay/IOKit framework"
-    #
-    # rebuild dyld_shared_cache to resolve display framework issues
-    #
-    _tidy_exec "sudo update_dyld_shared_cache -force" "Update dyld shared cache"
 }
 
 #
@@ -617,112 +363,22 @@ function _unlock_pixel_clock()
 function _check_and_fix_config()
 {
     #
-    # Check if the ig-platform-id is correct(i.e. ig-platform-id = 0x0a2e0008).
+    # Ensure / Force Graphics card to power.
     #
-    target_ig_platform_id="0x0a2e0008"
-    gClover_ig_platform_id=$(awk '/<key>ig-platform-id<\/key>.*/,/<\/string>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
-
-    #
-    # Added ig-platform-id injection.
-    #
-    if [ -z $gClover_ig_platform_id ];
-      then
-        ${doCommands[1]} "Add ':Graphics:ig-platform-id' string" ${config_plist}
-        ${doCommands[1]} "Set ':Graphics:ig-platform-id' $target_ig_platform_id" ${config_plist}
-      else
-        #
-        # ig-platform-id existed, check ig-platform-id.
-        #
-        if [[ $gClover_ig_platform_id != $target_ig_platform_id ]];
-          then
-            #
-            # Yes, we have to touch/modify the config.plist.
-            #
-            sed -ig "s/$gClover_ig_platform_id/$target_ig_platform_id/g" ${config_plist}
-        fi
+    if [[ `${doCommands[1]} "Print"  "${config_plist}"` == *"Intel = false"* ]]; then
+        ${doCommands[1]} "Set ':Graphics:Inject:Intel' true" "${config_plist}"
     fi
     #
-    # Check SSDT-m-M3800.aml
+    # Fix HiDPI boot graphics scale issue
     #
-    local dCheck_SSDT="SSDT-m-M3800.aml"
-    local gSortedOrder=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
-    local gSortedNumber=$(awk '/<key>SortedOrder<\/key>.*/,/<\/array>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g' | wc -l)
-    if [[ $gSortedOrder != *"$dCheck_SSDT"* ]];
-      then
-        #
-        # $dCheck_SSDT no found. Insert it.
-        #
-        ${doCommands[1]} "Add ':ACPI:SortedOrder:' string" ${config_plist}
-        ${doCommands[1]} "Set ':ACPI:SortedOrder:$gSortedNumber' $dCheck_SSDT" ${config_plist}
+    if [[ $gHorizontalRez -gt 1920 || $gSystemHorizontalRez -gt 1920 ]]; then
+        _PRINT_MSG "--->: ${BLUE}Setting EFILoginHiDPI & UIScale...${OFF}"
+        ${doCommands[1]} "Set :BootGraphics:EFILoginHiDPI 1" "${config_plist}"
+        ${doCommands[1]} "Set :BootGraphics:UIScale 2" "${config_plist}"
+    else
+        ${doCommands[1]} "Set :BootGraphics:EFILoginHiDPI 0" "${config_plist}"
+        ${doCommands[1]} "Set :BootGraphics:UIScale 1" "${config_plist}"
     fi
-
-    #
-    # Gain all binary patches from config.
-    #
-    if [ $gMINOR_VER -lt $gDelimitation_OSVer ];
-      then
-      #
-      # 10.12-, note: this detection will later remove due to optimization.
-      #
-      gClover_kexts_to_patch_data=$(awk '/<key>KextsToPatch<\/key>.*/,/<\/array>/' ${config_plist})
-    fi
-
-    #
-    # Repair the lid wake problem for 0x0a2e0008 by syscl
-    #
-    cLidWake="Enable lid wake after sleep for 0x0a2e0008 (c) syscl/lighting/Yating Zhou"
-    fLidWake="40000000 1e000000 05050901"
-    rLidWake="40000000 0f000000 05050901"
-    nLidWake="AppleIntelFramebufferAzul"
-    #
-    # Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl
-    #
-    cAzulFrameBuffer="Enable 160MB DVMT(48MB Framebuffer, 48MB Cursor),  3ports(port: 0000/eDP, 0105/HDMI, 0204/DP), 0x0a2e0008 (c) syscl"
-    fAzulFrameBuffer="08002e0a 01030303 00000004 00002002 00005001 00000060 6c050000 6c050000 00000000 00000000 00000800 02000000 30000000 01050900 00040000 07010000 02040a00 00040000 07010000"
-    rAzulFrameBuffer="08002e0a 01030303 0000000a 00000003 00000003 00000060 6c050000 6c050000 00000000 00000000 00000800 00040000 30000000 01051200 00080000 07010000 02040900 00040000 07010000"
-    nAzulFrameBuffer="AppleIntelFramebufferAzul"
-    #
-    # Check if "HDMI-audio, port 0105, port 0306, 0x0a2e0008 credit syscl" is located in config.plist.
-    #
-#    cHDMI="HDMI-audio, port 0204, port 0306, 0x0a2e0008 credit syscl"
-#    fHDMI="01050900 00040000 07010000 02040a00 00040000 07010000 ff000000 01000000 40000000"
-#    rHDMI="01050900 00080000 07010000 02040a00 00040000 07010000 03060800 00080000 07010000"
-#    nHDMI="AppleIntelFramebufferAzul"
-    #
-    # HDMI-audio 1/2
-    #
-    cHDMI_1="HDMI-audio, 1/2"
-    fHDMI_1="0b0c0000"
-    rHDMI_1="0c0c0000"
-    nHDMI_1="AppleHDAController"
-    #
-    # HDMI-audio 2/2
-    #
-    cHDMI_2="HDMI-audio, 2/2"
-    fHDMI_2="0c0a0000"
-    rHDMI_2="0c0c0000"
-    nHDMI_2="AppleHDAController"
-    #
-    # Now let's inject it.
-    #
-    cBinData=("$cLidWake" "$cAzulFrameBuffer" "$cHDMI_1" "$cHDMI_2")
-    fBinData=("$fLidWake" "$fAzulFrameBuffer" "$fHDMI_1" "$fHDMI_2")
-    rBinData=("$rLidWake" "$rAzulFrameBuffer" "$rHDMI_1" "$rHDMI_2")
-    nBinData=("$nLidWake" "$nAzulFrameBuffer" "$nHDMI_1" "$nHDMI_2")
-
-    for ((j=0; j<${#nBinData[@]}; ++j))
-    do
-      local gCmp_fString=$(_bin2base64 "$fBinData")
-      local gCmp_rString=$(_bin2base64 "$rBinData")
-      if [[ $gClover_kexts_to_patch_data != *"$gCmp_fString"* || $gClover_kexts_to_patch_data != *"$gCmp_rString"* ]];
-        then
-          #
-          # No patch existed in config.plist, add patch for it:
-          #
-          _kext2patch "${cBinData[j]}" "${fBinData[j]}" "${rBinData[j]}" "${nBinData[j]}"
-      fi
-    done
-
     #
     # Gain boot argv.
     #
@@ -1209,170 +865,6 @@ function _fix_usb_ejected_improperly()
 #--------------------------------------------------------------------------------
 #
 
-function _printBackupLOG()
-{
-    #
-    # Examples:
-    #
-    # 2016-07-17-h01_43_14
-    # ^^^^ ^^ ^^
-    #             ^^ ^^ ^^
-    local gDAY="${gBak_Time:5:2}/${gBak_Time:8:2}/${gBak_Time:0:4}"
-    local gTIME="${gBak_Time:12:2}:${gBak_Time:15:2}:${gBak_Time:18:2}"
-    local gBackupLOG=$(echo "${gBak_Dir}/BackupLOG.txt")
-
-    #
-    # Print Header.
-    #
-    echo "  Backup Recovery HD(BaseSystem.dmg)"                                                   > "${gBackupLOG}"
-    echo ''                                                                                       >>"${gBackupLOG}"
-    echo "  DATE:                     $gDAY"                                                      >>"${gBackupLOG}"
-    echo "  TIME:                     $gTIME"                                                     >>"${gBackupLOG}"
-    local gRecentFileMD5=$(md5 -q "${gBak_BaseSystem}")
-    echo "  Origin Recovery HD MD5:   ${gRecentFileMD5}"                                          >>"${gBackupLOG}"
-    local gPatchedFileMD5=$(md5 -q "${gBaseSystem_PATCH}")
-    echo "  Patched Recovery HD MD5:  ${gPatchedFileMD5}"                                         >>"${gBackupLOG}"
-    echo ''                                                                                       >>"${gBackupLOG}"
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _bakRecHDIsRequire()
-{
-    gLastOpenedFileMD5=$(md5 -q "${gRecoveryHD_DMG}")
-
-    if [ -d "${REPO}/Backups" ];
-      then
-        if [[ `ls ${REPO}/Backups/*` == *'.txt'* ]];
-          then
-            gBakFileNames=($(ls ${REPO}/Backups/*/*.txt))
-        fi
-    fi
-
-    if [[ "${#gBakFileNames[@]}" -gt 0 ]];
-      then
-        gBakFileMD5=($(cat ${gBakFileNames[@]} | grep 'Patched Recovery HD MD5:' | sed -e 's/.*: //' -e 's/ //'))
-        for checksum in "${gBakFileMD5[@]}"
-        do
-          if [[ $checksum == $gLastOpenedFileMD5 && ${gStop_Bak} != ${kBASHReturnSuccess} ]];
-            then
-              _PRINT_MSG "OK: Backup found. No more patch operations need"
-              gStop_Bak=${kBASHReturnSuccess}
-          fi
-        done
-    fi
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
-function _recoveryhd_fix()
-{
-    #
-    # Fixed RecoveryHD issues (c) syscl.
-    #
-    # Check BooterConfig = 0x2A.
-    #
-    local target_BooterConfig="0x2A"
-    local gClover_BooterConfig=$(awk '/<key>BooterConfig<\/key>.*/,/<\/string>/' ${config_plist} | egrep -o '(<string>.*</string>)' | sed -e 's/<\/*string>//g')
-    #
-    # Added BooterConfig = 0x2A(0x00101010).
-    #
-    if [ -z $gClover_BooterConfig ];
-      then
-        ${doCommands[1]} "Add ':RtVariables:BooterConfig' string" ${config_plist}
-        ${doCommands[1]} "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
-      else
-        #
-        # Check if BooterConfig = 0x2A.
-        #
-        if [[ $gClover_BooterConfig != $target_BooterConfig ]];
-          then
-            #
-            # Yes, we have to touch/modify the config.plist.
-            #
-            ${doCommands[1]} "Set ':RtVariables:BooterConfig' $target_BooterConfig" ${config_plist}
-        fi
-    fi
-
-    #
-    # Mount Recovery HD.
-    #
-    local gMountPoint="/tmp/RecoveryHD"
-    local gBaseSystem_RW="/tmp/BaseSystem_RW.dmg"
-    local gBaseSystem_PATCH="/tmp/BaseSystem_PATCHED.dmg"
-
-    #
-    # Locate Recovery HD
-    #
-    _tidy_exec "diskutil mount ${gRecoveryHD}" "Mount ${gRecoveryHD}"
-
-
-    #
-    # Check if backup RecoveryHD is required
-    #
-    _bakRecHDIsRequire
-    if [[ ${gStop_Bak} == ${kBASHReturnSuccess} ]]; then
-        #
-        # Already patched Recovery HD, return
-        #
-        return;
-    fi
-
-    #
-    # let's get started to backup and patch RecoveryHD
-    #
-    _touch "${gMountPoint}"
-    #
-    # Gain origin file format(e.g. UDZO...).
-    #
-    local gBaseSystem_FS=$(hdiutil imageinfo "${gRecoveryHD_DMG}" | grep -i "Format:" | sed -e 's/.*://' -e 's/ //')
-    local gTarget_FS=$(echo 'UDRW')
-
-    #
-    # Backup origin BaseSystem.dmg to ${REPO}/Backups
-    #
-    _touch "${gBak_Dir}"
-    cp "${gRecoveryHD_DMG}" "${gBak_Dir}"
-    gBak_BaseSystem="${gBak_Dir}/BaseSystem.dmg"
-    chflags nohidden "${gBak_BaseSystem}"
-
-    #
-    # Start to override.
-    #
-    _PRINT_MSG "--->: Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w) ..."
-    _tidy_exec "hdiutil convert "${gBak_BaseSystem}" -format ${gTarget_FS} -o ${gBaseSystem_RW} -quiet" "Convert ${gBaseSystem_FS}(r/o) to ${gTarget_FS}(r/w)"
-    _tidy_exec "hdiutil attach "${gBaseSystem_RW}" -nobrowse -quiet -readwrite -noverify -mountpoint ${gMountPoint}" "Attach Recovery HD"
-    _unlock_pixel_clock "${gMountPoint}"
-    _tidy_exec "hdiutil detach $gMountPoint" "Detach mountpoint"
-    #
-    # Convert to origin format.
-    #
-    _PRINT_MSG "--->: Convert ${gTarget_FS}(r/w) to ${gBaseSystem_FS}(r/o) ..."
-    _tidy_exec "hdiutil convert "${gBaseSystem_RW}" -format ${gBaseSystem_FS} -o ${gBaseSystem_PATCH} -quiet" "Convert ${gTarget_FS}(r/w) to ${gBaseSystem_FS}(r/o)"
-    _PRINT_MSG "--->: Updating Recovery HD for DELL M3800/XPS9530..."
-    cp ${gBaseSystem_PATCH} "${gRecoveryHD_DMG}"
-    chflags hidden "${gRecoveryHD_DMG}"
-
-    #
-    # Backup and patch finish, print out RecoveryHD dmg info
-    #
-    _printBackupLOG
-
-    #
-    # Clean redundant dmg files.
-    #
-    _tidy_exec "rm $gBaseSystem_RW $gBaseSystem_PATCH" "Clean redundant dmg files"
-    _tidy_exec "diskutil unmount ${gRecoveryHD}" "Unmount ${gRecoveryHD}"
-}
-
-#
-#--------------------------------------------------------------------------------
-#
-
 function main()
 {
     #
@@ -1427,12 +919,6 @@ function main()
     fi
     _getESPMntPoint ${targetEFI}
     _setESPVariable
-
-    #
-    # Ensure / Force Graphics card to power.
-    #
-    _initIntel
-    _getEDID
 
     #
     # Copy origin aml to raw.
@@ -1608,24 +1094,6 @@ function main()
     _tidy_exec "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
 
     #
-    # Detect which SSDT for processor to be installed.
-    #
-    if [[ `sysctl machdep.cpu.brand_string` == *"i7-4702HQ"* ]];
-      then
-        _tidy_exec "cp "${prepare}"/CpuPm-4702HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4702HQ${OFF}"
-    fi
-
-    if [[ `sysctl machdep.cpu.brand_string` == *"i7-4712HQ"* ]]
-      then
-        _tidy_exec "cp "${prepare}"/CpuPm-4712HQ.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i7-4712HQ${OFF}"
-    fi
-
-    if [[ `sysctl machdep.cpu.brand_string` == *"i5-4200H"* ]]
-      then
-        _tidy_exec "cp "${prepare}"/CpuPm-4200H.aml "${compile}"/SSDT-pr.aml" "Generate C-States and P-State for Intel ${BLUE}i5-4200H${OFF}"
-    fi
-
-    #
     # Install SSDT-m for ALS0.
     #
     _PRINT_MSG "--->: ${BLUE}Installing SSDT-m-M3800.aml to ./DSDT/compile...${OFF}"
@@ -1653,41 +1121,16 @@ function main()
     _update_thm
 
     #
-    # Install audio.
+    # Remove old patched HDA kext if exists.
     #
-    _PRINT_MSG "--->: ${BLUE}Installing audio...${OFF}"
-    _tidy_exec "install_audio" "Install audio"
+    _PRINT_MSG "--->: ${BLUE}Cleaning up old patched HDA kext if exists...${OFF}"
+    _tidy_exec "remove_patched_hda_kext" "Clean up old patched HDA kext if exists"
 
     #
-    # Fix HiDPI boot graphics issue
+    # Fix Clover's configuration for old config.plist compatible.
     #
-    if [[ $gHorizontalRez -gt 1920 || $gSystemHorizontalRez -gt 1920 ]];
-    _PRINT_MSG "--->: ${BLUE}Setting EFILoginHiDPI & UIScale...${OFF}"
-    then
-      ${doCommands[1]} "Set :BootGraphics:EFILoginHiDPI 1" "${config_plist}"
-      ${doCommands[1]} "Set :BootGraphics:UIScale 2" "${config_plist}"
-    else
-      ${doCommands[1]} "Set :BootGraphics:EFILoginHiDPI 0" "${config_plist}"
-      ${doCommands[1]} "Set :BootGraphics:UIScale 1" "${config_plist}"
-    fi
-
-    #
-    # Patch IOKit/CoreDisplay.
-    #
-    _PRINT_MSG "NOTE: Set ${BOLD}System Agent (SA) Configuration—>Graphics Configuration->DVMT Pre-Allocated->${RED}『160MB』${OFF}"
-
-    if [ $gPatchIOKit -eq 0 ]; then
-        #
-        # Patch CoreDisplay/IOKit Framework
-        #
-        _unlock_pixel_clock
-    fi
-
-    #
-    # Lead to lid wake on 0x0a2e0008 by syscl/lighting/Yating Zhou.
-    #
-    _PRINT_MSG "--->: ${BLUE}Leading to lid wake on 0x0a2e0008 (c) syscl/lighting/Yating Zhou...${OFF}"
-    _tidy_exec "_check_and_fix_config" "Lead to lid wake on 0x0a2e0008"
+    _PRINT_MSG "--->: ${BLUE}Fixing Clover's configuration...${OFF}"
+    _tidy_exec "_check_and_fix_config" "Fix Clover's configuration"
 
     #
     # Fix issue that external devices ejected improperly upon sleep (c) syscl/lighting/Yating Zhou.
@@ -1695,28 +1138,14 @@ function main()
     _fix_usb_ejected_improperly
 
     #
-    # Fixed Recovery HD entering issues (c) syscl.
-    #
-    gRecoveryHD=$(_locate_rhd ${targetEFI})
-    if [ ! -z ${gRecoveryHD} ];
-      then
-        #
-        # Recovery HD found, patch it or not?
-        #
-        if [ $gPatchRecoveryHD -eq 0 ];
-          then
-            #
-            # Yes, patch Recovery HD.
-            #
-            _recoveryhd_fix
-        fi
-    fi
-
-    #
     # Rebuild kernel extensions cache.
     #
     _PRINT_MSG "--->: ${BLUE}Rebuilding kernel extensions cache...${OFF}"
     _tidy_exec "rebuild_kernel_cache" "Rebuild kernel extensions cache"
+    #
+    # Rebuild dyld_shared_cache to resolve display framework issues
+    #
+    _tidy_exec "sudo update_dyld_shared_cache -force" "Update dyld shared cache"
 
     #
     # Clean up backup
