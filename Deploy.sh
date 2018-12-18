@@ -1417,7 +1417,14 @@ function main()
     diskutil list
     printf "Enter ${RED}EFI's${OFF} IDENTIFIER, e.g. ${BOLD}disk0s1${OFF}"
     read -p ": " targetEFI
-    _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
+    if [ $gMINOR_VER -ge 14 ]; then
+        #
+        # 10.14+
+        #
+        _tidy_exec "sudo diskutil mount ${targetEFI}" "Mount ${targetEFI}"
+    else
+        _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
+    fi
     _getESPMntPoint ${targetEFI}
     _setESPVariable
 
