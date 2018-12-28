@@ -1,5 +1,9 @@
 M3800-macOS Changelog
 =======================
+2018-12-27
+
+- Enable native/true multitouch gestures on PS2 controller credit @kprinssu
+
 2018-10-01
 
 - macOS Mojave ready
