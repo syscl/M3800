@@ -1,5 +1,9 @@
 M3800-macOS Changelog
 =======================
+2019-01-01
+
+- Fix up the ACPI interpreter error (aka Store (TCAP, \_PR.CPU0._PTC ()) issue)
+
 2018-12-27
 
 - Enable native/true multitouch gestures on PS2 controller credit @kprinssu

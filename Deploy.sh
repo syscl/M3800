@@ -1,9 +1,6 @@
 #!/bin/sh
-
-#
-# syscl/Yating Zhou/lighting from bbs.PCBeta.com
-# Merge for Dell Precision M3800 and XPS15 (9530).
-#
+# (c) syscl 2016-2019
+# Peform essential patching for Dell XPS15 9530 or Precision M3800.
 
 #================================= GLOBAL VARS ==================================
 
@@ -448,7 +445,7 @@ function _bin2base64()
 function _find_acpi()
 {
     #
-    # Search specification tables by syscl/Yating Zhou.
+    # Search specific tables by syscl/Yating Zhou.
     #
     dslfiles=($(find ${REPO}/DSDT/raw/ -type f -name \*.dsl -exec sh -c 'basename {} .dsl' \; ))
 
@@ -976,10 +973,8 @@ function main()
     _PRINT_MSG "--->: ${BLUE}Disassembling tables...${OFF}"
     _tidy_exec ""${REPO}"/tools/iasl -w1 -da -dl "${REPO}"/DSDT/raw/DSDT.aml "${REPO}"/DSDT/raw/SSDT-*.aml" "Disassemble tables"
 
-    #
-    # Search specification tables by syscl/Yating Zhou.
-    #
-    _tidy_exec "_find_acpi" "Search specification tables by syscl/Yating Zhou"
+    # Search specific tables
+    _tidy_exec "_find_acpi" "Locate specific ACPI tables."
 
     #
     # DSDT Patches.
@@ -1049,6 +1044,9 @@ function main()
     #
     if [ -f "${REPO}/DSDT/raw/${OptRef}.dsl" ]; then
         _PRINT_MSG "--->: ${BLUE}Patching ${OptRef}.dsl${OFF}"
+        # Fix up the ACPI interpreter error
+        sed -i '' -e  's/Store (TCAP, \\\_PR.CPU0._PTC ())//g' "${REPO}/DSDT/raw/${OptRef}.dsl"
+        _PRINT_MSG "OK: Fix up the ACPI interpreter error (aka Store (TCAP, \_PR.CPU0._PTC ()) issue)"
         _tidy_exec "patch_acpi ${OptRef} syscl "WMMX-invalid-operands"" "Remove invalid operands"
         _tidy_exec "patch_acpi ${OptRef} graphics "graphics_Rename-GFX0"" "Rename GFX0 to IGPU"
         _tidy_exec "patch_acpi ${OptRef} syscl "graphics_Disable_Nvidia"" "Disable Nvidia card (Non-operational in OS X)"
