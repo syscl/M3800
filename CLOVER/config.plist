@@ -72,6 +72,19 @@
 		<key>UIScale</key>
 		<integer>1</integer>
 	</dict>
+	<key>Devices</key>
+	<dict>
+		<key>Audio</key>
+		<dict>
+			<key>Inject</key>
+			<integer>27</integer>
+		</dict>
+		<key>FakeID</key>
+		<dict>
+			<key>IntelGFX</key>
+			<string>0x04128086</string>
+		</dict>
+	</dict>
 	<key>GUI</key>
 	<dict>
 		<key>Custom</key>

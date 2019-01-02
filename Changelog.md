@@ -3,6 +3,7 @@ M3800-macOS Changelog
 2019-01-01
 
 - Fix up the ACPI interpreter error (aka Store (TCAP, \_PR.CPU0._PTC ()) issue)
+- Fix up HD4600 (0412) inject issues and Audio (layoutID = 0x1B, 27) inject issue
 
 2018-12-27
 
