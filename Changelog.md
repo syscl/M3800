@@ -1,5 +1,10 @@
 M3800-macOS Changelog
 =======================
+2019-01-02
+
+- Resolved the interference of Lilu that will force inject external GPU properties that cause the lid wake issue
+- Clean up the boot arguements
+
 2019-01-01
 
 - Fix up the ACPI interpreter error (aka Store (TCAP, \_PR.CPU0._PTC ()) issue)
