@@ -3,6 +3,7 @@ M3800-macOS Changelog
 2019-01-02
 
 - Resolved the interference of Lilu that will force inject external GPU properties that cause the lid wake issue
+- Attempt to clean up dead code and configuration to fix issue #109 
 - Clean up the boot arguements
 
 2019-01-01
