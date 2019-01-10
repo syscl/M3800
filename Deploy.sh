@@ -45,13 +45,12 @@ gESPMountPoint=""
 decompile="${REPO}/DSDT/raw/"
 precompile="${REPO}/DSDT/precompile/"
 compile="${REPO}/DSDT/compile/"
-tools="${REPO}/tools/"
+gToolPath="${REPO}/tools"
 raw="${REPO}/DSDT/raw"
 prepare="${REPO}/DSDT/prepare"
 config_plist=""
 EFI_INFO="${REPO}/DSDT/EFIINFO"
 gInstall_Repo="/usr/local/sbin/"
-gFrom="${REPO}/tools"
 gUSBSleepConfig="/tmp/com.syscl.externalfix.sleepwatcher.plist"
 gUSBSleepScript="/tmp/sysclusbfix.sleep"
 gUSBWakeScript="/tmp/sysclusbfix.wake"
@@ -844,7 +843,7 @@ function _fix_usb_ejected_improperly()
     #
     _PRINT_MSG "--->: Installing external devices sleep patch..."
     sudo mkdir -p "${gInstall_Repo}"
-    _tidy_exec "sudo cp "${gFrom}/sleepwatcher" "${gInstall_Repo}"" "Install sleepwatcher daemon"
+    _tidy_exec "sudo cp "${gToolPath}/sleepwatcher" "${gInstall_Repo}"" "Install sleepwatcher daemon"
     _tidy_exec "sudo cp "${gUSBSleepConfig}" "${to_Plist}"" "Install configuration of sleepwatcher daemon"
     _tidy_exec "sudo cp "${gUSBSleepScript}" "${to_shell_sleep}"" "Install sleep script"
     _tidy_exec "sudo cp "${gUSBWakeScript}" "${to_shell_wake}"" "Install wake script"
@@ -900,20 +899,12 @@ function main()
     _tidy_exec "_touch "${precompile}"" "Create ./DSDT/precompile"
     _tidy_exec "_touch "${compile}"" "Create ./DSDT/compile"
 
-    #
-    # Mount esp.
-    #
+    # Mount EFI
     diskutil list
     printf "Enter ${RED}EFI's${OFF} IDENTIFIER, e.g. ${BOLD}disk0s1${OFF}"
     read -p ": " targetEFI
-    if [ $gMINOR_VER -ge 14 ]; then
-        #
-        # 10.14+
-        #
-        _tidy_exec "sudo diskutil mount ${targetEFI}" "Mount ${targetEFI}"
-    else
-        _tidy_exec "diskutil mount ${targetEFI}" "Mount ${targetEFI}"
-    fi
+    _tidy_exec "${gToolPath}/mnt ${targetEFI}" "Mount ${targetEFI}"
+    # Set up mount point path
     _getESPMntPoint ${targetEFI}
     _setESPVariable
 
@@ -999,7 +990,7 @@ function main()
     _tidy_exec "patch_acpi DSDT syscl "remove_glan"" "Remove GLAN device"
     _tidy_exec "patch_acpi DSDT syscl "syscl_iGPU_MEM2"" "iGPU TPMX to MEM2"
     _tidy_exec "patch_acpi DSDT syscl "syscl_IMTR2TIMR"" "IMTR->TIMR, _T_x->T_x"
-#   _tidy_exec "patch_acpi DSDT syscl "syscl_ALSD2ALS0"" "ALSD->ALS0"
+   _tidy_exec "patch_acpi DSDT syscl "syscl_ALSD2ALS0"" "ALSD->ALS0"
     #
     # Modificate ACPI for macOS to load devices correctly
     #
@@ -1090,12 +1081,6 @@ function main()
     #
     _PRINT_MSG "--->: ${BLUE}Copying SSDT-rmne.aml to ./DSDT/compile...${OFF}"
     _tidy_exec "cp "${prepare}"/SSDT-rmne.aml "${compile}"" "Copy SSDT-rmne.aml to ./DSDT/compile"
-
-    #
-    # Install SSDT-m for ALS0.
-    #
-    _PRINT_MSG "--->: ${BLUE}Installing SSDT-m-M3800.aml to ./DSDT/compile...${OFF}"
-    _tidy_exec "cp "${prepare}"/SSDT-m-M3800.aml "${compile}"" "Copy SSDT-m-M3800.aml to ./DSDT/compile"
 
     #
     # Clean up dynamic SSDTs.
