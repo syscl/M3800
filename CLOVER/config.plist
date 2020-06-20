@@ -267,6 +267,20 @@
 			</dict>
 			<dict>
 				<key>Comment</key>
+				<string>Enable lid wake after sleep for 0x0a2e0008 10.13.x-10.15.x</string>
+				<key>Disabled</key>
+				<false/>
+				<key>Find</key>
+				<data>AQAAAEAAAAAeAgAABQUJAQ==</data>
+				<key>InfoPlistPatch</key>
+				<false/>
+				<key>Name</key>
+				<string>AppleIntelFramebufferAzul</string>
+				<key>Replace</key>
+				<data>AQAAAEAAAAAfAgAABQUJAQ==</data>
+			</dict>
+			<dict>
+				<key>Comment</key>
 				<string>Enable 160MB DVMT (48MB Framebuffer, 48MB Cursor),  HDMI/DP @ 0105, 0204 (c) syscl</string>
 				<key>Disabled</key>
 				<false/>

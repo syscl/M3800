@@ -1,5 +1,12 @@
 M3800-macOS Changelog
 =======================
+2020-06-19
+
+- Fixed lid wake from 10.13.x-10.15.x
+- Updated to Clover 5119
+- Switch to a much better VoodooPS2 + VoodooInput
+- Removed unused kexts
+
 2019-01-02
 
 - Resolved the interference of Lilu that will force inject external GPU properties that cause the lid wake issue
