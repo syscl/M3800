@@ -1,5 +1,9 @@
 M3800-macOS Changelog
 =======================
+2020-06-27
+
+- Changed drivers64UEFI to drivers/UEFI
+
 2020-06-19
 
 - Fixed lid wake from 10.13.x-10.15.x

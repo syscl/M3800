@@ -60,7 +60,7 @@ to_Plist="/Library/LaunchDaemons/com.syscl.externalfix.sleepwatcher.plist"
 to_shell_sleep="/etc/sysclusbfix.sleep"
 to_shell_wake="/etc/sysclusbfix.wake"
 gRT_Config="/Applications/Wireless Network Utility.app"/${gMAC_adr}rfoff.rtl
-drivers64UEFI="${REPO}/CLOVER/drivers64UEFI"
+drivers64UEFI="${REPO}/CLOVER/drivers/UEFI"
 t_drivers64UEFI=""
 clover_tools="${REPO}/CLOVER/tools"
 t_clover_tools=""
@@ -238,7 +238,7 @@ function _getESPMntPoint()
 function _setESPVariable()
 {
     config_plist="${gESPMountPoint}/EFI/CLOVER/config.plist"
-    t_drivers64UEFI="${gESPMountPoint}/EFI/CLOVER/drivers64UEFI"
+    t_drivers64UEFI="${gESPMountPoint}/EFI/CLOVER/drivers/UEFI"
     t_clover_tools="${gESPMountPoint}/EFI/CLOVER/tools"
 }
 
